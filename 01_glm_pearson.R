@@ -4,6 +4,7 @@
 
 library(DHARMa)
 library(tidyverse)
+library(here)
 
 #####################################
 ##### Instructions & Simulating #####
@@ -58,7 +59,8 @@ for (i in intercept){
 
 
 # saving sim results
-save(result,out.out,sampleSize,intercept, file="glm_pearson_restest.Rdata")
+save(result,out.out,sampleSize,intercept, file=here("data", 
+                                                    "glm_pearson_restest.Rdata"))
 
 #######################################
 ##### Figures and summary results #####
@@ -91,13 +93,13 @@ ggplot(res.ks, aes(y=rev(as.factor(sampleSize)),x=as.factor(intercept), fill=col
   geom_text(aes(label=round(ks.pvalue,3))) +
   scale_fill_manual(values= c("#B9DBFA","#F7C6C6")) +
   ggtitle("P-values of KS test for pearson Stats and chisq distr")
-ggsave("1_glm_pearson_ksP-values.jpeg")
+ggsave(here("figures", "1_glm_pearson_ksP-values.jpeg"))
 
 
 #### Distribution plots save as PDF ####
 
 
-pdf("1_glm_pearson_distributions.pdf", width=15, height=15)
+pdf(here("figures", "1_glm_pearson_distributions.pdf"), width=15, height=15)
 par(mfrow=c(length(sampleSize),length(intercept)))
 
 for(i in sampleSize){
@@ -140,7 +142,7 @@ ggplot(prop.sig, aes(y=rev(as.factor(sampleSize)),x=as.factor(intercept),
   geom_text(aes(label=round(p.value,3))) +
   scale_fill_gradient2(name="type I", low="white", high=2, midpoint=0.05) +
   ggtitle("Proportion of significant Pvalues for Pearson-Chisquare dispersion test")
-ggsave("1_glm_pearson_typeI_dispersion.jpeg")
+ggsave(here("figures", "1_glm_pearson_typeI_dispersion.jpeg"))
 
 
 dat <- left_join(res.ks, prop.sig, by=c("sampleSize","intercept" ))
@@ -151,7 +153,10 @@ ggplot(dat, aes(x=ks.pvalue, y=p.value, col=as.factor(sampleSize))) +
   geom_text(aes(label=intercept)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
   geom_vline(xintercept = 0.05, linetype="dashed") +
-  ylab("Type 1 error for dispersion test") 
+  ylab("Type 1 error for dispersion test") +
+  ggtitle("Comparing type I dispersion test with KS test",
+          subtitle= "Number are intercept values")
+ggsave(here("figures", "1_glm_pearson_typeI_ks.jpeg"))
 
 ggplot(dat, aes(x=ks.pvalue, y=p.value, col=as.factor(intercept))) + 
   geom_text(aes(label=sampleSize)) +
