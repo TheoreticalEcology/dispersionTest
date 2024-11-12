@@ -46,7 +46,7 @@ intercept <- c(0,1,2,4,8,16,32)
 final.res <- list()
 out.out.out <- list()
 
-for (k in 1:2){
+for (k in 1:100){
 set.seed(k)  
 
   result <- list()
@@ -57,7 +57,7 @@ for (i in intercept){
   
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
                        intercept = i,
-                       nRep=1000, parallel = 7)
+                       nRep=1000, parallel = 15)
   
   chistats <- as.data.frame(apply(as.data.frame(out$simulations), 2, unlist ))
   chistats$intercept <- i
@@ -68,14 +68,41 @@ final.res[[k]] <- result
 out.out.out[[k]] <- out.out
 }
 
+names(final.res) <- 1:length(final.res)
+
+final <- bind_rows(final.res, .id="sim")
+
+ks.p <- function(x, y) ks.test(x,rchisq(100000,df=y))$p.value
+
+tests <- final %>% group_by(sim,controlValues,intercept) %>%
+  summarise(ks.p = ks.p(pearson.stat,rdf))
+
+prop.test <- tests %>% group_by(controlValues, intercept) %>%
+  summarise(ks.sig = sum(ks.p<0.05))
+
+ggplot(prop.test, aes(y=ks.sig, x=as.factor(controlValues),
+                      col=as.factor(intercept))) +
+  geom_point() + geom_line(aes(x=as.numeric(as.factor(controlValues)))) +
+  scale_color_discrete("intercept")+
+  xlab("sampleSize") + ylab("Prop of significant KS test")
+
+ggplot(prop.test, aes(y=ks.sig, col=as.factor(controlValues),
+                      x=as.factor(intercept))) +
+  geom_point() + geom_line(aes(x=as.numeric(as.factor(intercept)))) +
+  scale_color_discrete("sampleSize")+
+  xlab("intercept") + ylab("Prop of significant KS test")
 
 
-
-
-
-# saving sim results
-save(result,out.out,sampleSize,intercept, file=here("data", 
-                                                    "glm_pearson_restest.Rdata"))
+ggplot(prop.test, aes(y=rev(as.factor(controlValues)),
+                      x=as.factor(intercept), 
+                      fill=ks.sig)) +
+  geom_tile(show.legend = F) +
+  scale_y_discrete("sampleSize", labels=c(500,100,50,40,30,20,10)) +
+  scale_x_discrete("intercept", position = "top")+
+  geom_text(aes(label=round(ks.sig,3))) +
+  scale_fill_gradient(low="white", high=2) +
+  ggtitle("Prop of significant KS tests for pearson Stats and chisq distr")
+ggsave(here("figures", "1_glm_pearson_ksP_propsig.jpeg"))
 
 #######################################
 ##### Figures and summary results #####
@@ -99,6 +126,9 @@ res.ks <- data.frame(sampleSize = rep(sampleSize, each=7),
                      ks.pvalue = unlist(ks.p),
                      ks.d = unlist(ks.d))
 res.ks$col = ifelse(res.ks$ks.pvalue<0.05,"#F7C6C6","#B9DBFA" )
+
+
+
 
 
 ggplot(res.ks, aes(y=rev(as.factor(sampleSize)),x=as.factor(intercept), fill=col)) +
