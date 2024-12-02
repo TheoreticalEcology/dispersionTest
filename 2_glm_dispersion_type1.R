@@ -56,7 +56,7 @@ for (i in intercept){
 
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
                        intercept = i,
-                       nRep=1000, parallel = 15)
+                       nRep=10000, parallel = T)
   out.out[[length(out.out) + 1]] <- out
 }
 
@@ -64,22 +64,26 @@ names(out.out) <- intercept
 
 # saving sim results
 save(out.out,sampleSize,intercept, file=here("data", 
-                                                    "2_glm_dispersion_type1.Rdata"))
+                                                "2_glm_dispersion_type1.Rdata"))
 
 #load(here("data", "2_glm_dispersion_type1.Rdata"))
 
 
 # prep data
-prop.sig <- list()
-for (i in 1:length(out.out)) {
-  prop.sig <- rbind(prop.sig, out.out[[i]]$summaries$propSignificant)
-}
-prop.sig$sampleSize = prop.sig$controlValues
-prop.sig$intercept = rep(intercept, each=length(unique(sampleSize)))
+# using the summary table doesn't work because there are NAs in the DHARMa results
 
-prop.sig <- prop.sig %>% pivot_longer(c(Pear.p.val,DHA.p.val, Ref.p.val), 
-                                      names_to = "tests", values_to = "p.val")
-prop.sig$binom.test <- binom.test(prop.sig$p.val,n = 1000,p=0.05)
+# prop.sig <- list()
+# for (i in 1:length(out.out)) {
+#   prop.sig <- rbind(prop.sig, out.out[[i]]$summaries$propSignificant)
+# }
+# prop.sig$sampleSize = prop.sig$controlValues
+# prop.sig$intercept = rep(intercept, each=length(unique(sampleSize)))
+# 
+# prop.sig <- prop.sig %>% pivot_longer(c(Pear.p.val,DHA.p.val, Ref.p.val), 
+#                                       names_to = "tests", values_to = "p.val")
+# prop.sig$binom.test <- binom.test(prop.sig$p.val,n = 1000,p=0.05)
+
+
 
 simuls <- list()
 for (i in 1:length(out.out)) {
@@ -146,7 +150,7 @@ ggplot(simuls, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   ggtitle("Dispersion tests: Type I error rates for GLM Poisson",
-          sub = "95% CIs with exact Binomial tests; 1000 simulations") +
+          sub = "95% CIs with exact Binomial tests; 10000 simulations") +
   xlab("Sample size") +
   ylab("Type I error") +
   theme(panel.background  = element_rect(color = "black"))
