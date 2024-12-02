@@ -129,43 +129,39 @@ sims <- bind_rows(final.sims, .id="sim")
 sims %>% filter(controlValues == 10) %>%
   ggplot(aes(x=Pear.stat, group=sim)) +
   geom_density(col=2, alpha=0.5) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   stat_function(fun = dchisq, args = list(df = 8), col="black")+
-  ggtitle("N=10") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
   
 sims %>% filter(controlValues == 50) %>%
   ggplot(aes(x=Pear.stat, group=sim)) +
   geom_density(col=2, alpha=0.5) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   stat_function(fun = dchisq, args = list(df = 48), col="black")+
-  ggtitle("N=50") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
   
 sims %>% filter(controlValues == 100) %>%
   ggplot(aes(x=Pear.stat, group=sim)) +
   geom_density(col=2, alpha=0.5) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   stat_function(fun = dchisq, args = list(df = 98), col="black")+
-  ggtitle("N=100") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
 
 sims %>% filter(controlValues == 500) %>%
   ggplot(aes(x=Pear.stat, group=sim)) +
   geom_density(col=2, alpha=0.5) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   stat_function(fun = dchisq, args = list(df = 498), col="black")+
-  ggtitle("N=500") +
   xlab("Pearson Stats") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
-plot_layout(ncol=1) + plot_annotation(title="Pearson Stats distribution")
+plot_layout(ncol=1) + plot_annotation(title="Binomial: Pearson Stats distribution")
 ggsave(here("figures", "1_glmBin_pearsonChisq_distrib.jpeg"), width=15,
        height=15)
 
@@ -180,47 +176,41 @@ sims.mean <- sims %>% group_by(sim, controlValues,intercept) %>%
 
 sims.mean %>% filter(controlValues == 10) %>%
   ggplot(aes(x=mean.pearson)) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   geom_density(col=2) +
   stat_function(fun = dchisq, args = list(df = 8), col="black") +
-  ggtitle("N=10") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
-
 
 sims.mean %>% filter(controlValues == 50) %>%
   ggplot(aes(x=mean.pearson)) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   geom_density(col=2) +
   stat_function(fun = dchisq, args = list(df = 48), col="black") +
-  ggtitle("N=50") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
 
-
 sims.mean %>% filter(controlValues == 100) %>%
   ggplot(aes(x=mean.pearson)) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   geom_density(col=2) +
   stat_function(fun = dchisq, args = list(df = 98), col="black") +
-  ggtitle("N=100") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
 
 sims.mean %>% filter(controlValues == 500) %>%
   ggplot(aes(x=mean.pearson)) +
-  facet_grid(~intercept)+
+  facet_grid(controlValues~intercept)+
   geom_density(col=2) +
   stat_function(fun = dchisq, args = list(df = 498), col="black") +
-  ggtitle("N=500") +
   xlab("Pearson Stats") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
   
-plot_layout(ncol=1) + plot_annotation(title="Mean Pearson Stats distribution")
+plot_layout(ncol=1) + plot_annotation(title="Binomial: Mean Pearson Stats distribution")
 
 ggsave(here("figures", "1_glmBin_pearsonChisq_distrib_MEAN.jpeg"), width=15,
        height=15)
