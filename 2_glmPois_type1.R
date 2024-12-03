@@ -9,10 +9,10 @@ library(here)
 library(patchwork)
 
 #####################################
-##### Instructions & Simulating #####
+##### Instructions & Simulations ####
 #####################################
 
-# 1) Simulating 1000 Poisson datasets with different sample sizes and intercepts
+# 1) Simulating 10000 Poisson datasets with different sample sizes and intercepts
 #       - sampleSize: c(10,50,100,500)
 #       - intercept:  c(-3,-1,0,2,4)
 # 2) fitting them to correct GLM models

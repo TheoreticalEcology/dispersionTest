@@ -9,7 +9,7 @@ library(here)
 #library(patchwork)
 
 #####################################
-##### Instructions & Simulation #####
+##### Instructions & Simulations #####
 #####################################
 
 # 1) Simulating 10000 binomial prop datasets with different sample sizes and intercepts. Fixing the number of trials to 20
