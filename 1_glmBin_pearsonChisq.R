@@ -24,7 +24,7 @@ library(here)
 
 # sampleSizes and intercepts
 sampleSize = c(10,50,100,500)
-intercept <- c(-3,-1,0,1,3)
+
 
 
 # KS TEST
@@ -38,10 +38,13 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
   result <- list()
   sims <- list()
   
-  for (i in intercept){
+  intercept <- c(-3,-1,0,1,3)
+  
+  for (i in 1:length(intercept)){
     
     calculateStatistics <- function(control = 10){
-      testData <- DHARMa::createData(sampleSize = control, intercept = i,
+      testData <- DHARMa::createData(sampleSize = control, 
+                                     intercept = intercept[i],
                                      numGroups = 10,
                                      randomEffectVariance = 0,
                                      binomialTrials = 10,
@@ -63,13 +66,13 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
                          nRep=1000, parallel = T)
     #simulations
     stats <- as.data.frame(apply(as.data.frame(out$simulations), 2, unlist))
-    stats$intercept <- i
+    stats$intercept <- intercept[i]
     sims <- rbind(stats,sims)
     
     #results
     res <- stats %>% group_by(controlValues) %>%
       summarise(ks.p = ks.p(Pear.stat,rdf))
-    res$intercept <- i
+    res$intercept <- intercept[i]
     result <- rbind(result,res)
   }
   final.res[[k]] <- result
