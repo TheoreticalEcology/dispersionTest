@@ -195,7 +195,7 @@ propSig %>% filter(intercept == 0) %>%
   ylim(0,0.35) +
   ggtitle("Poisson GLMM: power 5 dispersion tests",
           subtitle = "100 sim; intercept=0")
-
+ggsave(here("figures", "3_glmm_dispersion.jpeg"))
 
 
 
