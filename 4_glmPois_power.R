@@ -65,7 +65,23 @@ names(out.out) <- sampleSize
 save(out.out,sampleSize,overdispersion, file=here("data", 
                                              "4_glmPois_power.Rdata"))
 
-#load(here("data", "2_glmPois_type1.Rdata"))
 
 
 # prep data
+
+#load(here("data", "4_glmPois_power.Rdata"))
+
+props <- list()
+for (i in 1:length(out.out)){
+  suma <- out.out[[i]]$simulations
+  suma$sampleSize <- sampleSize[i]
+}
+
+
+
+
+
+
+
+
+
