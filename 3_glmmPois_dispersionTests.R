@@ -12,7 +12,7 @@ library(here)
 
 
 #####################################
-##### Instructions & Simulating #####
+##### Instructions & Simulations #####
 #####################################
 
 # GLMM Poisson tests of type 1 and power for 5 dispersion tests
@@ -96,7 +96,7 @@ for (i in REvariance){ # Varying RE variances
                            intercept = k,
                            sampleSize = j,
                            REvariance = i,
-                           nRep=100, parallel = 15)
+                           nRep=100, parallel = T)
       output[[length(output) + 1]] <- out
 
     }
@@ -110,7 +110,7 @@ nms <- expand.grid(inter = intercept,
 
 names(output) <- as.vector(nms)$name
 
-save(output, file=here("data", "3_glmm_dispersionTests.Rdata"))
+save(output, file=here("data", "3_glmmPois_dispersionTests.Rdata"))
 
 
 
@@ -124,7 +124,7 @@ theme_set(theme_cowplot() +
            theme(panel.background=element_rect(color="black")))
 library(patchwork)
 
-load(here("data", "3_glmm_dispersionTests.Rdata"))
+load(here("data", "3_glmmPois_dispersionTests.Rdata"))
 
 props <- list()
 for (i in 1:length(output)){
@@ -194,8 +194,9 @@ propSig %>% filter(intercept == 0) %>%
   xlab("Overdispersion") + ylab("Prop")+
   ylim(0,0.35) +
   ggtitle("Poisson GLMM: power 5 dispersion tests",
-          subtitle = "100 sim; intercept=0")
-ggsave(here("figures", "3_glmm_dispersion.jpeg"))
+          subtitle = "100 sim; intercept=0") +
+  theme(panel.grid.major = element_line(color="gray",linewidth=0.1) )
+ggsave(here("figures", "3_glmmPois_dispersion.jpeg"))
 
 
 
