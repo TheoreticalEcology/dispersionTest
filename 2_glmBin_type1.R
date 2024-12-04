@@ -34,6 +34,7 @@ for (i in intercept){
     # data
     testData <- DHARMa::createData(sampleSize = control,
                                    numGroups = 1,
+                                   intercept = i,
                                    binomialTrials = 20,
                                    family = binomial())
     # model
@@ -57,7 +58,6 @@ for (i in intercept){
   
   
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                       intercept = i,
                        nRep=10000, parallel = T, exportGlobal = T)
   out.out[[length(out.out) + 1]] <- out
 }
