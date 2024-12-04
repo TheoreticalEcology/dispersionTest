@@ -33,7 +33,9 @@ for (i in intercept){
   calculateStatistics <- function(control = 10){
     # data
     testData <- DHARMa::createData(sampleSize = control,
-                                   numGroups = 1,
+                                   intercept = i,
+                                   numGroups = 10,
+                                   randomEffectVariance = 0,
                                    family = poisson())
     # model
     fittedModel <- stats::glm(observedResponse ~ Environment1, 
@@ -56,7 +58,6 @@ for (i in intercept){
   
   
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                       intercept = i,
                        nRep=10000, parallel = T, exportGlobal = T)
   out.out[[length(out.out) + 1]] <- out
 }
@@ -67,11 +68,12 @@ names(out.out) <- intercept
 save(out.out,sampleSize,intercept, file=here("data", 
                                                 "2_glmPois_type1.Rdata"))
 
-#load(here("data", "2_glmPois_type1.Rdata"))
+
 
 
 # prep data
 
+#load(here("data", "2_glmPois_type1.Rdata"))
 
 simuls <- list()
 for (i in 1:length(out.out)) {
@@ -88,13 +90,13 @@ simuls <- simuls %>% pivot_longer(1:3, names_to = "test", values_to = "p.val") %
 simuls$prop.sig <- simuls$p.sig/simuls$nsim
 for (i in 1:nrow(simuls)) {
   btest <- binom.test(simuls$p.sig[i], n=simuls$nsim[i], p=0.05)
-  simuls$p.bin0.05[i] <- btest$p.value 
+  simuls$p.bin0.05[i] <- btest$p.value
   simuls$conf.low[i] <- btest$conf.int[1]
   simuls$conf.up[i] <- btest$conf.int[2]
   }
 simuls$intercept <- as.factor(as.numeric(simuls$intercept))
 
-simuls$test <- factor(simuls$test, levels = c("Pear.p.val", "DHA.p.val", "Ref.p.val"))
+simuls$test <- factor(simuls$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
 
 
 #######################################
@@ -105,18 +107,20 @@ simuls$test <- factor(simuls$test, levels = c("Pear.p.val", "DHA.p.val", "Ref.p.
 
 
 ggplot(simuls, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
-  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val`="DHARMa default" ,
+  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val`="Quantile residuals" ,
                                              `Pear.p.val`="Pearson-Chisq" ,
-                                             `Ref.p.val`="DHARMa refit"))) +
+                                             `Ref.p.val`="Pearson Param. Bootstrapping"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
-  ggtitle("Dispersion tests: Type I error rates for GLM Poisson",
+  geom_line(aes(x=as.numeric(as.factor(sampleSize))),
+            position = position_dodge(width=0.8))+
+  ggtitle("Poisson",
           sub = "95% CIs with exact Binomial tests; 10000 simulations") +
   xlab("Sample size") +
   ylab("Type I error") +
-  ylim(0,0.08)+
+  scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
   theme(panel.background  = element_rect(color = "black"))
 ggsave(here("figures", "2_glmPois_type1.jpeg"), width=8, height = 4)
 

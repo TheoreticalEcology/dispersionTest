@@ -80,141 +80,155 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
 
 # saving results
 save(final.res, final.sims, file = here("data", "1_glmBin_pearsonChisq.Rdata"))
-#load(here("data", "1_glmBin_pearsonChisq.Rdata"))
+
 
 
 
 
 
 ### FIGURES
-#
-# library(cowplot);
-# theme_set(theme_cowplot())
-# library(patchwork)
-# 
-# ## Summary
-# 
-# # manipulaing results
-# names(final.res) <- 1:length(final.res)
-# 
-# final.bin <- bind_rows(final.res, .id="sim") %>% group_by(controlValues,intercept) %>%
-#   summarise(ks.sig = sum(ks.p<0.05))
-# 
-# for (i in 1:nrow(final.bin)) {
-#   confs <- binom.test(final.bin$ks.sig[i], 100)$conf.int
-#   final.bin$conf.low[i] <-  round(confs[1],2)
-#   final.bin$conf.up[i] <-  round(confs[2],2)
-# }
-# 
-# pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
-#                   col=as.factor(intercept))) +
-#   geom_point(position = position_dodge(width=0.4)) +
-#   geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
-#                 position = position_dodge(width=0.4)) +
-#   geom_hline(yintercept = 0.05, linetype="dashed") +
-#   ylim(0,1)+
-#   scale_color_discrete("intercept")+
-#   xlab("sampleSize") + ylab("Prop of significant KS test") +
-#   labs(title="Binomial", tag = "B)") +
-#   theme(panel.border  = element_rect(color = "black"))
-# pbin
-# ggsave(here("figures", "1_glmBin_pearsonChisq.jpeg"), width = 6, height = 4)
-# 
-# 
-# # shape distributions
-# 
-# sims <- bind_rows(final.sims, .id="sim") 
-# 
-# # all simulations
-# 
-# sims %>% filter(controlValues == 10) %>%
-#   ggplot(aes(x=Pear.stat, group=sim)) +
-#   geom_density(col=2, alpha=0.5) +
-#   facet_grid(controlValues~intercept)+
-#   stat_function(fun = dchisq, args = list(df = 8), col="black")+
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-#   
-# sims %>% filter(controlValues == 50) %>%
-#   ggplot(aes(x=Pear.stat, group=sim)) +
-#   geom_density(col=2, alpha=0.5) +
-#   facet_grid(controlValues~intercept)+
-#   stat_function(fun = dchisq, args = list(df = 48), col="black")+
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-#   
-# sims %>% filter(controlValues == 100) %>%
-#   ggplot(aes(x=Pear.stat, group=sim)) +
-#   geom_density(col=2, alpha=0.5) +
-#   facet_grid(controlValues~intercept)+
-#   stat_function(fun = dchisq, args = list(df = 98), col="black")+
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-# 
-# sims %>% filter(controlValues == 500) %>%
-#   ggplot(aes(x=Pear.stat, group=sim)) +
-#   geom_density(col=2, alpha=0.5) +
-#   facet_grid(controlValues~intercept)+
-#   stat_function(fun = dchisq, args = list(df = 498), col="black")+
-#   xlab("Pearson Stats") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-# plot_layout(ncol=1) + plot_annotation(title="Binomial: Pearson Stats distribution")
-# ggsave(here("figures", "1_glmBin_pearsonChisq_distrib.jpeg"), width=15,
-#        height=15)
-# 
-# 
-# # Mean distribution of 100 simulations
-# 
-# sims.mean <- sims %>% group_by(sim, controlValues,intercept) %>% 
-#   arrange(sim, controlValues, intercept, Pear.stat) %>%
-#   mutate(n = 1:n()) %>%
-#   group_by(controlValues,intercept,n) %>%
-#   summarise(mean.pearson = mean(Pear.stat))
-# 
-# sims.mean %>% filter(controlValues == 10) %>%
-#   ggplot(aes(x=mean.pearson)) +
-#   facet_grid(controlValues~intercept)+
-#   geom_density(col=2) +
-#   stat_function(fun = dchisq, args = list(df = 8), col="black") +
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-# 
-# sims.mean %>% filter(controlValues == 50) %>%
-#   ggplot(aes(x=mean.pearson)) +
-#   facet_grid(controlValues~intercept)+
-#   geom_density(col=2) +
-#   stat_function(fun = dchisq, args = list(df = 48), col="black") +
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-# 
-# sims.mean %>% filter(controlValues == 100) %>%
-#   ggplot(aes(x=mean.pearson)) +
-#   facet_grid(controlValues~intercept)+
-#   geom_density(col=2) +
-#   stat_function(fun = dchisq, args = list(df = 98), col="black") +
-#   xlab("") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-# 
-# sims.mean %>% filter(controlValues == 500) %>%
-#   ggplot(aes(x=mean.pearson)) +
-#   facet_grid(controlValues~intercept)+
-#   geom_density(col=2) +
-#   stat_function(fun = dchisq, args = list(df = 498), col="black") +
-#   xlab("Pearson Stats") + ylab("Density") +
-#   theme(panel.border  = element_rect(color = "black"),
-#         legend.position = "none") +
-#   
-# plot_layout(ncol=1) + plot_annotation(title="Binomial: Mean Pearson Stats distribution")
-# 
-# ggsave(here("figures", "1_glmBin_pearsonChisq_distrib_MEAN.jpeg"), width=15,
-#        height=15)
+
+load(here("data", "1_glmBin_pearsonChisq.Rdata"))
+library(cowplot);
+theme_set(theme_cowplot())
+library(patchwork)
+
+## Summary
+
+# manipulaing results
+names(final.res) <- 1:length(final.res)
+
+final.bin <- bind_rows(final.res, .id="sim") %>% group_by(controlValues,intercept) %>%
+  summarise(ks.sig = sum(ks.p<0.05))
+
+for (i in 1:nrow(final.bin)) {
+  confs <- binom.test(final.bin$ks.sig[i], 100)$conf.int
+  final.bin$conf.low[i] <-  round(confs[1],2)
+  final.bin$conf.up[i] <-  round(confs[2],2)
+}
+
+pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
+                  col=as.factor(intercept))) +
+  geom_point(position = position_dodge(width=0.4)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
+                position = position_dodge(width=0.4)) +
+  geom_hline(yintercept = 0.05, linetype="dashed") +
+  ylim(0,1)+
+  scale_color_discrete("intercept")+
+  xlab("sampleSize") + ylab("Prop of significant KS test") +
+  labs(title="Binomial", tag = "B)") +
+  theme(panel.border  = element_rect(color = "black"))
+pbin
+ggsave(here("figures", "1_glmBin_pearsonChisq.jpeg"), width = 6, height = 4)
+
+
+# shape distributions
+
+sims <- bind_rows(final.sims, .id="sim")
+
+# all simulations
+
+sims %>% filter(controlValues == 10) %>%
+  ggplot(aes(x=Pear.stat, group=sim)) +
+  geom_density(col=2, alpha=0.5) +
+  facet_grid(controlValues~intercept)+
+  stat_function(fun = dchisq, args = list(df = 8), col="black")+
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none") +
+
+sims %>% filter(controlValues == 50) %>%
+  ggplot(aes(x=Pear.stat, group=sim)) +
+  geom_density(col=2, alpha=0.5) +
+  facet_grid(controlValues~intercept)+
+  stat_function(fun = dchisq, args = list(df = 48), col="black")+
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+
+sims %>% filter(controlValues == 100) %>%
+  ggplot(aes(x=Pear.stat, group=sim)) +
+  geom_density(col=2, alpha=0.5) +
+  facet_grid(controlValues~intercept)+
+  stat_function(fun = dchisq, args = list(df = 98), col="black")+
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+
+sims %>% filter(controlValues == 500) %>%
+  ggplot(aes(x=Pear.stat, group=sim)) +
+  geom_density(col=2, alpha=0.5) +
+  facet_grid(controlValues~intercept)+
+  stat_function(fun = dchisq, args = list(df = 498), col="black")+
+  xlab("Pearson Stats") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+plot_layout(ncol=1) + plot_annotation(title="Binomial: Pearson Stats distribution")
+ggsave(here("figures", "1_glmBin_pearsonChisq_distrib.jpeg"), width=15,
+       height=15)
+
+
+# Mean distribution of 100 simulations
+
+sims.mean <- sims %>% group_by(sim, controlValues,intercept) %>%
+  arrange(sim, controlValues, intercept, Pear.stat) %>%
+  mutate(n = 1:n()) %>%
+  group_by(controlValues,intercept,n) %>%
+  summarise(mean.pearson = mean(Pear.stat))
+
+sims.mean %>% filter(controlValues == 10) %>%
+  ggplot(aes(x=mean.pearson)) +
+  facet_grid(controlValues~intercept)+
+  geom_density(col=2) +
+  stat_function(fun = dchisq, args = list(df = 8), col="black") +
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none") +
+
+sims.mean %>% filter(controlValues == 50) %>%
+  ggplot(aes(x=mean.pearson)) +
+  facet_grid(controlValues~intercept)+
+  geom_density(col=2) +
+  stat_function(fun = dchisq, args = list(df = 48), col="black") +
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+
+sims.mean %>% filter(controlValues == 100) %>%
+  ggplot(aes(x=mean.pearson)) +
+  facet_grid(controlValues~intercept)+
+  geom_density(col=2) +
+  stat_function(fun = dchisq, args = list(df = 98), col="black") +
+  xlab("") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+
+sims.mean %>% filter(controlValues == 500) %>%
+  ggplot(aes(x=mean.pearson)) +
+  facet_grid(controlValues~intercept)+
+  geom_density(col=2) +
+  stat_function(fun = dchisq, args = list(df = 498), col="black") +
+  xlab("Pearson Stats") + ylab("Density") +
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none",
+        strip.background.x = element_blank(),
+        strip.text.x = element_blank()) +
+
+plot_layout(ncol=1) + 
+  plot_annotation(title="Binomial: Mean Pearson Stats distribution")
+
+ggsave(here("figures", "1_glmBin_pearsonChisq_distrib_MEAN.jpeg"), width=15,
+       height=15)
 
 
 
