@@ -12,9 +12,9 @@ library(here)
 ##### Instructions & Simulations #####
 #####################################
 
-# 1) Simulating 10000 binomial prop datasets with different sample sizes and intercepts. Fixing the number of trials to 20
+# 1) Simulating 10000 binomial prop datasets with different sample sizes and intercepts. Fixing the number of trials to 10
 #       - sampleSize: c(10,50,100,500)
-#       - intercept:  c(-3,-1,0,2,4)
+#       - intercept:  c(-3,-1,0,1,3)
 # 2) fitting them to correct GLM models
 # 5) calculating type I error rate for 
 #     - Pearson-chisq, 
@@ -22,7 +22,7 @@ library(here)
 #     - DHARMa refit (boostrapped Pearson residuals)
 
 
-# varying intercept in a loop 
+# varying parameters
 intercept <- c(-3,-1,0,1,3)
 sampleSize = c(10,50,100,500)
 
@@ -49,7 +49,7 @@ for (i in intercept){
                                      type="PearsonChisq")$p.value
     # DHARMa default residuals
     res <- simulateResiduals(fittedModel)
-    out$DHA.p.val<- testDispersion(res, type = "DHARMa",plot = F)$p.value
+    out$DHA.p.val <- testDispersion(res, type = "DHARMa",plot = F)$p.value
     
     # DHARMa refit residuals -> bootstrapped Pearson
     res <- simulateResiduals(fittedModel, refit=T)

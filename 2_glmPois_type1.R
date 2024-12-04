@@ -23,7 +23,7 @@ library(patchwork)
 
 
 # varying intercept in a loop 
-intercept <- c(-3,-1,0,1,4)
+intercept <- c(-3,-1,0,1,3)
 sampleSize = c(10,50,100,500)
 
 out.out <- list()
