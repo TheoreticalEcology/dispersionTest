@@ -24,7 +24,7 @@ library(here)
 
 # sampleSizes and intercepts
 sampleSize = c(10,50,100,500)
-
+intercept <- c(-3,-1,0,1,3)
 
 
 # KS TEST
@@ -38,7 +38,6 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
   result <- list()
   sims <- list()
   
-  intercept <- c(-3,-1,0,1,3)
   
   for (i in 1:length(intercept)){
     
@@ -63,7 +62,7 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
     }
   
     out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                         nRep=1000, parallel = T)
+                         nRep=1000, parallel = T, exportGlobal = TRUE)
     #simulations
     stats <- as.data.frame(apply(as.data.frame(out$simulations), 2, unlist))
     stats$intercept <- intercept[i]

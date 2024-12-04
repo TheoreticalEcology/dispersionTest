@@ -58,7 +58,7 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
     }
     
     out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                         nRep=1000, parallel = T)
+                         nRep=1000, parallel = T, exportGlobal = T)
     #simulations
     stats <- as.data.frame(apply(as.data.frame(out$simulations), 2, unlist))
     stats$intercept <- i

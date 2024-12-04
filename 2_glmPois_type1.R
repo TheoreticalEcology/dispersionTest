@@ -22,31 +22,6 @@ library(patchwork)
 #     - DHARMa refit (boostrapped Pearson residuals)
 
 
-# function to varying sampleSize
-calculateStatistics <- function(control = 10){
-  # data
-  testData <- DHARMa::createData(sampleSize = control,
-                                 numGroups = 1,
-                                 family = poisson())
-  # model
-  fittedModel <- stats::glm(observedResponse ~ Environment1, 
-                            data = testData, family = poisson()) 
-  #results
-  out <- list()
-  
-  # pearson residual
-  out$Pear.p.val <- testDispersion(fittedModel, plot = F, 
-                                   type="PearsonChisq")$p.value
-  # DHARMa default residuals
-  res <- simulateResiduals(fittedModel)
-  out$DHA.p.val<- testDispersion(res, type = "DHARMa",plot = F)$p.value
-  
-  # DHARMa refit residuals -> bootstrapped Pearson
-  res <- simulateResiduals(fittedModel, refit=T)
-  out$Ref.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
-  return(unlist(out))
-}
-
 # varying intercept in a loop 
 intercept <- c(-3,-1,0,1,4)
 sampleSize = c(10,50,100,500)
@@ -54,9 +29,35 @@ sampleSize = c(10,50,100,500)
 out.out <- list()
 for (i in intercept){
 
+  # function to varying sampleSize
+  calculateStatistics <- function(control = 10){
+    # data
+    testData <- DHARMa::createData(sampleSize = control,
+                                   numGroups = 1,
+                                   family = poisson())
+    # model
+    fittedModel <- stats::glm(observedResponse ~ Environment1, 
+                              data = testData, family = poisson()) 
+    #results
+    out <- list()
+    
+    # pearson residual
+    out$Pear.p.val <- testDispersion(fittedModel, plot = F, 
+                                     type="PearsonChisq")$p.value
+    # DHARMa default residuals
+    res <- simulateResiduals(fittedModel)
+    out$DHA.p.val<- testDispersion(res, type = "DHARMa",plot = F)$p.value
+    
+    # DHARMa refit residuals -> bootstrapped Pearson
+    res <- simulateResiduals(fittedModel, refit=T)
+    out$Ref.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
+    return(unlist(out))
+  }
+  
+  
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
                        intercept = i,
-                       nRep=10000, parallel = T)
+                       nRep=10000, parallel = T, exportGlobal = T)
   out.out[[length(out.out) + 1]] <- out
 }
 
