@@ -12,7 +12,7 @@ library(here)
 
 # 1) Simulating 1000 Poisson datasets with different sample sizes, intercepts and overdispertion.
 #       - sampleSize: c(10,50,100,500)
-#       - intercept:  c(-3,-1,0,2,4)
+#       - intercept:  c(-3,-1,0,1,3)
 #       - overdisperstion: seq(0,1,0.10)
 # 2) fitting them to correct GLM models
 # 5) calculating power for the dispersion tests 
@@ -30,14 +30,14 @@ intercept <- c(-3,-1,0,1,3)
 
 out.out <- list()
 for (k in sampleSize){
-  for (i in interept){
+  for (i in intercept){
   
   # function to varying overdispersion
   calculateStatistics <- function(control = 0){
     # data
     testData <- DHARMa::createData(overdispersion = control,
                                    sampleSize = k,
-                                   intercept = i
+                                   intercept = i,
                                    numGroups = 10,
                                    randomEffectVariance = 0,
                                    family = poisson())
