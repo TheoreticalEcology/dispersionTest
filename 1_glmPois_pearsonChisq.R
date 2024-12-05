@@ -14,8 +14,6 @@ library(here)
 
 
 # 1) Simulating 1000 Poisson datasets with different sample sizes and intercepts
-# -sampleSize: c(10,50,100,500)
-# -intercept:  c(-3,-1,0,2,4)
 # 2) fitting them to correct GLM model
 # 3) calculating pearson statistics of the pearson residuals (sum(resˆ2)) 
 # 4) comparing distribution of these statistics with the Chi-squared distribution with the same DF.
@@ -23,8 +21,8 @@ library(here)
 
 
 # sampleSizes
-sampleSize = c(10,50,100,500)
-intercept <- c(-3,-1,0,1,3)
+sampleSize = c(10,20,50,100,200,500,1000,10000)
+intercept <- c(-3,-1.5,0,1.5,3)
 
 
 # KS TEST
@@ -104,13 +102,18 @@ for (i in 1:nrow(final.pois)) {
 ggplot(final.pois, aes(y=ks.sig/100, x=as.factor(controlValues),
                   col=as.factor(intercept))) +
   geom_point(position = position_dodge(width=0.4)) +
+  geom_line(aes(x=as.numeric(as.factor(controlValues))),
+            position = position_dodge(width=0.4))+
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
                 position = position_dodge(width=0.4)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
   scale_color_discrete("intercept")+
   xlab("sampleSize") + ylab("Prop of significant KS test") +
   labs(title="Poisson", tag = "A)") +
-  theme(panel.border  = element_rect(color = "black"))
+  theme(panel.border  = element_rect(color = "black")) +
+ pbin + plot_layout(ncol=1, guides="collect")
+ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 6, height = 8)
+
 
 
 ggsave(here("figures", "1_glmPois_pearsonChisq.jpeg"), width = 6, height = 8)
@@ -191,19 +194,31 @@ sims.mean <- sims %>% group_by(sim, controlValues,intercept) %>%
   group_by(controlValues,intercept,n) %>%
   summarise(mean.pearson = mean(Pear.stat))
 
+#trick to include binomial results
+sims.mean <- bind_rows(list(poisson = sims.mean, binomial = sims.mean.bin),
+                       .id="model")
+
+
+
+
 sims.mean %>% filter(controlValues == 10) %>%
-  ggplot(aes(x=mean.pearson)) +
+  ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(col=2) +
-  stat_function(fun = dchisq, args = list(df = 8), col="black") +
+  stat_density(geom="line",size=1.1, position="identity")+
+  stat_function(fun = dchisq, args = list(df = 8), aes(color = "Chi-squared")) +
+  scale_color_manual(values = c("binomial" ="olivedrab4", 
+                                "poisson" = "mediumpurple3", 
+                                "Chi-squared" = "black"))+
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
-        legend.position = "none") +
+        legend.position = c(0.87,0.85),
+        legend.key = element_rect()) +
 
-  sims.mean %>% filter(controlValues == 50) %>%
-  ggplot(aes(x=mean.pearson)) +
+sims.mean %>% filter(controlValues == 50) %>%
+  ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(col=2) +
+  geom_density(size=1.1) +
+  scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 48), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
@@ -211,10 +226,12 @@ sims.mean %>% filter(controlValues == 10) %>%
         strip.background.x = element_blank(),
         strip.text.x = element_blank()) +
 
-  sims.mean %>% filter(controlValues == 100) %>%
-  ggplot(aes(x=mean.pearson)) +
+
+sims.mean %>% filter(controlValues == 100) %>%
+  ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(col=2) +
+  geom_density(size=1.1) +
+  scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 98), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
@@ -223,9 +240,10 @@ sims.mean %>% filter(controlValues == 10) %>%
         strip.text.x = element_blank()) +
 
   sims.mean %>% filter(controlValues == 500) %>%
-  ggplot(aes(x=mean.pearson)) +
+  ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(col=2) +
+  geom_density(size=1.1) +
+  scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 498), col="black") +
   xlab("Pearson Stats") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
@@ -233,11 +251,15 @@ sims.mean %>% filter(controlValues == 10) %>%
         strip.background.x = element_blank(),
         strip.text.x = element_blank()) +
 
-  plot_layout(ncol=1) + plot_annotation(title="Poisson: Mean Pearson Stats distribution")
+  plot_layout(ncol=1) + 
+  plot_annotation(title="Pearson Statistics X Chi-squared distribution")
+
+ggsave(here("figures", "1_glm_pearsonChisq_distrib_MEAN.jpeg"), width=12,
+       height=10)
+
 
 ggsave(here("figures", "1_glmPois_pearsonChisq_distrib_MEAN.jpeg"), width=15,
        height=15)
-
 
 
 
