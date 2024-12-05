@@ -14,7 +14,7 @@ library(patchwork)
 
 # 1) Simulating 10000 Poisson datasets with different sample sizes and intercepts
 #       - sampleSize: c(10,50,100,500)
-#       - intercept:  c(-3,-1,0,2,4)
+#       - intercept:  c(-3,-1,0,1,3)
 # 2) fitting them to correct GLM models
 # 5) calculating type I error rate for 
 #     - Pearson-chisq, 
@@ -116,7 +116,7 @@ ggplot(simuls, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
-  ggtitle("Poisson",
+  ggtitle("GLM Poisson",
           sub = "95% CIs with exact Binomial tests; 10000 simulations") +
   xlab("Sample size") +
   ylab("Type I error") +
