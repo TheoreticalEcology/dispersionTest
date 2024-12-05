@@ -29,13 +29,13 @@ intercept <- c(-3,-1,0,1,3)
 
 
 out.out <- list()
-for (k in intercept){
-  for (i in sampleSize){
+for (k in sampleSize){
+  for (i in intercept){
   
   # function to varying sampleSize
   calculateStatistics <- function(control = 0){
     # data
-    testData <- DHARMa::createData(overdispersion = control,
+    testData <- createData(overdispersion = control,
                                    sampleSize = k,
                                    intercept = i,
                                    numGroups = 10,
@@ -43,8 +43,8 @@ for (k in intercept){
                                    binomialTrials = 10,
                                    family = binomial())
     # model
-    fittedModel <- stats::glm(cbind(observedResponse1, observedResponse0)  ~ 
-                                Environment1, data = testData, family = binomial()) 
+    fittedModel <-glm(cbind(observedResponse1, observedResponse0)  ~ 
+                            Environment1, data = testData, family = binomial()) 
     #results
     out <- list()
     
