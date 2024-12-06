@@ -61,7 +61,7 @@ ggsave(here("figures", "1_glmBin_pearsonChisq.jpeg"), width = 6, height = 4)
 
 # Figure all simulations
 
-sims %>% filter(controlValues == 10) %>%
+sims.bin %>% filter(controlValues == 10) %>%
   ggplot(aes(x=Pear.stat, group=sim)) +
   geom_density(col=2, alpha=0.5) +
   facet_grid(controlValues~intercept)+
@@ -197,15 +197,15 @@ ggplot(final.pois, aes(y=ks.sig/100, x=as.factor(controlValues),
                        col=as.factor(intercept))) +
   geom_point(position = position_dodge(width=0.4)) +
   geom_line(aes(x=as.numeric(as.factor(controlValues))),
-            position = position_dodge(width=0.4))+
+            position = position_dodge(width=0.4)) +
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
                 position = position_dodge(width=0.4)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
-  scale_color_discrete("intercept")+
+  scale_color_discrete("intercept") +
   xlab("sampleSize") + ylab("Prop of significant KS test") +
-  labs(title="Poisson", tag = "A)") +
-  theme(panel.border  = element_rect(color = "black")) +
-  pbin + plot_layout(ncol=1, guides="collect")
+  labs(title="Poisson", tag = "A)")# +
+  #theme(panel.border  = element_rect(color = "black")) #+
+  #pbin + plot_layout(ncol=1, guides="collect")
 ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 6, height = 8)
 
 

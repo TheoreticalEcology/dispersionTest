@@ -75,9 +75,9 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
 }
 
 # saving results
-save(final.res.bin, final.simsbin, file = here("data", "1_glmBin_pearsonChisq.Rdata"))
+save(final.res.bin, final.sims.bin, file = here("data", "1_glmBin_pearsonChisq.Rdata"))
 
-
+rm(ls())
 
 
 ###################
@@ -116,12 +116,11 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
                                      intercept = intercept[i],
                                      numGroups = 10,
                                      randomEffectVariance = 0,
-                                     binomialTrials = 10,
-                                     family = binomial())
+                                     family = poisson())
       
-      fittedModel <- stats::glm(cbind(observedResponse1,observedResponse0) ~
+      fittedModel <- stats::glm(observedResponse ~
                                   Environment1, data = testData, 
-                                family = binomial()) 
+                                family = poisson()) 
       
       pearson <- residuals(fittedModel, "pearson")
       
@@ -149,4 +148,4 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
 }
 
 # saving results
-save(final.res.pois, final.sims.pois, file = here("data", "1_glmBin_pearsonChisq.Rdata"))
+save(final.res.pois, final.sims.pois, file = here("data", "1_glmPois_pearsonChisq.Rdata"))
