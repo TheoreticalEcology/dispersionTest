@@ -53,8 +53,8 @@ pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
   ylim(0,1)+
   scale_color_discrete("intercept")+
   xlab("sampleSize") + ylab("Prop of significant KS test") +
-  labs(title="Binomial", tag = "B)") +
-  theme(panel.border  = element_rect(color = "black"))
+  labs(title="Binomial", tag = "B)") #+
+  #theme(panel.border  = element_rect(color = "black"))
 pbin
 ggsave(here("figures", "1_glmBin_pearsonChisq.jpeg"), width = 6, height = 4)
 

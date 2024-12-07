@@ -77,7 +77,7 @@ for (k in 1:100) { # MANY SIMULATIONS TO HAVE A PROP OF SIG RESULTS
 # saving results
 save(final.res.bin, final.sims.bin, file = here("data", "1_glmBin_pearsonChisq.Rdata"))
 
-rm(ls())
+rm(list=ls())
 
 
 ###################
