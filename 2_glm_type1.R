@@ -60,7 +60,7 @@ for (i in intercept){
   
   
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                       nRep=10000, parallel = T, exportGlobal = T)
+                       nRep=1000, parallel = T, exportGlobal = T)
   out.bin[[length(out.bin) + 1]] <- out
 }
 
@@ -124,7 +124,7 @@ for (i in intercept){
   
   
   out <- runBenchmarks(calculateStatistics, controlValues = sampleSize,
-                       nRep=10000, parallel = T, exportGlobal = T)
+                       nRep=1000, parallel = T, exportGlobal = T)
   out.pois[[length(out.pois) + 1]] <- out
 }
 
