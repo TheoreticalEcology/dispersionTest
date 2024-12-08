@@ -83,38 +83,38 @@ save(out.out,sampleSize,intercept,overdispersion, file=here("data",
 # 
 
 
-# load(here("data", "3_glmBin_power.Rdata"))
-# 
-# 
-# simuls <- list()
-# for (i in 1:length(out.out)) {
-#   sim <- out.out[[i]]$simulations
-#   params <- strsplit(names(out.out)[[i]], "_")[[1]]
-#   sim$intercept <- params[1]
-#   sim$sampleSize <- params[2]
-#   simuls <- rbind(simuls,sim)
-# }
-# names(simuls)[names(simuls)=="controlValues"] <- "overdispersion"
-# 
-# simuls <- simuls %>% pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
-#   group_by(sampleSize,intercept,overdispersion, test) %>%
-#   summarise(p.sig = sum(p.val<0.05,na.rm=T),
-#             nsim = length(p.val[!is.na(p.val)]) ) 
-# simuls$prop.sig <- simuls$p.sig/simuls$nsim
-# simuls$intercept <- fct_relevel(simuls$intercept, "-3", "-1", "0", "1", "3")
-# simuls$sampleSize <- fct_relevel(simuls$sampleSize, "10", "50", "100", "500")
-# 
-# ggplot(simuls, aes(x=overdispersion, y=prop.sig, col=test))+
-#   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-#   scale_color_discrete(
-#     labels=c("Quantile Residuals", "Pearson Chi-squared",
-#                               "Pearson Param. Bootstrap."))+
-#   facet_grid(sampleSize~intercept) +
-#   geom_hline(yintercept = 0.5, linetype="dotted") +
-#   ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
-#   theme(panel.background = element_rect(color="black"),
-#         legend.position = "bottom")
-# ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 8)
+load(here("data", "3_glmBin_power.Rdata"))
+
+
+simuls <- list()
+for (i in 1:length(out.out)) {
+  sim <- out.out[[i]]$simulations
+  params <- strsplit(names(out.out)[[i]], "_")[[1]]
+  sim$intercept <- params[1]
+  sim$sampleSize <- params[2]
+  simuls <- rbind(simuls,sim)
+}
+names(simuls)[names(simuls)=="controlValues"] <- "overdispersion"
+
+simuls <- simuls %>% pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize,intercept,overdispersion, test) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]) )
+simuls$prop.sig <- simuls$p.sig/simuls$nsim
+simuls$intercept <- fct_relevel(simuls$intercept, "-3", "-1", "0", "1", "3")
+simuls$sampleSize <- fct_relevel(simuls$sampleSize, "10", "50", "100", "500")
+
+ggplot(simuls, aes(x=overdispersion, y=prop.sig, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Quantile Residuals", "Pearson Chi-squared",
+                              "Pearson Param. Bootstrap."))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom")
+ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 8)
 
 
 
