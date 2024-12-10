@@ -25,7 +25,7 @@ for (i in 1:length(out.bin)) {
 }
 names(simuls.bin)[names(simuls.bin)=="controlValues"] <- "sampleSize"
 
-# p values
+##### p values #####
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                 intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
@@ -42,12 +42,27 @@ for (i in 1:nrow(p.bin)) {
 p.bin$intercept <- as.factor(as.numeric(p.bin$intercept))
 p.bin$test <- factor(p.bin$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
 
-# Dispersion statistics
+# Dispersion statistics ####
 stats.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion,
                                           DHA.stat.dispersion,
                                           Ref.stat.dispersion, replicate,
                                          intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") 
+
+## distribution p.values ####
+
+pvals.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
+                                          intercept, sampleSize) %>%
+  pivot_longer(1:3, names_to = "test", values_to = "p.val")  %>%
+  mutate(intercept = as.factor(as.numeric(intercept)))
+
+## find the callibrated alpha for 0.05% p-value: ####
+
+alpha.bin <- pvals.bin %>% group_by(sampleSize, intercept, test) %>%
+  summarise(alpha = quantile(ecdf(p.val), 0.05))
+# saving it together with alpha.pois to use in script 3_glm_power_results.R
+# to callibrate the power
+
 
 
 ##################
@@ -82,12 +97,28 @@ p.pois$intercept <- as.factor(as.numeric(p.pois$intercept))
 
 p.pois$test <- factor(p.pois$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
 
-# Dispersion statistics
+# Dispersion statistics ####
 stats.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion,
                                           DHA.stat.dispersion,
                                           Ref.stat.dispersion, replicate,
                                           intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") 
+
+
+## distribution p.values ####
+
+pvals.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
+                                            intercept, sampleSize) %>%
+  pivot_longer(1:3, names_to = "test", values_to = "p.val")  %>%
+  mutate(intercept = as.factor(as.numeric(intercept)))
+
+
+## find the callibrated alpha for 0.05 p-value: ####
+
+alpha.pois <- pvals.pois %>% group_by(sampleSize, intercept, test) %>%
+  summarise(alpha = quantile(ecdf(p.val), 0.05))
+alpha.pois
+save(alpha.pois, alpha.bin, file=here("data", "2_callibrated_alphaLevels.Rdata"))
 
 
 
@@ -111,7 +142,7 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)
   xlab("Sample size") +
   ylab("Type I error") +
   theme(panel.background  = element_rect(color = "black"),
-        legend.position = "bottom",
+        legend.position = c(0.9,0.75),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(tag="B)")
 f.bin
@@ -133,7 +164,7 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
   ylab("Type I error") +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
   theme(panel.background  = element_rect(color = "black"),
-        legend.position = "none",
+        legend.position = c(0.9,0.75),
         axis.text.x = element_text(angle=45, hjust=1)) +
   labs(tag="A)")
 f.pois
@@ -144,7 +175,7 @@ f.pois
 
 f.pois + f.bin+
   plot_layout(ncol=1, )
-ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 10)
+ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
 
 
@@ -215,40 +246,32 @@ ggsave(here("figures", "2_glm_dispersionStats.jpeg"), width=10, height = 8)
 
 #### distribution p values ####
 
-pvals.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
-                                      intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "p.val")  %>%
-  mutate(intercept = as.factor(as.numeric(intercept)))
-
 ggplot(pvals.bin, aes(x=p.val, col=test))+
   geom_density()+
   geom_hline(yintercept=1, linetype="dotted")+
-  facet_grid(sampleSize ~ intercept) +
+  facet_grid(sampleSize ~ intercept, scales="free") +
   scale_color_discrete(
     labels=c("Quantile Residuals", "Pearson Chi-squared",
              "Pearson Param. Bootstrap."))+ 
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
-  ggtitle("Binomial")
+  ggtitle("Binomial: distribution P-values")
 ggsave(here("figures", "2_glmBin_distribPvals.jpeg"), width=10, height = 15)
 
-pvals.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
-                                          intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "p.val")  %>%
-  mutate(intercept = as.factor(as.numeric(intercept)))
 
 ggplot(pvals.pois, aes(x=p.val, col=test))+
   geom_density()+
   geom_hline(yintercept=1, linetype="dotted")+
-  facet_grid(sampleSize ~ intercept) +
+  facet_grid(sampleSize ~ intercept, scales="free") +
+  #scale_y_log10()+
   scale_color_discrete(
     labels=c("Quantile Residuals", "Pearson Chi-squared",
              "Pearson Param. Bootstrap."))+ 
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
-  ggtitle("Poisson")
+  ggtitle("Poisson: distribution P-values")
 ggsave(here("figures", "2_glmPois_distribPvals.jpeg"), width=10, height = 15)
 
 
@@ -262,7 +285,7 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
-  ggtitle("Binomial")
+  ggtitle("Binomial: ecdf p-values")
 ggsave(here("figures", "2_glmBin_ecdfPvals.jpeg"), width=10, height = 15)
 
 ggplot(pvals.pois, aes(x=p.val, col=test))+
@@ -273,6 +296,6 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
-  ggtitle("Poisson")
+  ggtitle("Poisson: ecdf p-values")
 ggsave(here("figures", "2_glmPois_ecdfPvals.jpeg"), width=10, height = 15)
 
