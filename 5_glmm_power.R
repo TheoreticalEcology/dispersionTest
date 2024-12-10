@@ -31,9 +31,9 @@ ngroups <- 100 # change it in the future
 out.bin <- list()
 for(m in ngroups){
   
-  if(ngroups == 10) sampleSize <- c(20,50,100,200,500,1000,10000)
-  if(ngroups == 50) sampleSize <- c(100,200,500,1000,10000)
-  if(ngroups == 100) sampleSize <- c(200,500,1000,10000)
+  if(m == 10) sampleSize <- c(20,50,100,200,500,1000,10000)
+  if(m == 50) sampleSize <- c(100,200,500,1000,10000)
+  if(m == 100) sampleSize <- c(200,500,1000,10000)
     
   for (k in sampleSize){
     
@@ -45,7 +45,7 @@ for(m in ngroups){
       testData <- createData(overdispersion = control,
                              sampleSize = k,
                              intercept = i,
-                             numGroups = ngroups,
+                             numGroups = m,
                              randomEffectVariance = 1,
                              binomialTrials = 10,
                              family = binomial())
@@ -89,12 +89,11 @@ for(m in ngroups){
     out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
                          nRep=1000, parallel = T, exportGlobal = T)
     out.bin[[length(out.bin) + 1]] <- out
+    names(out.bin)[length(out.bin)] <- paste(m, k, i, sep="_")
     }
   }
 }
   
-names(out.bin) <- as.vector(unite(expand.grid(intercept,sampleSize), "sim"))$sim
-
 # saving sim results
 save(out.bin,sampleSize,intercept,overdispersion,ngroups,
      file=here("data","5_glmmBin_power.Rdata"))
@@ -122,9 +121,9 @@ ngroups <- 100 # change it in the future
 out.pois <- list()
 for(m in ngroups){
   
-  if(ngroups == 10) sampleSize <- c(20,50,100,200,500,1000,10000)
-  if(ngroups == 50) sampleSize <- c(100,200,500,1000,10000)
-  if(ngroups == 100) sampleSize <- c(200,500,1000,10000)
+  if(m == 10) sampleSize <- c(20,50,100,200,500,1000,10000)
+  if(m == 50) sampleSize <- c(100,200,500,1000,10000)
+  if(m == 100) sampleSize <- c(200,500,1000,10000)
   
   for (k in sampleSize){
     
@@ -136,7 +135,7 @@ for(m in ngroups){
         testData <- createData(overdispersion = control,
                                sampleSize = k,
                                intercept = i,
-                               numGroups = ngroups,
+                               numGroups = m,
                                randomEffectVariance = 1,
                                family = poisson())
         # model
@@ -179,11 +178,10 @@ for(m in ngroups){
       out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
                            nRep=1000, parallel = T, exportGlobal = T)
       out.pois[[length(out.pois) + 1]] <- out
+      names(out.pois)[length(out.pois)] <- paste(m, k, i, sep="_")
     }
   }
 }
-
-names(out.pois) <- as.vector(unite(expand.grid(intercept,sampleSize), "sim"))$sim
 
 # saving sim results
 save(out.pois,sampleSize,intercept,overdispersion,ngroups,
