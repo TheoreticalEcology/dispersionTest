@@ -27,7 +27,27 @@ for (i in 1:length(out.bin)) {
 names(simuls.bin)[names(simuls.bin)=="controlValues"] <- "overdispersion"
 
 
-# figure Power 
+## type 1 ####
+type1.bin <- simuls.bin %>% filter(overdispersion ==0) %>% 
+  dplyr::select(Pear.p.val, DHA.p.val, Ref.p.val, replicate,
+                                      intercept, sampleSize) %>%
+  pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize,intercept, test) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]) )
+type1.bin$prop.sig <- type1.bin$p.sig/type1.bin$nsim
+for (i in 1:nrow(type1.bin)) {
+  btest <- binom.test(type1.bin$p.sig[i], n=type1.bin$nsim[i], p=0.05)
+  type1.bin$type1.bin0.05[i] <- btest$p.value
+  type1.bin$conf.low[i] <- btest$conf.int[1]
+  type1.bin$conf.up[i] <- btest$conf.int[2]
+}
+type1.bin$intercept <- as.factor(as.numeric(type1.bin$intercept))
+type1.bin$test <- factor(type1.bin$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
+
+
+
+# Power ####
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
@@ -37,6 +57,10 @@ p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
 p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
 p.bin$intercept <- fct_relevel(p.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
+
+
+
+## "raw" power ####
 
 ggplot(p.bin, aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -50,7 +74,34 @@ ggplot(p.bin, aes(x=overdispersion, y=prop.sig, col=test))+
         legend.position = "bottom")
 ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 15)
 
-# figure statistics
+
+# Calibrated power ####
+
+c.bin <- p.bin %>% left_join(type1.bin %>% 
+                            dplyr::select(sampleSize, intercept, test, prop.sig),
+                              by=c("sampleSize", "intercept", "test")) %>%
+  mutate(power.calibrated = prop.sig.x - prop.sig.y,
+         intercept = fct_relevel(intercept, "-3", "-1.5", "0", "1.5", "3"))
+c.bin$sampleSize <- as.factor(as.numeric(c.bin$sampleSize))
+
+  
+
+ggplot(c.bin, aes(x=overdispersion, y=power.calibrated, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Quantile Residuals", "Pearson Chi-squared",
+             "Pearson Param. Bootstrap."))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom")
+ggsave(here("figures", "3_glmBin_powerCalibrated.jpeg"), width=10, height = 15)
+
+
+
+
+# figure statistics ####
 
 st.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
                                        Ref.stat.dispersion, replicate,
@@ -75,47 +126,12 @@ ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
 ggsave(here("figures", "3_glmBin_dispersionStats.jpeg"), width=10, height = 15)
 
 
-# Dispersion statistics for 0 overdispersion
-
-st.1.bin <- simuls.bin %>% 
-  filter(overdispersion == 0) %>%
-  dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
-                Ref.stat.dispersion, replicate,
-                overdispersion, intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "Disp.stats") %>%
-  group_by(sampleSize,intercept,overdispersion, test) %>%
-  summarise(median.stat = median(Disp.stats, na.rm=T))
-st.1.bin$intercept <- fct_relevel(st.1.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
-st.1.bin$sampleSize <- as.numeric(st.1.bin$sampleSize)
-
-ggplot(st.1.bin, aes(x=sampleSize, y=median.stat, col=test))+
-  geom_point()+ geom_line()+
-  facet_grid(~intercept) +
-  scale_x_log10()+
-  geom_hline(yintercept = 1, linetype="dashed")
-
-
-st.1.bin %>% filter(sampleSize %in% c(10,20,50,100)) %>%
-  ggplot(aes(x=test, y=Disp.stats, col=test))+
-  geom_violin()+
-  facet_grid(sampleSize~intercept)+
-  geom_hline(yintercept = 1, linetype="dashed") +
-  scale_x_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap.")) +
-  theme(axis.text.x = element_text(angle=45,hjust=1),
-        legend.position = "none")
-
-
-
-
 ####################
 ##### Poisson  #####
 ####################
 
 
 load(here("data", "3_glmPois_power.Rdata"))
-
 
 simuls.pois <- list()
 for (i in 1:length(out.pois)) {
@@ -169,7 +185,7 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   scale_color_discrete(
     labels=c("Quantile Residuals", "Pearson Chi-squared",
              "Pearson Param. Bootstrap."))+
-  facet_grid(sampleSize~intercept) +
+  facet_grid(sampleSize~intercept, scales="free_y") +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson", subtitle = "1000 sim; Ntrials=10") +
   theme(panel.background = element_rect(color="black"),
@@ -177,25 +193,3 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
 ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
 
 
-# Dispersion statistics for 0 overdispersion
-
-st.1.pois <- simuls.pois %>% 
-  filter(overdispersion == 0) %>%
-  dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
-                Ref.stat.dispersion, replicate,
-                overdispersion, intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "Disp.stats")
-st.1.pois$intercept <- fct_relevel(st.1.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
-st.1.pois$sampleSize <- as.factor(as.numeric(st.1.pois$sampleSize))
-
-
-st.1.pois %>% filter(sampleSize %in% c(10,20,50,100)) %>%
-  ggplot(aes(x=test, y=Disp.stats, col=test))+
-  geom_violin()+
-  facet_grid(sampleSize~intercept)+
-  geom_hline(yintercept = 1, linetype="dashed") +
-  scale_x_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap.")) +
-  theme(axis.text.x = element_text(angle=45,hjust=1),
-        legend.position = "none")
