@@ -7,6 +7,15 @@ library(tidyverse)
 library(here)
 library(lme4)
 
+
+# varying parameters
+overdispersion <- seq(0,1,0.10)
+intercept <- c(-3,-1.5,0,1.5,3)
+## sample size depend on ngroups (see it within the loop)
+ngroups <- 100 # change it in the future 10, 50 and 100
+nRep=100
+
+
 #########################
 ##### Binomial GLMM #####
 #########################
@@ -19,13 +28,6 @@ library(lme4)
 #     - DHARMa conditional (simulated residuals)
 #     - DHARMa refit unconditional (boostrapped Pearson residuals)
 #     - DHARMa refit conditional (boostrapped Pearson residuals)
-
-
-# varying parameters
-overdispersion <- seq(0,1,0.10)
-intercept <- c(-3,-1.5,0,1.5,3)
-## sample size depend on ngroups (see it within the loop)
-ngroups <- 100 # change it in the future
 
 
 out.bin <- list()
@@ -78,7 +80,7 @@ for(m in ngroups){
       out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
       
       # DHARMa refit conditional
-      res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
+      res <- simulateResiduals(fittedModel, refit=T, re.form=NULL)
       out$refCO.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
       out$refCO.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
       
@@ -87,16 +89,15 @@ for(m in ngroups){
     }
     
     out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
-                         nRep=1000, parallel = T, exportGlobal = T)
+                         nRep=nRep, parallel = T, exportGlobal = T)
     out.bin[[length(out.bin) + 1]] <- out
     names(out.bin)[length(out.bin)] <- paste(m, k, i, sep="_")
+    # saving sim results
+    save(out.bin, file=here("data","5_glmmBin_power.Rdata"))
     }
   }
 }
   
-# saving sim results
-save(out.bin,sampleSize,intercept,overdispersion,ngroups,
-     file=here("data","5_glmmBin_power.Rdata"))
 
 #########################
 ##### Poisson GLMM #####
@@ -111,12 +112,6 @@ save(out.bin,sampleSize,intercept,overdispersion,ngroups,
 #     - DHARMa refit unconditional (boostrapped Pearson residuals)
 #     - DHARMa refit conditional (boostrapped Pearson residuals)
 
-
-# varying parameters
-overdispersion <- seq(0,1,0.10)
-intercept <- c(-3,-1.5,0,1.5,3)
-## sample size depend on ngroups (see it within the loop)
-ngroups <- 100 # change it in the future
 
 out.pois <- list()
 for(m in ngroups){
@@ -161,13 +156,13 @@ for(m in ngroups){
         out$dhaCO.p.val <- testDispersion(res, type = "DHARMa",plot = F)$p.value
         out$dhaCO.stat  <- testDispersion(res, type = "DHARMa",plot = F)$statistic
         
-        # DHARMa refit unconditional
+        # DHARMa refit
         res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
         out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
         out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
         
         # DHARMa refit conditional
-        res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
+        res <- simulateResiduals(fittedModel, refit=T, re.form=NULL)
         out$refCO.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
         out$refCO.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
         
@@ -176,14 +171,15 @@ for(m in ngroups){
       }
       
       out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
-                           nRep=1000, parallel = T, exportGlobal = T)
+                           nRep=nRep, parallel = T, exportGlobal = T)
       out.pois[[length(out.pois) + 1]] <- out
       names(out.pois)[length(out.pois)] <- paste(m, k, i, sep="_")
+      # saving sim results
+      save(out.pois, file=here("data","5_glmmPois_power.Rdata"))
     }
   }
 }
 
-# saving sim results
-save(out.pois,sampleSize,intercept,overdispersion,ngroups,
-     file=here("data","5_glmmPois_power.Rdata"))
+
+
 
