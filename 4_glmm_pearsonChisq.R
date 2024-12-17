@@ -11,7 +11,7 @@ library(lme4)
 # parameters
 nRep       <- 10000
 sampleSize <- 1000
-ngroups    <- c(10,30,100) 
+ngroups    <- c(10,20,50,100) 
 intercept  <- 0
 ntrials    <- 10 # binomial
 overdispersion <- seq(0,1,0.10)
@@ -41,10 +41,10 @@ for(m in ngroups){
     out <- list()
     
     # pearson residual
-    out$Pear2.p.var <- testDispersion(fittedModel, plot = F, 
+    out$Pear2.p.val <- testDispersion(fittedModel, plot = F, 
                                       alternative = "two.sided",
                                      type="PearsonChisq")$p.value
-    out$PearG.p.var <- testDispersion(fittedModel, plot = F, 
+    out$PearG.p.val <- testDispersion(fittedModel, plot = F, 
                                       alternative = "great",
                                       type="PearsonChisq")$p.value
     out$Pear.stat <- testDispersion(fittedModel, plot = F, 
@@ -84,10 +84,10 @@ for(m in ngroups){
     out <- list()
     
     # pearson residual
-    out$Pear2.p.var <- testDispersion(fittedModel, plot = F, 
+    out$Pear2.p.val <- testDispersion(fittedModel, plot = F, 
                                       alternative = "two.sided",
                                       type="PearsonChisq")$p.value
-    out$PearG.p.var <- testDispersion(fittedModel, plot = F, 
+    out$PearG.p.val <- testDispersion(fittedModel, plot = F, 
                                       alternative = "great",
                                       type="PearsonChisq")$p.value
     out$Pear.stat <- testDispersion(fittedModel, plot = F, 
