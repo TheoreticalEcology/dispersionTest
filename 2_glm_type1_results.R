@@ -9,9 +9,9 @@ library(here)
 library(patchwork)
 
 
-####################
-##### Binomial #####
-####################
+##############-###
+#### Binomial ####
+##############-###
 
 load(here("data","2_glmBin_type1.Rdata"))
 
@@ -24,6 +24,8 @@ for (i in 1:length(out.bin)) {
   simuls.bin <- rbind(simuls.bin,sim)
 }
 names(simuls.bin)[names(simuls.bin)=="controlValues"] <- "sampleSize"
+
+
 
 ##### p values #####
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
@@ -42,22 +44,27 @@ for (i in 1:nrow(p.bin)) {
 p.bin$intercept <- as.factor(as.numeric(p.bin$intercept))
 p.bin$test <- factor(p.bin$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
 
-# Dispersion statistics ####
+
+
+##### Dispersion statistics ####
 stats.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion,
                                           DHA.stat.dispersion,
                                           Ref.stat.dispersion, replicate,
                                          intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "Dispersion") 
+  pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
+  mutate(intercept = as.factor(as.numeric(intercept)))
 
-## distribution p.values ####
 
+
+##### distribution p.values ####
 pvals.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                           intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "p.val")  %>%
   mutate(intercept = as.factor(as.numeric(intercept)))
 
-## find the callibrated alpha for 0.05% p-value: ####
 
+
+##### find the callibrated alpha for 0.05% p-value: ####
 alpha.bin <- pvals.bin %>% group_by(sampleSize, intercept, test) %>%
   summarise(alpha = quantile(ecdf(p.val), 0.05))
 # saving it together with alpha.pois to use in script 3_glm_power_results.R
@@ -65,10 +72,9 @@ alpha.bin <- pvals.bin %>% group_by(sampleSize, intercept, test) %>%
 
 
 
-##################
-##### Poisson #####
-###################
-
+#############-###
+#### Poisson ####
+#############-###
 
 load(here("data", "2_glmPois_type1.Rdata"))
 
@@ -97,15 +103,16 @@ p.pois$intercept <- as.factor(as.numeric(p.pois$intercept))
 
 p.pois$test <- factor(p.pois$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val"))
 
-# Dispersion statistics ####
+##### Dispersion statistics ####
 stats.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion,
                                           DHA.stat.dispersion,
                                           Ref.stat.dispersion, replicate,
                                           intercept, sampleSize) %>%
-  pivot_longer(1:3, names_to = "test", values_to = "Dispersion") 
+  pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
+  mutate(intercept = as.factor(as.numeric(intercept)))
 
 
-## distribution p.values ####
+##### distribution p.values ####
 
 pvals.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                             intercept, sampleSize) %>%
@@ -113,7 +120,7 @@ pvals.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, repl
   mutate(intercept = as.factor(as.numeric(intercept)))
 
 
-## find the callibrated alpha for 0.05 p-value: ####
+##### find the callibrated alpha for 0.05 p-value: ####
 
 alpha.pois <- pvals.pois %>% group_by(sampleSize, intercept, test) %>%
   summarise(alpha = quantile(ecdf(p.val), 0.05))
@@ -122,11 +129,12 @@ save(alpha.pois, alpha.bin, file=here("data", "2_callibrated_alphaLevels.Rdata")
 
 
 
-#######################################
-##### Figures and summary results #####
-#######################################
+##################################-###
+#### Figures and summary results #####
+##################################-###
 
-#### Type I error rate for the dispersion tests #####
+
+##### Type I error rate for the dispersion tests #####
 
 f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
   facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val`="Quantile residuals" ,
@@ -179,27 +187,46 @@ ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
 
 
-#### Dispersion statistics #### 
+##### Dispersion statistics #### 
 
-ggplot(stats.bin, aes(x=as.factor(sampleSize), y=Dispersion, col=test))+
+# boxplot
+box.bin <- ggplot(stats.bin, aes(x=as.factor(sampleSize), y=Dispersion, col=test))+
   geom_boxplot()+
   facet_grid(~intercept) +
   scale_color_discrete(
     labels=c("Quantile Residuals", "Pearson Chi-squared",
              "Pearson Param. Bootstrap."))+
-
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial") +
+  ylim(0,5)+
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "none",
+        axis.text.x = element_text(angle=45, hjust=1)) 
+
+box.pois <- ggplot(stats.pois, aes(x=as.factor(sampleSize), y=Dispersion, col=test))+
+  geom_boxplot()+
+  facet_grid(~intercept) +
+  scale_color_discrete(
+    labels=c("Quantile Residuals", "Pearson Chi-squared",
+             "Pearson Param. Bootstrap."))+
+  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
+  ggtitle("Poisson") +
+  ylim(0,5)+
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom",
         axis.text.x = element_text(angle=45, hjust=1))
 
-d.bin <- stats.bin %>% group_by(test,sampleSize, intercept) %>%
+box.pois + box.bin + plot_layout(ncol=1)
+
+
+# summary stats
+
+d.bin <- stats.bin %>% group_by(test, sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
             sd = sd(Dispersion, na.rm=T)) %>%
-  mutate(intercept = as.factor(as.numeric(intercept))) %>%
-  ggplot(aes(x=sampleSize, y=median, col=test))+
+  pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
+  ggplot(aes(x=sampleSize, y=Dispersion, col=test, linetype=stat))+
   geom_point()+ geom_line()+
   #geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd))+
   scale_x_log10()+
@@ -212,7 +239,7 @@ d.bin <- stats.bin %>% group_by(test,sampleSize, intercept) %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom",
         axis.text.x = element_text(angle=45, hjust=1))+
-  ylab("Dispersion (median)")+
+  ylab("Dispersion")+
   labs(tag="B)")
 d.bin
 
@@ -220,8 +247,8 @@ d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
             sd = sd(Dispersion, na.rm=T)) %>%
-  mutate(intercept = as.factor(as.numeric(intercept))) %>%
-  ggplot(aes(x=sampleSize, y=median, col=test))+
+  pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
+  ggplot(aes(x=sampleSize, y=Dispersion, col=test, linetype=stat))+
   geom_point()+ geom_line()+
   #geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd))+
   scale_x_log10()+
@@ -234,7 +261,7 @@ d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "none",
         axis.text.x = element_text(angle=45, hjust=1)) +
-  ylab("Dispersion (median)")+
+  ylab("Dispersion")+
   labs(tag="A)")
 d.pois
 
@@ -244,7 +271,7 @@ d.pois + d.bin +
 ggsave(here("figures", "2_glm_dispersionStats.jpeg"), width=10, height = 8)
 
 
-#### distribution p values ####
+##### distribution p values ####
 
 ggplot(pvals.bin, aes(x=p.val, col=test))+
   geom_density()+
@@ -275,7 +302,7 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
 ggsave(here("figures", "2_glmPois_distribPvals.jpeg"), width=10, height = 15)
 
 
-#### ecdf p values ####
+##### ecdf p values ####
 
 ggplot(pvals.bin, aes(x=p.val, col=test))+
   stat_ecdf()+
