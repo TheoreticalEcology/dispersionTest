@@ -12,9 +12,9 @@ library(patchwork)
 load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
 # created in script 2_glm_type1_results.R
 
-##################-###
-###### Binomial ######
-##################-###
+##############-###
+#### Binomial ####
+##############-###
 
 load(here("data", "3_glmBin_power.Rdata")) # simulated data
 
@@ -29,7 +29,7 @@ for (i in 1:length(out.bin)) {
 }
 names(simuls.bin)[names(simuls.bin)=="controlValues"] <- "overdispersion"
 
-# "RAW" Power ######
+###### "RAW" Power ######
 
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                       overdispersion, intercept, sampleSize) %>%
@@ -57,7 +57,7 @@ ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 15)
 
 
 
-## Callibrated Power #####
+##### Callibrated Power #####
 
 cp.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                              overdispersion, intercept, sampleSize) %>%
@@ -86,9 +86,7 @@ ggplot(cp.bin, aes(x=overdispersion, y=prop.sig, col=test))+
 ggsave(here("figures", "3_glmBin_powerCalibrated.jpeg"), width=10, height = 15)
 
 
-
-
-# figure statistics #####
+##### figure statistics #####
 
 st.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
                                        Ref.stat.dispersion, replicate,
@@ -113,9 +111,9 @@ ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
 ggsave(here("figures", "3_glmBin_dispersionStats.jpeg"), width=10, height = 15)
 
 
-#################-##
-##### Poisson  #####
-################-###
+###############-##
+#### Poisson  ####
+##############-###
 
 
 load(here("data", "3_glmPois_power.Rdata"))
@@ -131,7 +129,7 @@ for (i in 1:length(out.pois)) {
 names(simuls.pois)[names(simuls.pois)=="controlValues"] <- "overdispersion"
 
 
-# "RAW" Power #####
+##### "RAW" Power #####
 p.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                         overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "p.val") %>%
@@ -155,7 +153,7 @@ ggplot(p.pois, aes(x=overdispersion, y=prop.sig, col=test))+
 ggsave(here("figures", "3_glmPois_power.jpeg"), width=10, height = 15)
 
 
-# Calibrated power #####
+##### Calibrated power #####
 
 cp.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
                                        overdispersion, intercept, sampleSize) %>%
@@ -186,7 +184,7 @@ ggsave(here("figures", "3_glmPois_powerCalibrated.jpeg"), width=10, height = 15)
 
 
 
-### figure statistics #####
+##### figure statistics #####
 
 st.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
                                          Ref.stat.dispersion, replicate,
@@ -212,21 +210,60 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
 ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
 
 
-# FIGURE DISPERSION STATISTICS together ####
+
+
+
+## FIGURE POWER together ####
+
+# raw
+pow <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id= "model")
+
+
+
+
+
+## FIGURE DISPERSION STATISTICS together ####
 
 dispersion <- bind_rows(list(Poisson = st.pois, Binomial = st.bin), .id= "model") %>%
-  filter(intercept == 0, sampleSize %in% c(10,20,50,100)) %>%
   pivot_wider(names_from = test, values_from = mean.stat) %>%
   mutate(reldif_DHA_Pear = (DHA.stat.dispersion - Pear.stat.dispersion)/DHA.stat.dispersion,
-         reldif_DHA_REf = (DHA.stat.dispersion - Ref.stat.dispersion)/DHA.stat.dispersion)
+         reldif_DHA_Ref = (DHA.stat.dispersion - Ref.stat.dispersion)/DHA.stat.dispersion)
 
 
+##### DHARMa stats X Pearson Chi-sq ####
+small.text <- data.frame(label = c("Sim-based higher than Pearson", 
+                                       "Sim-based lower than Pearson", "", ""),
+                         model= rep(c("Binomial", "Poisson"), each=2),
+                         x = rep(0.7,4), y=c(0.03,-0.025, 0,0 ))
+#all results
 ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   geom_point(size=2) + geom_line()+
+  facet_grid(intercept~model, scales="free")+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Chi-sq)")+
+  geom_hline(yintercept = 0, linetype="dotted") +
+  theme(panel.background = element_rect(color="black"))
+
+###### figure to present intercept == 0 ####
+dispersion %>% filter(intercept == 0) %>%
+ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
+  geom_point(size=2) + geom_line()+
   facet_grid(~model)+
-  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson)")+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Chi-sq)")+
+  geom_hline(yintercept = 0, linetype="dotted")  +
+  ylim(-0.4,0.4) +
+  geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),
+           colour="black")
+ggsave(here("figures", "3_glm_DISP_diff_DHA-Pear.jpeg"), height=4, width=9)
+
+
+
+##### DHARMa stats X Pearson Bootstrapping ####
+ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
+  geom_point(size=2) + geom_line()+
+  facet_grid(~model)+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Boot)")+
   ylim(-0.4,0.2)+
-  geom_hline(yintercept = 0, linetype="dotted") 
-ggsave(here("figures", "3_glm_DISPERSION_diff.jpeg"), height=5, width=10)
-
-
+  geom_hline(yintercept = 0, linetype="dotted") +
+  geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),
+            colour="black")
+ggsave(here("figures", "3_glm_DISP_diff_DHA-Ref.jpeg"), height=4, width=9)
