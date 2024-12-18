@@ -56,11 +56,11 @@ ggplot(p.bin, aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_power.jpeg"), width=10, height = 15)
+ggsave(here("figures", "5_glmmBin_power.jpeg"), width=12, height = 10)
 
 
 
-# dispersion stat
+###### dispersion stat ####
 d.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispersion,
                                     dhaCO.stat.dispersion, refUN.stat.dispersion, 
                                       refCO.stat.dispersion, replicate, ngroups,
@@ -85,7 +85,7 @@ ggplot(d.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_dispersionStats.jpeg"), width=10, height = 15)
+ggsave(here("figures", "5_glmmBin_dispersionStats.jpeg"), width=12, height = 10)
 
 
 
@@ -135,23 +135,23 @@ ggplot(p.pois, aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_power.jpeg"), width=10, height = 15)
+ggsave(here("figures", "5_glmmPois_power.jpeg"), width=12, height = 10)
 
 
 
-# dispersion stat
-d.bin <- simuls.pois %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispersion,
+###### dispersion stat ####
+d.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispersion,
                                       dhaCO.stat.dispersion, refUN.stat.dispersion, 
                                       refCO.stat.dispersion, replicate, ngroups,
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "dispersion") %>%
   group_by(sampleSize,intercept,overdispersion, test) %>%
   summarise(mean.stat = mean(dispersion, na.rm=T))
-d.bin$intercept <- fct_relevel(d.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
-d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
+d.pois$intercept <- fct_relevel(d.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
+d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
 
 
-ggplot(d.bin, aes(x=overdispersion, y=mean.stat, col=test))+
+ggplot(d.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
@@ -163,13 +163,57 @@ ggplot(d.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 100 groups; Ntrials=10") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
-  scale_y_log10()+ ylim(0,3)+
+  scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_dispersionStats.jpeg"), width=10, height = 15)
+ggsave(here("figures", "5_glmmPois_dispersionStats.jpeg"), width=12, height = 10)
 
 
 
+#### FIGURE ALL ####
+
+pow <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
+  ungroup() %>%
+  mutate(model= fct_relevel(model, "Poisson", "Binomial"))
+disp <- bind_rows(list(Poisson = d.pois, Binomial = d.bin), .id="model") %>%
+  ungroup() %>%
+  mutate(model= fct_relevel(model, "Poisson", "Binomial"))
 
 
+fig.pow <- pow %>% filter(intercept == 0, test != "Pear.p.val",
+               sampleSize == 1000) %>%
+  ggplot(aes(x=overdispersion, y= prop.sig, col=test)) +
+  geom_point() + geom_line() +
+  facet_grid(~model) +
+  annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
+           alpha = .1,fill = "blue")+
+  ylab("Power")+
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "none")+
+  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+  labs(tag="A)")
+
+fig.disp <- disp %>% filter(intercept == 0, test != "Pear.stat.dispersion",
+               sampleSize == 1000) %>%
+  ggplot(aes(x=overdispersion, y= mean.stat, col=test)) +
+  geom_point() + geom_line() +
+  facet_grid(~model) +
+  ylab("Dispersion statistics")+
+  geom_hline(yintercept = 1, linetype="dotted")+
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom")+
+  guides(color=guide_legend(nrow=2, byrow=TRUE))+
+  labs(tag="B)")
 
 
+fig.pow + fig.disp + plot_layout(ncol=1)
+ggsave(here("figures", "5_glmm_power_dispersion.jpeg"), width = 8, heigh=8)
