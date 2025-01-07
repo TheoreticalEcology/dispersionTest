@@ -60,6 +60,23 @@ ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   guides(color=guide_legend(nrow=4, byrow=TRUE))
 ggsave(here("figures", "5_glmmBin_power_10g.jpeg"), width=12, height = 15)
 
+# 50 groups
+p.bin %>% filter(ngroups == "50") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson ParBoot. conditional",
+             "Pearson ParBoot. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  ggtitle("Binomial", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmBin_power_50g.jpeg"), width=12, height = 15)
+
 
 # 100 groups
 p.bin %>% filter(ngroups == "100") %>%
@@ -92,7 +109,7 @@ group_by(sampleSize,ngroups,intercept,overdispersion, test) %>%
 d.bin$intercept <- fct_relevel(d.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
 
-
+# 10 groups
 d.bin %>% filter(ngroups == "10") %>%
 ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -109,6 +126,25 @@ ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   guides(color=guide_legend(nrow=4, byrow=TRUE))
 ggsave(here("figures", "5_glmmBin_dispersionStats_10g.jpeg"), width=12, height = 15)
 
+# 50 groups
+d.bin %>% filter(ngroups == "50") %>%
+  ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
+  ggtitle("Binomial: dispersion statistics", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmBin_dispersionStats_50g.jpeg"), width=12, height = 15)
+
+
+# 100 groups
 d.bin %>% filter(ngroups == "100") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -161,7 +197,44 @@ p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 
 ###### figure power ####
 
-ggplot(p.pois, aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
+# 10 groups
+p.pois %>% filter(ngroups == "10") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson ParBoot. conditional",
+             "Pearson ParBoot. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  ggtitle("Poisson", subtitle = "100 sim; 10 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmPois_power_10g.jpeg"), width=12, height = 10)
+
+# 50 groups
+p.pois %>% filter(ngroups == "50") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson ParBoot. conditional",
+             "Pearson ParBoot. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  ggtitle("Poisson", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmPois_power_50g.jpeg"), width=12, height = 10)
+
+
+# 100 groups
+p.pois %>% filter(ngroups == "100") %>%
+ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
@@ -174,7 +247,7 @@ ggplot(p.pois, aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_power.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_power_100g.jpeg"), width=12, height = 10)
 
 
 
@@ -184,13 +257,52 @@ d.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispers
                                       refCO.stat.dispersion, replicate, ngroups,
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "dispersion") %>%
-  group_by(sampleSize,intercept,overdispersion, test) %>%
+  group_by(sampleSize, ngroups, intercept,overdispersion, test) %>%
   summarise(mean.stat = mean(dispersion, na.rm=T))
 d.pois$intercept <- fct_relevel(d.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
 
+# 10 groups
+d.pois %>% filter(ngroups == "10") %>%
+  ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 10 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  scale_y_log10() + #ylim(0,3) +
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmPois_dispersionStats_10g.jpeg"), width=12, height = 10)
 
-ggplot(d.pois, aes(x=overdispersion, y=mean.stat, col=test))+
+# 50 groups
+d.pois %>% filter(ngroups == "50") %>%
+  filter(mean.stat <110) %>% # excluding weird results 
+  ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Chi-squared",
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional"))+
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  scale_y_log10() + #ylim(0,3) +
+  guides(color=guide_legend(nrow=4, byrow=TRUE))
+ggsave(here("figures", "5_glmmPois_dispersionStats_50g.jpeg"), width=12, height = 10)
+
+
+# 100 groups
+d.pois %>% filter(ngroups == "100") %>%
+ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
@@ -204,7 +316,7 @@ ggplot(d.pois, aes(x=overdispersion, y=mean.stat, col=test))+
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_dispersionStats.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_dispersionStats_100g.jpeg"), width=12, height = 10)
 
 
 
