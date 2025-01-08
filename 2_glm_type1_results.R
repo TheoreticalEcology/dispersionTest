@@ -137,9 +137,9 @@ save(alpha.pois, alpha.bin, file=here("data", "2_callibrated_alphaLevels.Rdata")
 ##### Type I error rate for the dispersion tests #####
 
 f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
-  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val`="Quantile residuals" ,
-                                             `Pear.p.val`="Pearson-Chisq" ,
-                                    `Ref.p.val`="Pearson Param. Bootstrapping"))) +
+  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
+                                             `Pear.p.val` = "1a) Pearson Chi-squared" ,
+                                    `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
@@ -158,9 +158,9 @@ f.bin
 
 f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize), 
                              col=intercept)) +
-  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val`="Quantile residuals" ,
-                                             `Pear.p.val`="Pearson-Chisq" ,
-                                    `Ref.p.val`="Pearson Param. Bootstrapping"))) +
+  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
+                                             `Pear.p.val` = "1a) Pearson Chi-squared" ,
+                                    `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
