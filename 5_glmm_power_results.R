@@ -75,7 +75,7 @@ p.bin %>% filter(ngroups == "50") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_power_50g.jpeg"), width=12, height = 15)
+ggsave(here("figures", "5_glmmBin_power_50g.jpeg"), width=12, height = 9)
 
 
 # 100 groups
@@ -89,11 +89,11 @@ p.bin %>% filter(ngroups == "100") %>%
              "Pearson ParBoot. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Binomial", subtitle = "100 sim; 10 groups; Ntrials=10") +
+  ggtitle("Binomial", subtitle = "100 sim; 100 groups; Ntrials=10") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_power_100g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmBin_power_100g.jpeg"), width=12, height = 9)
 
 
 
@@ -141,7 +141,7 @@ d.bin %>% filter(ngroups == "50") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_dispersionStats_50g.jpeg"), width=12, height = 15)
+ggsave(here("figures", "5_glmmBin_dispersionStats_50g.jpeg"), width=12, height = 9)
 
 
 # 100 groups
@@ -159,7 +159,7 @@ d.bin %>% filter(ngroups == "100") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_dispersionStats_100g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmBin_dispersionStats_100g.jpeg"), width=12, height = 9)
 
 
 
@@ -208,11 +208,11 @@ p.pois %>% filter(ngroups == "10") %>%
              "Pearson ParBoot. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Poisson", subtitle = "100 sim; 10 groups; Ntrials=10") +
+  ggtitle("Poisson", subtitle = "100 sim; 10 groups") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_power_10g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_power_10g.jpeg"), width=12, height = 12)
 
 # 50 groups
 p.pois %>% filter(ngroups == "50") %>%
@@ -225,11 +225,11 @@ p.pois %>% filter(ngroups == "50") %>%
              "Pearson ParBoot. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Poisson", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  ggtitle("Poisson", subtitle = "100 sim; 50 groups0") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_power_50g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_power_50g.jpeg"), width=12, height = 9)
 
 
 # 100 groups
@@ -243,11 +243,11 @@ ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
              "Pearson ParBoot. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Poisson", subtitle = "100 sim; 100 groups; Ntrials=10") +
+  ggtitle("Poisson", subtitle = "100 sim; 100 groups") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_power_100g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_power_100g.jpeg"), width=12, height = 9)
 
 
 
@@ -273,12 +273,12 @@ d.pois %>% filter(ngroups == "10") %>%
              "Pearson Param. Boostrap. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 10 groups; Ntrials=10") +
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 10 groups") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_dispersionStats_10g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_dispersionStats_10g.jpeg"), width=12, height = 12)
 
 # 50 groups
 d.pois %>% filter(ngroups == "50") %>%
@@ -292,12 +292,12 @@ d.pois %>% filter(ngroups == "50") %>%
              "Pearson Param. Boostrap. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 50 groups; Ntrials=10") +
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 50 groups") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_dispersionStats_50g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_dispersionStats_50g.jpeg"), width=12, height = 9)
 
 
 # 100 groups
@@ -311,60 +311,151 @@ ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
              "Pearson Param. Boostrap. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 100 groups; Ntrials=10") +
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; 100 groups") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_dispersionStats_100g.jpeg"), width=12, height = 10)
+ggsave(here("figures", "5_glmmPois_dispersionStats_100g.jpeg"), width=12, height = 9)
 
 
 
-#### FIGURE ALL ####
+#### FIGURES ALL ####
 
+# all simulations
 pow <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
   ungroup() %>%
-  mutate(model= fct_relevel(model, "Poisson", "Binomial"))
+  mutate(model= fct_relevel(model, "Poisson", "Binomial"),
+         ngroups = fct_relevel(ngroups, "10", "50", "100"))
 disp <- bind_rows(list(Poisson = d.pois, Binomial = d.bin), .id="model") %>%
   ungroup() %>%
-  mutate(model= fct_relevel(model, "Poisson", "Binomial"))
+  mutate(model= fct_relevel(model, "Poisson", "Binomial"),
+         ngroups = fct_relevel(ngroups, "10", "50", "100"))
 
-
+# intercept = 0, sample 1000
 fig.pow <- pow %>% filter(intercept == 0, test != "Pear.p.val",
-               sampleSize == 1000) %>%
-  ggplot(aes(x=overdispersion, y= prop.sig, col=test)) +
+               sampleSize %in% c(1000)) %>%
+  ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=sampleSize)) +
   geom_point() + geom_line() +
-  facet_grid(~model) +
+  facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
+                                                     `50`= "m = 50 groups",
+                                                     `100`= "m = 100 groups",
+                                                     `Binomial` = "Binomial",
+                                                     `Poisson` = "Poisson"))) +
   annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
            alpha = .1,fill = "blue")+
   ylab("Power")+
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Chi-squared",
              "Pearson Param. Bootstrap. conditional",
              "Pearson Param. Boostrap. unconditional")) +
   theme(panel.background = element_rect(color="black"),
         legend.position = "none")+
   guides(color=guide_legend(nrow=2, byrow=TRUE)) +
-  labs(tag="A)")
+  labs(tag="A)") +
+  geom_hline(yintercept = 0.5, linetype="dotted")
+fig.pow
 
 fig.disp <- disp %>% filter(intercept == 0, test != "Pear.stat.dispersion",
                sampleSize == 1000) %>%
-  ggplot(aes(x=overdispersion, y= mean.stat, col=test)) +
+  ggplot(aes(x=overdispersion, y= mean.stat, col=test, )) +
   geom_point() + geom_line() +
-  facet_grid(~model) +
+  facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
+                                                     `50`= "m = 50 groups",
+                                                     `100`= "m = 100 groups",
+                                                     `Binomial` = "Binomial",
+                                                     `Poisson` = "Poisson"))) +
   ylab("Dispersion statistics")+
   geom_hline(yintercept = 1, linetype="dotted")+
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Chi-squared",
              "Pearson Param. Bootstrap. conditional",
              "Pearson Param. Boostrap. unconditional")) +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")+
-  guides(color=guide_legend(nrow=2, byrow=TRUE))+
-  labs(tag="B)")
+  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+  labs(tag="B)") +
+  scale_y_log10()+
+  annotate("rect", xmin = 0, xmax = 1, ymin = 0.75, ymax = 1,
+           alpha = .1,fill = "red")
+fig.disp
+
+fig.pow + fig.disp + plot_layout(ncol=1)+
+  plot_annotation(title="Alternative dispersion test for GLMMs",
+                  theme = theme(plot.title = element_text(hjust=0.5)))
+ggsave(here("figures", "5_glmm_results.jpeg"), width = 10, heigh=12)
 
 
-fig.pow + fig.disp + plot_layout(ncol=1)
-ggsave(here("figures", "5_glmm_power_dispersion.jpeg"), width = 8, heigh=8)
+## ALTERNATIVE ####
+## 
+
+library(ggh4x)
+
+pow %>% filter(intercept == 0, test != "Pear.p.val",
+               sampleSize %in% c(200,500,1000)) %>%
+  ggplot(aes(x=overdispersion, y= prop.sig, col=test)) +
+  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
+  facet_nested(sampleSize~model + ngroups) +
+  ylab("Power") +  
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") +
+  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
+  ggtitle("GLMM Power")
+
+
+pow %>% filter(intercept == 0, test != "Pear.p.val",
+               overdispersion >= 0.2 & overdispersion <=0.5,
+               sampleSize %in% c(200,500,1000)) %>%
+  ggplot(aes(x=as.numeric(as.character(ngroups)), y= prop.sig, col=test)) +
+  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
+  facet_nested(overdispersion ~ model + sampleSize) +
+  scale_x_continuous(breaks=c(10,50,100))+
+  ylab("Power") +  xlab("number of groups (m)")+
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") +
+  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
+  ggtitle("GLMM Power ")
+
+
+
+
+pow %>% filter(intercept == 0, test != "Pear.p.val",
+               overdispersion %in% c(0.2,0.5),
+               sampleSize %in% c(200,500,1000)) %>%
+  ggplot(aes(x=as.numeric(as.character(ngroups)), y= prop.sig, col=test, linetype=as.factor(overdispersion))) +
+  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
+  facet_grid(model~sampleSize) +
+  scale_x_continuous(breaks=c(10,50,100))+
+  ylab("Power") +  xlab("number of groups (m)")+
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") +
+  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
+  ggtitle("GLMM Power for 0.5 of overdispersion")
+
+pow %>% filter(intercept == 0, test != "Pear.p.val",
+               overdispersion %in% c(0,0.2,0.5,0.75),
+               sampleSize %in% c(200,500,1000)) %>%
+  ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=ngroups)) +
+  geom_point() + geom_line() +
+  facet_grid(model~sampleSize) +
+  ylab("Power") +
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",  
+             "Pearson Param. Bootstrap. conditional",
+             "Pearson Param. Boostrap. unconditional")) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") +
+  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+  ggtitle("GLMM Power")

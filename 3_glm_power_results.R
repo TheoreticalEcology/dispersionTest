@@ -215,10 +215,23 @@ ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
 
 ## FIGURE POWER together ####
 
-# raw
-pow <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id= "model")
+# raw and callibrated
+pow <- bind_rows(list(Poisson_uncallibrated = p.pois, 
+                      Binomial_uncallibrated = p.bin,
+                      Poisson_callibrated = cp.pois, 
+                      Binomial_callibrated = cp.bin), .id= "model") %>%
+  separate(model, c("model", "callibration"))
 
+# intercept = 0, some sample sizes
+sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 
+ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibration)) +
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  facet_grid(model~sampleSize) +
+  geom_hline(yintercept = 0.5, linetype = "dotted")+
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom")
+ggsave(here("figures", "3_glm_both_power.jpeg"), width=10, height = 6)
 
 
 
