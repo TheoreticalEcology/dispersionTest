@@ -187,6 +187,68 @@ ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
 
 
+##### ALTERNATIVA TYPE I ERROR FIGURE #####
+f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize), col=test)) +
+  facet_grid(~intercept) +
+  geom_point(position = position_dodge(width=0.8)) +
+  geom_errorbar(position = position_dodge(width=0.8),
+                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_hline(yintercept = 0.05, linetype="dotted")+
+  geom_line(aes(x=as.numeric(as.factor(sampleSize))),
+            position = position_dodge(width=0.8))+
+  scale_color_discrete(name="Test", labels=c( "Pearson Chi-squared",
+                                              "Pearson param. bootstrap",
+                                              "Sim-based residuals"))+
+  ggtitle("GLM Poisson") +
+  xlab("Sample size") +
+  ylab("Type I error") +
+  theme(panel.background  = element_rect(color = "black"),
+        legend.position = "bottom",
+        axis.text.x = element_text(angle=45, hjust=1))+
+  labs(tag="A)")
+
+
+f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=test)) +
+  facet_grid(~intercept) +
+  geom_point(position = position_dodge(width=0.8)) +
+  geom_errorbar(position = position_dodge(width=0.8),
+                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_hline(yintercept = 0.05, linetype="dotted")+
+  geom_line(aes(x=as.numeric(as.factor(sampleSize))),
+            position = position_dodge(width=0.8))+
+  scale_color_discrete(name="Test", labels=c( "Pearson Chi-squared",
+                                             "Pearson param. bootstrap",
+                                             "Sim-based residuals"))+
+  ggtitle("GLM Binomial") +
+  xlab("Sample size") +
+  ylab("Type I error") +
+  theme(panel.background  = element_rect(color = "black"),
+        legend.position = "bottom",
+        axis.text.x = element_text(angle=45, hjust=1))+
+  labs(tag="B)")
+
+f.pois + f.bin+
+  plot_layout(ncol=1, )
+#ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
+
+
+# zero intercept
+data.fig <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), 
+                      .id="model")
+data.fig %>% filter(intercept == 0,
+                    sampleSize %in% c(10,100,1000)) %>%
+  ggplot(aes(x=test, y=prop.sig, col=test)) +
+  facet_grid(model~sampleSize)+
+  geom_point(position = position_dodge(width=0.8)) +
+  geom_errorbar(position = position_dodge(width=0.8),
+                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_hline(yintercept = 0.05, linetype="dotted")+
+  theme(panel.background  = element_rect(color = "black"))
+
+
+
+
+
 ##### Dispersion statistics #### 
 
 # boxplot
