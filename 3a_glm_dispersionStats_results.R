@@ -3,8 +3,10 @@
 # Jan 25
 
 library(DHARMa)
-library(tidyverse)
+library(tidyverse); library(cowplot);
+theme_set(theme_cowplot())
 library(here)
+library(patchwork)
 
 
 ##############-###
@@ -45,6 +47,9 @@ stats.bin <- bin %>% dplyr::select(Pear.stat.dispersion,
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(slope, overdispersion,test) %>% 
   summarise(mean.stat = mean(Dispersion, na.rm=T))
+stats.bin$test <- factor(stats.bin$test, levels = c("Pear.stat.dispersion", 
+                                                    "Ref.stat.dispersion",
+                                                    "DHA.stat.dispersion"))
 
 
 
@@ -86,28 +91,55 @@ stats.pois <- pois %>% dplyr::select(Pear.stat.dispersion,
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(slope, overdispersion,test) %>% 
   summarise(mean.stat = mean(Dispersion, na.rm=T))
+stats.pois$test <- factor(stats.pois$test, levels = c("Pear.stat.dispersion", 
+                                                      "Ref.stat.dispersion",
+                                                      "DHA.stat.dispersion"))
 
 
 
+#-###########-#
 ## Figures ####
+#-###########-#
 
-pval <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model")
-
-pval %>%
+##### Pvalues #####
+pval <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), 
+                  .id="model") %>%
+  mutate(slope = as.numeric(slope))
+ 
+pfig <- pval %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
-  facet_grid(model~slope)
+  facet_grid(model~slope) +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  labs(title= "GLM power dif slopes", 
+       subtitle = "n=500, intercept = 0, ntrial(binomial)=10")
+pfig
 
-statval <- bind_rows(list(Poisson = stats.pois, Binomial = stats.bin), .id="model")
 
 
-statval %>%
+##### dispersion stats #####
+statval <- bind_rows(list(Poisson = stats.pois, Binomial = stats.bin), .id="model") %>%
+  mutate(slope = as.numeric(slope))
+
+statfig <- statval %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point() + geom_line() +
   facet_grid(model~slope, scales="free") +
   labs(title="GLM dispersion stats for dif slopes", 
-       subtitle  = "n=500, intercept=0")
+       subtitle  = "n=500, intercept=0,  ntrial(binomial)=10")+
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom")
+statfig
+
+# dif in percentage of the DHA stats
+statval %>% filter(test != "Ref.stat.dispersion",
+                   overdispersion == 1) %>% ungroup() %>%
+  select(-overdispersion) %>%
+  pivot_wider(names_from = test, values_from = mean.stat) %>%
+  mutate(dif_prop = (DHA.stat.dispersion-Pear.stat.dispersion)/DHA.stat.dispersion)
+# poisson
 
 
-
-
+pfig + statfig + plot_layout(ncol=1)
+ggsave(here("figures", "3_glm_dispPower_slopes.jpeg"), width=13,height = 10)
