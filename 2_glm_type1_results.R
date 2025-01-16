@@ -188,48 +188,62 @@ ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
 
 ##### ALTERNATIVA TYPE I ERROR FIGURE #####
-f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize), col=test)) +
-  facet_grid(~intercept) +
+#library(ggbreak)
+#library(ggh4x)
+
+dats <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
+  mutate(model = fct_relevel(model, "Poisson", "Binomial")) 
+
+dats %>%
+ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
+  facet_nested(model~test, labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
+                                                   `Pear.p.val` = "1a) Pearson Chi-squared" ,
+                                                   `Ref.p.val` = "1b) Pearson param. bootstrap",
+                                                  `Binomial` = "Binomial",
+                                                  `Poisson` = "Poisson"))) +
+  scale_y_continuous(limits=c(0,0.1))+
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
-  scale_color_discrete(name="Test", labels=c( "Pearson Chi-squared",
-                                              "Pearson param. bootstrap",
-                                              "Sim-based residuals"))+
-  ggtitle("GLM Poisson") +
   xlab("Sample size") +
   ylab("Type I error") +
   theme(panel.background  = element_rect(color = "black"),
-        legend.position = "bottom",
-        axis.text.x = element_text(angle=45, hjust=1))+
-  labs(tag="A)")
+        legend.position = c(0.9,0.36),
+        legend.background  = element_rect(fill="#F0F0F0"),
+        axis.text.x = element_text(angle=45, hjust=1))
+
+#ggsave(here("figures", "2_glm_type1_alternative.jpeg"), width=10, height = 7)
 
 
-f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=test)) +
-  facet_grid(~intercept) +
+dats %>%
+  ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
+  facet_grid(model~test, scales="free",
+             labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
+                                                    `Pear.p.val` = "1a) Pearson Chi-squared" ,
+                                                    `Ref.p.val` = "1b) Pearson param. bootstrap",
+                                                    `Binomial` = "Binomial",
+                                                    `Poisson` = "Poisson"))) +
+  scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
+  geom_hline(yintercept = 0, col="gray")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
-  scale_color_discrete(name="Test", labels=c( "Pearson Chi-squared",
-                                             "Pearson param. bootstrap",
-                                             "Sim-based residuals"))+
-  ggtitle("GLM Binomial") +
   xlab("Sample size") +
   ylab("Type I error") +
   theme(panel.background  = element_rect(color = "black"),
-        legend.position = "bottom",
-        axis.text.x = element_text(angle=45, hjust=1))+
-  labs(tag="B)")
+        legend.position = c(0.9,0.86),
+        legend.background  = element_rect(fill="#F0F0F0"),
+        axis.text.x = element_text(angle=45, hjust=1))
 
-f.pois + f.bin+
-  plot_layout(ncol=1, )
-#ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
+ggsave(here("figures", "2_glm_type1_alternative.jpeg"), width=10, height = 7)
+
+
 
 
 # zero intercept

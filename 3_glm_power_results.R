@@ -227,10 +227,15 @@ sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 
 ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibration)) +
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_linetype_discrete(name="")+
+  scale_color_discrete( name="", labels = c("Sim-based residuals",
+                                            "Pearson Chi-squared",
+                                            "Pearson Param. Bootstrap.")) +
   facet_grid(model~sampleSize) +
   geom_hline(yintercept = 0.5, linetype = "dotted")+
   theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")
+        legend.position = c(0.01,0.9))
+
 ggsave(here("figures", "3_glm_both_power.jpeg"), width=10, height = 6)
 
 
