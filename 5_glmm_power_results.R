@@ -125,6 +125,7 @@ d.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispersio
 group_by(sampleSize,ngroups,intercept,overdispersion, test) %>%
   summarise(mean.stat = mean(dispersion, na.rm=T))
 d.bin$intercept <- fct_relevel(d.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
+d.bin$ngroups <- fct_relevel(d.bin$ngroups, "10", "50", "100")
 d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
 
 
@@ -336,23 +337,26 @@ d.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispers
   group_by(sampleSize, ngroups, intercept,overdispersion, test) %>%
   summarise(mean.stat = mean(dispersion, na.rm=T))
 d.pois$intercept <- fct_relevel(d.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
+d.pois$ngroups <- fct_relevel(d.pois$ngroups, "10", "50", "100")
 d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
 
 
 # all groups
-d.pois %>% filter(test != "Pear.stat.dispersion") %>%
+d.pois %>% filter(test != "Pear.stat.dispersion",
+                  mean.stat <1000) %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_y_log10()+
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
              "Pearson Chi-squared",
              "Pearson Param. Bootstrap. conditional",
              "Pearson Param. Boostrap. unconditional"))+
-  facet_grid(sampleSize~intercept) +
-  annotate("rect", xmin = 0, xmax = 1, ymin = 0.75, ymax = 1,
+  facet_grid(sampleSize~intercept, scales="free") +
+  annotate("rect", xmin = 0, xmax = 1, ymin = 0.5, ymax = 1,
            alpha = .1,fill = "red")+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim; Ntrials=10") +
+  ggtitle("Poisson: dispersion statistics", subtitle = "100 sim") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
