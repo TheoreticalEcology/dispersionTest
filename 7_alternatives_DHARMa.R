@@ -29,14 +29,16 @@ getP <- function(simulated, observed, alternative, plot = FALSE, ...){
   return(p)
 }
 
-spread2 <- function(x, simSD.obs){
+spread2 <- function(x, simulationOutput, simSD.obs){
   val <- (x - simulationOutput$fittedPredictedResponse)/simSD.obs
   (sum(val^2)/(length(x)-1))
 }
 
-dispersion <- function(simSD.obs){
-  observed = spread2(simulationOutput$observedResponse, simSD.obs)
-  simulated = apply(simulationOutput$simulatedResponse, 2, spread2, simSD.obs)
+dispersion <- function(simulationOutput, simSD.obs){
+  observed = spread2(simulationOutput$observedResponse,simulationOutput, simSD.obs)
+  simulated = apply(simulationOutput$simulatedResponse, 2, spread2, 
+                    simulationOutput = simulationOutput, 
+                    simSD.obs = simSD.obs)
   dispersion = observed/mean(simulated)
   pval = getP(simulated, observed, "two.sided")
   return(list(statistic = dispersion, p.value = pval))
@@ -83,35 +85,40 @@ for (k in sampleSize){
       # Observation-wise SD
       simulationSD.obs <-  apply(simulationOutput$simulatedResponse,1,sd)
       
+      # if there is a simOBS with zero sd
+      out$zeroSD <- min(simulationSD.obs)==0
+      out$prop.zeroSD <- sum(simulationSD.obs==0)/simulationOutput$nObs
+      
       # Alternative 1: use te minimum SD
+      simSD.obs1 <- simulationSD.obs
       if(min(simulationSD.obs)==0){
         newSD <- min(simulationSD.obs[simulationSD.obs != 0])
-        simSD.obs <- simulationSD.obs
-        simSD.obs[simSD.obs==0] <- newSD
+        simSD.obs1[simSD.obs1==0] <- newSD
       }
-      out$A1.p <- dispersion(simSD.obs)$p.value
-      out$A1.stat <- dispersion(simSD.obs)$statistic
+      out$A1.p <- dispersion(simulationOutput, simSD.obs1)$p.value
+      out$A1.stat <- dispersion(simulationOutput,simSD.obs1)$statistic
       
       # Alternative 2: min SD divided by the max N unique vals
       n.uniq <- function(x) length(unique(x))
       nuniq <- apply(simulationOutput$simulatedResponse,1,n.uniq)
       
+      simSD.obs2 <- simulationSD.obs
       if(min(simulationSD.obs)==0){
         newSD <- min(simulationSD.obs[simulationSD.obs != 0])/max(nuniq)
-        simSD.obs <- simulationSD.obs
-        simSD.obs[simSD.obs==0] <- newSD
+        simSD.obs2[simSD.obs2==0] <- newSD
       }
-      out$A2.p <- dispersion(simSD.obs)$p.value
-      out$A2.stat <- dispersion(simSD.obs)$statistic
+      out$A2.p <- dispersion(simulationOutput,simSD.obs2)$p.value
+      out$A2.stat <- dispersion(simulationOutput,simSD.obs2)$statistic
       
       # Alternative 3: min SD divided by the nSim
+      simSD.obs3 <- simulationSD.obs
       if(min(simulationSD.obs)==0){
-        newSD <- min(simulationSD.obs[simulationSD.obs != 0])/simulationOutput$nSim
-        simSD.obs <- simulationSD.obs
-        simSD.obs[simSD.obs==0] <- newSD
+        newSD <- min(simulationSD.obs[simulationSD.obs != 0])/
+          simulationOutput$nSim
+        simSD.obs3[simSD.obs3==0] <- newSD
       }
-      out$A3.p <- dispersion(simSD.obs)$p.value
-      out$A3.stat <- dispersion(simSD.obs)$statistic
+      out$A3.p <- dispersion(simulationOutput,simSD.obs3)$p.value
+      out$A3.stat <- dispersion(simulationOutput,simSD.obs3)$statistic
 
       return(unlist(out))
     }
@@ -167,30 +174,6 @@ for (k in sampleSize){
 # }
 
 
-# results:
-# library(tidyverse)
-# 
-# # seeing data:
-# load(here("data","6_DHARMa_dispersion_bin.Rdata"))
-# load(here("data","6_DHARMa_dispersion_pois.Rdata"))
-# 
-# simbin <- map_dfr(out.bin, "simulations", .id="ngroups")  %>%
-#   separate(ngroups, c("sampleSize", "nSim")) %>%
-#   rename("intercept" = "controlValues")
-# simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
-#   separate(ngroups, c("sampleSize", "nSim")) %>%
-#   rename("intercept" = "controlValues")
-# 
-# res <- bind_rows(list(Poisson = simpois, Binomial = simbin), .id="model")
-# 
-# 
-# res %>%
-#   mutate(nSim = fct_relevel(nSim, "50","100","250") ) %>%
-#   ggplot(aes(x = nSim, y = prop.zero, col = sampleSize))+
-#   geom_boxplot() +
-#   #geom_violin() +
-#   facet_grid(model ~ intercept, scales = "free") +
-#   scale_y_sqrt()
 
 
 
