@@ -5,6 +5,7 @@
 library(DHARMa)
 library(here)
 library(tidyverse)
+library(cowplot); theme_set(theme_cowplot())
 
 
 
@@ -23,7 +24,7 @@ simpois %>% group_by(intercept,sampleSize, nSim) %>%
 # looking at the percentage of zeros in the simulations
 
 simpois %>%
-  ggplot(aes(x=intercept, y=prop.zeroSD, col=nSim)) +
+  ggplot(aes(x=intercept, y=prop.zeroSD, col=as.factor(nSim))) +
   geom_boxplot()+
   facet_wrap(~sampleSize, scales="free")
 
@@ -50,7 +51,8 @@ for (i in 1:nrow(p.pois)) {
 
 
 p.pois %>%
-  ggplot(aes(x=nSim, y=prop.sig, col=test))+
+  ggplot(aes(x=nSim, y=prop.sig, col=intercept, linetype=sampleSize))+
+  facet_grid(~test)+
   geom_point(position = position_dodge(width = 0.2)) + 
   geom_line(position = position_dodge(width = 0.2), aes(x=as.numeric(nSim))) +
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
