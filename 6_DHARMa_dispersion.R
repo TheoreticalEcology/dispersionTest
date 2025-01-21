@@ -57,7 +57,6 @@ for (k in sampleSize){
 #out.pois<- list()
 load(here("data","6_DHARMa_dispersion_pois.Rdata"))
 
-
 for (k in sampleSize){
   for (i in nSim){
     
@@ -94,30 +93,30 @@ for (k in sampleSize){
 
 
 # results:
-# library(tidyverse)
+ library(tidyverse)
 # 
 # # seeing data:
-# load(here("data","6_DHARMa_dispersion_bin.Rdata"))
-# load(here("data","6_DHARMa_dispersion_pois.Rdata"))
-# 
-# simbin < map_dfr(out.bin, "simulations", .id="ngroups")  %>%
-#   separate(ngroups, c("sampleSize", "nSim")) %>%
-#   rename("intercept" = "controlValues")
-# simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
-#   separate(ngroups, c("sampleSize", "nSim")) %>%
-#   rename("intercept" = "controlValues")
-# 
-# res <- bind_rows(list(Poisson = simpois, Binomial = simbin), .id="model")
-# 
-# 
-# res %>%
-#   mutate(nSim = fct_relevel(nSim, "50","100","250", "1000") ) %>%
-#   ggplot(aes(x = nSim, y = prop.zero, col = sampleSize))+
-#   geom_boxplot() +
-#   #geom_violin() +
-#   facet_grid(model ~ intercept, scales = "free") +
-#   scale_y_sqrt()
-# 
+load(here("data","6_DHARMa_dispersion_bin.Rdata"))
+load(here("data","6_DHARMa_dispersion_pois.Rdata"))
+
+simbin <- map_dfr(out.bin, "simulations", .id="ngroups")  %>%
+  separate(ngroups, c("sampleSize", "nSim")) %>%
+  rename("intercept" = "controlValues")
+simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
+  separate(ngroups, c("sampleSize", "nSim")) %>%
+  rename("intercept" = "controlValues")
+
+res <- bind_rows(list(Poisson = simpois, Binomial = simbin), .id="model")
+
+
+res %>%
+  mutate(nSim = fct_relevel(nSim, "50","100","250", "1000") ) %>%
+  ggplot(aes(x = nSim, y = prop.zero, col = sampleSize))+
+  geom_boxplot() +
+  #geom_violin() +
+  facet_grid(model ~ intercept, scales = "free") +
+  scale_y_sqrt()
+
 
 
 

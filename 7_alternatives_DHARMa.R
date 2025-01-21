@@ -8,8 +8,8 @@ library(here)
 # testing the diff alternatives for DHARMa disp test
 
 sampleSize <- c(100,1000)
-intercept <- c(-3,-1.5,0)
-nSim = c(250,1000)
+intercept <- c(0,3)
+nSim = c(5,10,50,250,1000)
 nRep = 10000
 
 
@@ -52,15 +52,16 @@ out.pois<- list()
 
 
 for (k in sampleSize){
-  for (i in nSim){
+  for (i in intercept){
     
     # function to varying sampleSize
-    calculateStatistics <- function(control = 0){
+    calculateStatistics <- function(control = 5){
       # data
       testData <- createData(overdispersion = 0,
                              sampleSize = k,
-                             intercept = control,
+                             intercept = i,
                              numGroups = 10,
+                             randomEffectVariance = 0,
                              family = poisson())
       # model
       fittedModel <-glm(observedResponse ~ 
@@ -68,7 +69,7 @@ for (k in sampleSize){
       #results
       out <- list()
       
-      simulationOutput <- simulateResiduals(fittedModel, n = i)
+      simulationOutput <- simulateResiduals(fittedModel, n = control)
       
       #Pearson
       out$Pear.p <- testDispersion(fittedModel, plot = F, 
@@ -120,10 +121,20 @@ for (k in sampleSize){
       out$A3.p <- dispersion(simulationOutput,simSD.obs3)$p.value
       out$A3.stat <- dispersion(simulationOutput,simSD.obs3)$statistic
 
+      # Alternative 4: add 0.5 in the first observation to have a sd
+      simSD.obs4 <- simulationSD.obs
+      if(min(simulationSD.obs)==0){
+        sim.mat <- simulationOutput$simulatedResponse
+        sim.mat[simulationSD.obs==0,1] <- sim.mat[simulationSD.obs==0,1]+0.5
+        simSD.obs4 <- apply(sim.mat,1,sd)
+      }
+      out$A4.p <- dispersion(simulationOutput, simSD.obs4)$p.value
+      out$A4.stat <- dispersion(simulationOutput, simSD.obs4)$statistic
+      
       return(unlist(out))
     }
     
-    out <- runBenchmarks(calculateStatistics, controlValues = intercept,
+    out <- runBenchmarks(calculateStatistics, controlValues = nSim,
                          nRep = nRep, parallel = T, exportGlobal = T)
     out.pois[[length(out.pois) + 1]] <- out
     names(out.pois)[length(out.pois)] <- paste(k, i, sep="_")
