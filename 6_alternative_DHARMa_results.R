@@ -24,10 +24,9 @@ simpois %>%
   ggplot(aes(x=as.factor(overdispersion), y=prop.zero, col=as.factor(sampleSize))) +
   geom_boxplot()+
   facet_grid(nSim~intercept, scales="free") +
-  labs(title="Poisson", 
-       subtitle="Proportion of obs with zero SD estimated for simulated observation") +
+  labs(title="Prop obs with zero SD estimated for simulated data") +
   theme(panel.background = element_rect(color="black"))
-
+ggsave(here('figures', '6_propzero.jpeg'), height=10, width=10)
 
 ## evaluating just the results with NO zero SD-obs
 
@@ -61,7 +60,7 @@ p.pois %>%
   geom_hline(yintercept = 0.05, linetype = "dotted")+
   labs(title= "Type I error Poisson") +
   theme(panel.background = element_rect(color="black"))
-
+ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
 
 
 #dispersion stat for zeo overdisp
@@ -78,6 +77,7 @@ dis %>%
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_dispersion.jpeg'), height=6, width=10)
 
 ## differences between dispersions stats and Pearson
 dis2 <- simpois %>% filter(prop.zero ==0, overdispersion==0) %>%
@@ -86,24 +86,25 @@ dis2 <- simpois %>% filter(prop.zero ==0, overdispersion==0) %>%
   select(sampleSize,intercept,nSim, P.DHA, P.Alt) %>%
   pivot_longer(4:5,names_to = "test", values_to = "dif")
 
+#library(patchwork)
 dis2 %>% 
   ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
   geom_boxplot() +
   geom_hline(yintercept = 0, linetype="dashed")  +
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Dispersion statistics") +
-  theme(panel.background = element_rect(color="black"))
-
+  theme(panel.background = element_rect(color="black")) #+
 
 dis2 %>% filter(nSim %in% c(250,1000)) %>%
   ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
   geom_boxplot() +
-  geom_hline(yintercept = 0, linetype="dashed")  +
+  ylim(-0.1,0.1) + ylab("Dif (Pearson - disp)")+
+   geom_hline(yintercept = 0, linetype="dashed")  +
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Dispersion statistics") +
-  theme(panel.background = element_rect(color="black"))
-
-
+  theme(panel.background = element_rect(color="black")) #+
+#  plot_layout(ncol=1)
+#ggsave(here('figures', '6_dispersion_dif.jpeg'), height=12, width=10)
 
 dis2 %>% filter(nSim %in% c(250,1000)) %>%
   ggplot(aes(x = as.factor(nSim), y = dif, col = test))+
@@ -111,9 +112,54 @@ dis2 %>% filter(nSim %in% c(250,1000)) %>%
   geom_hline(yintercept = 0, linetype="dashed")  +
   facet_grid(sampleSize~intercept, scales="free")+
   labs(title= "Dispersion statistics") +
+  theme(panel.background = element_rect(color="black"))+
+   ylim(-0.1,0.1) + ylab("Dif (Pearson - disp)")
+
+
+
+# dipersion with oeverdispersion
+disper <- simpois %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
+  pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
+  mutate(nSim = as.factor(nSim))
+
+
+disper %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
+  summarise(mean.disp = mean(disp.statistics)) %>%
+  ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 1, linetype="dashed")  +
+  scale_y_log10() +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
 
+## power
+power <- simpois %>% filter(prop.zero == 0,) %>% 
+  select(sampleSize,intercept, nSim, overdispersion, ends_with(".p")) %>%
+  pivot_longer(5:7, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize, intercept, nSim, test, overdispersion) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]))
+power$prop.sig <- power$p.sig/power$nsim
+power$nSim <- as.factor(power$nSim)
+# add sig test
+for (i in 1:nrow(power)) {
+  btest <- binom.test(power$p.sig[i], n=power$nsim[i], p=0.05)
+  power$p.bin0.05[i] <- btest$p.value
+  power$conf.low[i] <- btest$conf.int[1]
+  power$conf.up[i] <- btest$conf.int[2]
+}
 
+power %>% 
+  ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 0)  +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Power") +
+  theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_power.jpeg'), height=6, width=12)
 
 
 
@@ -140,7 +186,6 @@ dis0 %>% filter(disp.statistics <10) %>%
   facet_grid(sampleSize ~ intercept, scales = "free") +
   scale_y_sqrt() +
   theme(panel.background = element_rect(color="black"))
-
 
 
 

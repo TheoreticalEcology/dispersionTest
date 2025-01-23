@@ -89,6 +89,15 @@ for(s in nSim) {
       out$Alt.stat <- alterna$statistic
       out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
       
+      
+      
+      resP = residuals(fittedModel, type = "pearson")
+      m2 <- summary(lm(alterna$resPA - resP ~ resP))
+      out$resPA.inter = m2$coefficients[1,1]
+      out$resPA.interP = m2$coefficients[1,4]
+      out$resPA.slope = m2$coefficients[2,1]
+      out$resPA.slopeP = m2$coefficients[2,4]
+      
       return(unlist(out))
     }
     
