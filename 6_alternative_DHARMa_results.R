@@ -14,15 +14,16 @@ library(cowplot); theme_set(theme_cowplot())
 load(here("data","6_alternative_DHARMA.Rdata"))
 
 simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
-  separate(ngroups, c("sampleSize", "intercept"), sep="_") %>%
-  rename("nSim" = "controlValues") 
+  separate(ngroups, c("nSim", "sampleSize", "intercept"), sep="_") %>%
+  rename("overdispersion" = "controlValues") %>%
+  mutate(nSim = as.factor(as.numeric(nSim)))
 
 # looking at the percentage of zeros in the simulations
 
 simpois %>%
-  ggplot(aes(x=as.factor(nSim), y=prop.zero, col=as.factor(sampleSize))) +
+  ggplot(aes(x=as.factor(overdispersion), y=prop.zero, col=as.factor(sampleSize))) +
   geom_boxplot()+
-  facet_grid(~intercept, scales="free") +
+  facet_grid(nSim~intercept, scales="free") +
   labs(title="Poisson", 
        subtitle="Proportion of obs with zero SD estimated for simulated observation") +
   theme(panel.background = element_rect(color="black"))
@@ -31,7 +32,7 @@ simpois %>%
 ## evaluating just the results with NO zero SD-obs
 
 ## type I error:
-p.pois <- simpois %>% filter(prop.zero == 0) %>% 
+p.pois <- simpois %>% filter(prop.zero == 0, overdispersion == 0) %>% 
   select(sampleSize,intercept, nSim, ends_with(".p")) %>%
   pivot_longer(4:6, names_to = "test", values_to = "p.val") %>%
   group_by(sampleSize, intercept, nSim, test) %>%
@@ -63,8 +64,8 @@ p.pois %>%
 
 
 
-#dispersion stat
-dis <- simpois %>%  filter(prop.zero ==0) %>%
+#dispersion stat for zeo overdisp
+dis <- simpois %>%  filter(prop.zero ==0, overdispersion==0) %>%
   select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
   pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
   mutate(nSim = as.factor(nSim))
@@ -79,7 +80,7 @@ dis %>%
   theme(panel.background = element_rect(color="black"))
 
 ## differences between dispersions stats and Pearson
-dis2 <- simpois %>% filter(prop.zero ==0) %>%
+dis2 <- simpois %>% filter(prop.zero ==0, overdispersion==0) %>%
   mutate(P.DHA = Pear.stat.dispersion - DHA.stat.dispersion,
                             P.Alt = Pear.stat.dispersion - Alt.stat.dispersion) %>% 
   select(sampleSize,intercept,nSim, P.DHA, P.Alt) %>%
