@@ -26,7 +26,7 @@ simpois %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Prop obs with zero SD estimated for simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_propzero.jpeg'), height=10, width=10)
+#ggsave(here('figures', '6_propzero.jpeg'), height=10, width=10)
 
 ## evaluating just the results with NO zero SD-obs
 
@@ -60,7 +60,7 @@ p.pois %>%
   geom_hline(yintercept = 0.05, linetype = "dotted")+
   labs(title= "Type I error Poisson") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
 
 
 #dispersion stat for zeo overdisp
@@ -77,7 +77,7 @@ dis %>%
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_dispersion.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_dispersion.jpeg'), height=6, width=10)
 
 ## differences between dispersions stats and Pearson
 dis2 <- simpois %>% filter(prop.zero ==0, overdispersion==0) %>%
@@ -133,7 +133,7 @@ disper %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
+#ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
 
 ## power
 power <- simpois %>% filter(prop.zero == 0,) %>% 
@@ -159,7 +159,58 @@ power %>%
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Power") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_power.jpeg'), height=6, width=12)
+#ggsave(here('figures', '6_power.jpeg'), height=6, width=12)
+
+
+
+## lm approximate pearson and the pearson residuals
+
+#lm(alterna$resPA - resP ~ resP)
+# expecting intercept and slope in zero
+
+# slope
+slope <- simpois %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
+  mutate(nSim = as.factor(nSim))
+
+slope %>%
+  ggplot(aes(x=overdispersion, y=resPA.slope, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+
+slope %>% filter(nSim %in% c("250","1000")) %>%
+  ggplot(aes(x=overdispersion, y=resPA.slope, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+
+# intercept
+inter <- simpois %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.inter, resPA.interP) %>%
+  mutate(nSim = as.factor(nSim))
+
+inter %>%
+  ggplot(aes(x=overdispersion, y=resPA.inter, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+
+inter %>% filter(nSim %in% c("250","1000")) %>%
+  ggplot(aes(x=overdispersion, y=resPA.inter, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+
+
+
+
+
+
 
 
 
