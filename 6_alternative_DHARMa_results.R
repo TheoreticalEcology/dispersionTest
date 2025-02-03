@@ -8,9 +8,7 @@ library(tidyverse)
 library(cowplot); theme_set(theme_cowplot())
 
 
-
-
-# seeing data:
+# Simulated data ####
 load(here("data","6_alternative_DHARMA.Rdata"))
 
 simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
@@ -18,6 +16,7 @@ simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
   rename("overdispersion" = "controlValues") %>%
   mutate(nSim = as.factor(as.numeric(nSim)))
 
+# Percentage of zeros ####
 # looking at the percentage of zeros in the simulations
 
 simpois %>%
@@ -30,7 +29,7 @@ simpois %>%
 
 ## evaluating just the results with NO zero SD-obs
 
-## type I error:
+# type I error ####
 p.pois <- simpois %>% filter(prop.zero == 0, overdispersion == 0) %>% 
   select(sampleSize,intercept, nSim, ends_with(".p")) %>%
   pivot_longer(4:6, names_to = "test", values_to = "p.val") %>%
@@ -63,7 +62,7 @@ p.pois %>%
 #ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
 
 
-#dispersion stat for zeo overdisp
+# dispersion stat for zeo overdisp ####
 dis <- simpois %>%  filter(prop.zero ==0, overdispersion==0) %>%
   select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
   pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
@@ -135,7 +134,9 @@ disper %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
   theme(panel.background = element_rect(color="black"))
 #ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
 
-## power
+
+
+# power ####
 power <- simpois %>% filter(prop.zero == 0,) %>% 
   select(sampleSize,intercept, nSim, overdispersion, ends_with(".p")) %>%
   pivot_longer(5:7, names_to = "test", values_to = "p.val") %>%
@@ -163,29 +164,40 @@ power %>%
 
 
 
-## lm approximate pearson and the pearson residuals
+# lm approximate pearson and the pearson residuals ####
 
 #lm(alterna$resPA - resP ~ resP)
 # expecting intercept and slope in zero
 
 # slope
-slope <- simpois %>%  filter(prop.zero ==0) %>%
+slope <- simpois %>%  filter(prop.zero == 0) %>%
   select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
   mutate(nSim = as.factor(nSim))
 
 slope %>%
-  ggplot(aes(x=overdispersion, y=resPA.slope, col=intercept))+
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
   geom_boxplot() +
   facet_grid(sampleSize ~ nSim, scales="free") +
   geom_hline(yintercept = 0, linetype="dotted")+
   theme(panel.background = element_rect(color = "black"))
 
 slope %>% filter(nSim %in% c("250","1000")) %>%
-  ggplot(aes(x=overdispersion, y=resPA.slope, col=intercept))+
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
   geom_boxplot() +
-  facet_grid(sampleSize ~ nSim, scales="free") +
+  facet_grid(sampleSize ~ nSim) +
   geom_hline(yintercept = 0, linetype="dotted")+
   theme(panel.background = element_rect(color = "black"))
+
+slope %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.slope = mean(resPA.slope),
+            median.slope = median(resPA.slope)) %>%
+  ggplot(aes(x=overdispersion, y=mean.slope, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+
 
 # intercept
 inter <- simpois %>%  filter(prop.zero ==0) %>%
@@ -193,20 +205,28 @@ inter <- simpois %>%  filter(prop.zero ==0) %>%
   mutate(nSim = as.factor(nSim))
 
 inter %>%
-  ggplot(aes(x=overdispersion, y=resPA.inter, col=intercept))+
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
   geom_boxplot() +
   facet_grid(sampleSize ~ nSim, scales="free") +
   geom_hline(yintercept = 0, linetype="dotted")+
   theme(panel.background = element_rect(color = "black"))
 
 inter %>% filter(nSim %in% c("250","1000")) %>%
-  ggplot(aes(x=overdispersion, y=resPA.inter, col=intercept))+
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
   geom_boxplot() +
-  facet_grid(sampleSize ~ nSim, scales="free") +
+  facet_grid(sampleSize ~ nSim) +
   geom_hline(yintercept = 0, linetype="dotted")+
   theme(panel.background = element_rect(color = "black"))
 
-
+inter %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.inter = mean(resPA.inter),
+            median.inter = median(resPA.inter)) %>%
+  ggplot(aes(x=overdispersion, y=mean.inter, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
 
 
 
