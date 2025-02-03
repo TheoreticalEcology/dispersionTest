@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## Melina Leite
-# feb 25
+# Feb 25
 
 library(DHARMa)
 library(here)
@@ -112,7 +112,7 @@ for(m in ngroups){
   
   if(m == 10) sampleSize <- c(50,100,200,500,1000) # 20, 10,000 excluded
   if(m == 50) sampleSize <- c(100,200,500,1000) # 10,000 excluded
-  if(m == 100) sampleSize <- c(200,500,1000,10000)
+  if(m == 100) sampleSize <- c(200,500,1000) # 10,000 excluded
   
   for (k in sampleSize){
     
