@@ -4,6 +4,7 @@
 
 library(DHARMa)
 library(here)
+library(lme4)
 
 
 # functions for the alternative
@@ -80,6 +81,7 @@ for(m in ngroups){
         out <- list()
 
         # Alternative DHARMa test
+        simulationOutput <- simulateResiduals(fittedModel)
         alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
         out$Alt.p <- alterna$p.value
         out$Alt.stat <- alterna$statistic
@@ -133,6 +135,7 @@ for(m in ngroups){
         out <- list()
         
         # Alternative DHARMa test
+        simulationOutput <- simulateResiduals(fittedModel)
         alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
         out$Alt.p <- alterna$p.value
         out$Alt.stat <- alterna$statistic
