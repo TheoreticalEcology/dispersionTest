@@ -80,8 +80,8 @@ for(m in ngroups){
         #results
         out <- list()
 
-        # Alternative DHARMa test
-        simulationOutput <- simulateResiduals(fittedModel)
+        # Alternative DHARMa test - CONDITIONAL
+        simulationOutput <- simulateResiduals(fittedModel, re.form=NULL)
         alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
         out$Alt.p <- alterna$p.value
         out$Alt.stat <- alterna$statistic
@@ -135,7 +135,7 @@ for(m in ngroups){
         out <- list()
         
         # Alternative DHARMa test
-        simulationOutput <- simulateResiduals(fittedModel)
+        simulationOutput <- simulateResiduals(fittedModel, re.form=NULL)
         alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
         out$Alt.p <- alterna$p.value
         out$Alt.stat <- alterna$statistic
