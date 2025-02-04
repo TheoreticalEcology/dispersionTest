@@ -47,7 +47,7 @@ overdispersion <- seq(0,1,0.10)
 intercept <- c(-1.5,0,1.5)
 ## sample size depend on ngroups (see it within the loop)
 ngroups <- 100
-nRep = 100
+nRep = 1000
 
 
 out.binA <- list()
