@@ -493,7 +493,8 @@ ggsave(here("figures", "5_glmm_type1.jpeg"), width = 12, heigh=6)
 ###### Power ####
 
 # intercept = 0, sample 1000
-fig.pow <- pow %>% filter(intercept == 0, test != "Pear.p.val",
+fig.pow <- pow %>% filter(intercept == 0, 
+                          !test %in% c("Pear.p.val", "refUN.p.val" ),
                sampleSize %in% c(1000)) %>%
   ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=sampleSize)) +
   geom_point() + geom_line() +
@@ -507,10 +508,10 @@ fig.pow <- pow %>% filter(intercept == 0, test != "Pear.p.val",
            alpha = .1,fill = "blue")+
   ylab("Power")+
   scale_color_discrete(
-    labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Param. Bootstrap. conditional",
-             "Pearson Param. Boostrap. unconditional")) +
+    labels=c("Sim-based conditional","Sim-based unconditional",
+             "Pearson Param. Boostrap")) +
   theme(panel.background = element_rect(color="black"),
+        legend.box.background = element_rect(fill = "gray94", color="gray94"),
         legend.position = "none") +
   guides(color=guide_legend(nrow=2, byrow=TRUE)) +
   labs(tag="A)") +
@@ -521,7 +522,8 @@ fig.pow
 ###### Dispersion stat ####
 
 # intercept = 0, sample 1000
-fig.disp <- disp %>% filter(intercept == 0, test != "Pear.stat.dispersion",
+fig.disp <- disp %>% filter(intercept == 0, 
+                            !test %in% c("Pear.stat.dispersion", "refUN.stat.dispersion" ),
                sampleSize == 1000) %>%
   ggplot(aes(x=overdispersion, y= mean.stat, col=test, )) +
   geom_point() + geom_line() +
@@ -534,11 +536,11 @@ fig.disp <- disp %>% filter(intercept == 0, test != "Pear.stat.dispersion",
   geom_hline(yintercept = 1, linetype="dotted")+
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Param. Bootstrap. conditional",
-             "Pearson Param. Boostrap. unconditional")) +
+             "Pearson Param. Bootstrap.")) +
   theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")+
-  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+        legend.position = "bottom",
+        legend.box.background = element_rect(fill = "gray94", color="gray94"))+
+  guides(color=guide_legend(nrow=1, byrow=TRUE)) +
   labs(tag="B)") +
   scale_y_log10()+
   annotate("rect", xmin = 0, xmax = 1, ymin = 0.75, ymax = 1,
