@@ -1,0 +1,519 @@
+---
+title: "Alternative Simulation-based dispersion test: Approximation of Pearson residuals"
+author: "Melina Leite"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    highlight: kate
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(DHARMa)
+library(here)
+library(tidyverse)
+library(cowplot); theme_set(theme_cowplot())
+#library(patchwork)
+# plot Colors
+source(here("plotColors.R"))
+```
+
+# Simulated data
+```{r}
+# Simulated data ####
+load(here("data","6_approxPear_pois.Rdata"))
+
+simpois <- map_dfr(out.pois, "simulations", .id="ngroups")  %>%
+  separate(ngroups, c("nSim", "sampleSize", "intercept"), sep="_") %>%
+  rename("overdispersion" = "controlValues") %>%
+  mutate(nSim = as.factor(as.numeric(nSim)))
+
+load(here("data","6_approxPear_bin.Rdata"))
+
+simbin <- map_dfr(out.bin, "simulations", .id="ngroups")  %>%
+  separate(ngroups, c("nSim", "sampleSize", "intercept"), sep="_") %>%
+  rename("overdispersion" = "controlValues") %>%
+  mutate(nSim = as.factor(as.numeric(nSim)))
+
+```
+
+# Percentage of zeros 
+
+looking at the percentage of zeros in the simulations
+
+```{r}
+simpois %>%
+  ggplot(aes(x=as.factor(overdispersion), y=prop.zero, col=as.factor(sampleSize))) +
+  geom_boxplot()+
+  facet_grid(nSim~intercept, scales="free") +
+  labs(title="Poisson: Prop obs with zero SD simulated data") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_propzero.jpeg'), height=10, width=10)
+```
+
+
+```{r}
+simbin %>%
+  ggplot(aes(x=as.factor(overdispersion), y=prop.zero, col=as.factor(sampleSize))) +
+  geom_boxplot()+
+  facet_grid(nSim~intercept, scales="free") +
+  labs(title="Binomial: Prop obs with zero SD simulated data") +
+  theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_propzero_bin.jpeg'), height=10, width=10)
+```
+
+# Results withou zeros 
+## type I error ####
+
+```{r}
+p.pois <- simpois %>% filter(prop.zero == 0, overdispersion == 0) %>% 
+  select(sampleSize,intercept, nSim, ends_with(".p")) %>%
+  pivot_longer(4:6, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize, intercept, nSim, test) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]))
+p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
+p.pois$nSim <- as.factor(p.pois$nSim)
+# add sig test
+for (i in 1:nrow(p.pois)) {
+  btest <- binom.test(p.pois$p.sig[i], n=p.pois$nsim[i], p=0.05)
+  p.pois$p.bin0.05[i] <- btest$p.value
+  p.pois$conf.low[i] <- btest$conf.int[1]
+  p.pois$conf.up[i] <- btest$conf.int[2]
+}
+```
+
+
+```{r}
+p.pois %>%
+  ggplot(aes(x=nSim, y=prop.sig, col=intercept))+
+  facet_grid(sampleSize~test)+
+  geom_point(position = position_dodge(width = 0.2)) + 
+  geom_line(position = position_dodge(width = 0.2), aes(x=as.numeric(nSim))) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
+                position = position_dodge(width = 0.2)) +
+  scale_y_sqrt(breaks=c(0,0.01, 0.05,0.25,0.5, 0.75)) +
+  geom_hline(yintercept = 0.05, linetype = "dotted")+
+  labs(title= "Type I error Poisson") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
+```
+
+
+```{r}
+p.bin <- simbin %>% filter(prop.zero == 0, overdispersion == 0) %>% 
+  select(sampleSize,intercept, nSim, ends_with(".p")) %>%
+  pivot_longer(4:6, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize, intercept, nSim, test) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]))
+p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
+p.bin$nSim <- as.factor(p.bin$nSim)
+# add sig test
+for (i in 1:nrow(p.bin)) {
+  btest <- binom.test(p.bin$p.sig[i], n=p.bin$nsim[i], p=0.05)
+  p.bin$p.bin0.05[i] <- btest$p.value
+  p.bin$conf.low[i] <- btest$conf.int[1]
+  p.bin$conf.up[i] <- btest$conf.int[2]
+}
+```
+
+
+```{r}
+p.bin %>%
+  ggplot(aes(x=nSim, y=prop.sig, col=intercept))+
+  facet_grid(sampleSize~test)+
+  geom_point(position = position_dodge(width = 0.2)) + 
+  geom_line(position = position_dodge(width = 0.2), aes(x=as.numeric(nSim))) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
+                position = position_dodge(width = 0.2)) +
+  scale_y_sqrt(breaks=c(0,0.01, 0.05,0.25,0.5, 0.75)) +
+  geom_hline(yintercept = 0.05, linetype = "dotted")+
+  labs(title= "Type I error Binomial") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_type1_bin.jpeg'), height=6, width=10)
+```
+
+## Dispersion statistics
+
+### Zero overdispersion
+dispersion = 1
+
+```{r}
+dis <- simpois %>%  filter(prop.zero ==0, overdispersion==0) %>%
+  select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
+  pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
+  mutate(nSim = as.factor(nSim))
+
+dis %>% 
+  ggplot(aes(x = nSim, y = disp.statistics, col = intercept))+
+  geom_boxplot() +
+  geom_hline(yintercept = 1, linetype="dashed")  +
+  scale_y_log10() +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Dispersion statistics") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_dispersion.jpeg'), height=6, width=10)
+```
+
+
+```{r}
+disbin <- simbin %>%  filter(prop.zero ==0, overdispersion==0) %>%
+  select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
+  pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
+  mutate(nSim = as.factor(nSim))
+
+disbin %>% 
+  ggplot(aes(x = nSim, y = disp.statistics, col = intercept))+
+  geom_boxplot() +
+  geom_hline(yintercept = 1, linetype="dashed")  +
+  scale_y_log10() +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Binomial: Dispersion statistics") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_dispersionBin.jpeg'), height=6, width=10)
+```
+
+### differences between dispersions stats and Pearson 
+
+```{r}
+dis2 <- simpois %>% filter(prop.zero ==0, overdispersion==0) %>%
+  mutate(P.DHA = Pear.stat.dispersion - DHA.stat.dispersion,
+                            P.Alt = Pear.stat.dispersion - Alt.stat.dispersion) %>% 
+  select(sampleSize,intercept,nSim, P.DHA, P.Alt) %>%
+  pivot_longer(4:5,names_to = "test", values_to = "dif")
+
+
+dis2 %>% 
+  ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype="dashed")  +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Dispersion statistics") +
+  theme(panel.background = element_rect(color="black")) #+
+
+dis2 %>% filter(nSim %in% c(250,1000)) %>%
+  ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
+  geom_boxplot() +
+  ylim(-0.1,0.1) + ylab("Dif (Pearson - disp)")+
+   geom_hline(yintercept = 0, linetype="dashed")  +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Dispersion statistics") +
+  theme(panel.background = element_rect(color="black")) #+
+#  plot_layout(ncol=1)
+#ggsave(here('figures', '6_dispersion_dif.jpeg'), height=12, width=10)
+```
+
+
+```{r}
+disbin2 <- simbin %>% filter(prop.zero ==0, overdispersion==0) %>%
+  mutate(P.DHA = Pear.stat.dispersion - DHA.stat.dispersion,
+         P.Alt = Pear.stat.dispersion - Alt.stat.dispersion) %>% 
+  select(sampleSize,intercept,nSim, P.DHA, P.Alt) %>%
+  pivot_longer(4:5,names_to = "test", values_to = "dif")
+
+#library(patchwork)
+disbin2 %>% 
+  ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
+  geom_boxplot() +
+  geom_hline(yintercept = 0, linetype="dashed")  +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Binomial: Dispersion statistics") +
+  theme(panel.background = element_rect(color="black")) #+
+
+disbin2 %>% filter(nSim %in% c(250,1000)) %>%
+  ggplot(aes(x = as.factor(nSim), y = dif, col = intercept))+
+  geom_boxplot() +
+  ylim(-0.1,0.1) + ylab("Dif (Pearson - disp)")+
+  geom_hline(yintercept = 0, linetype="dashed")  +
+  facet_grid(sampleSize~test, scales="free")+
+  labs(title= "Binomial: Dispersion statistics") +
+  theme(panel.background = element_rect(color="black")) #+
+ # plot_layout(ncol=1)
+ggsave(here('figures', '6_dispersion_difBin.jpeg'), height=12, width=10)
+```
+
+### dipersion with oeverdispersion
+
+```{r}
+disper <- simpois %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
+  pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
+  mutate(nSim = as.factor(nSim))
+
+
+disper %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
+  summarise(mean.disp = mean(disp.statistics)) %>%
+  ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 1, linetype="dashed")  +
+  scale_y_log10() +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Dispersion statistics") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
+```
+
+
+```{r}
+disperbin <- simbin %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, ends_with("dispersion")) %>%
+  pivot_longer(4:6,names_to = "test", values_to = "disp.statistics") %>%
+  mutate(nSim = as.factor(nSim))
+
+
+disperbin %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
+  summarise(mean.disp = mean(disp.statistics)) %>%
+  filter(nSim %in% c(250, 1000)) %>%
+  ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 1, linetype="dashed")  +
+  scale_y_log10() +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Binomial: Dispersion statistics") +
+  theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_dispersion_overdispBin.jpeg'), height=6, width=8)
+```
+
+## Power
+
+```{r}
+power <- simpois %>% filter(prop.zero == 0,) %>% 
+  select(sampleSize,intercept, nSim, overdispersion, ends_with(".p")) %>%
+  pivot_longer(5:7, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize, intercept, nSim, test, overdispersion) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]))
+power$prop.sig <- power$p.sig/power$nsim
+power$nSim <- as.factor(power$nSim)
+# add sig test
+for (i in 1:nrow(power)) {
+  btest <- binom.test(power$p.sig[i], n=power$nsim[i], p=0.05)
+  power$p.bin0.05[i] <- btest$p.value
+  power$conf.low[i] <- btest$conf.int[1]
+  power$conf.up[i] <- btest$conf.int[2]
+}
+```
+
+
+```{r}
+power %>% 
+  ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 0)  +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Power") +
+  theme(panel.background = element_rect(color="black"))
+#ggsave(here('figures', '6_power.jpeg'), height=6, width=12)
+```
+
+
+```{r}
+powerbin <- simbin %>% filter(prop.zero == 0,) %>% 
+  select(sampleSize,intercept, nSim, overdispersion, ends_with(".p")) %>%
+  pivot_longer(5:7, names_to = "test", values_to = "p.val") %>%
+  group_by(sampleSize, intercept, nSim, test, overdispersion) %>%
+  summarise(p.sig = sum(p.val<0.05,na.rm=T),
+            nsim = length(p.val[!is.na(p.val)]))
+powerbin$prop.sig <- powerbin$p.sig/powerbin$nsim
+powerbin$nSim <- as.factor(powerbin$nSim)
+# add sig test
+for (i in 1:nrow(powerbin)) {
+  btest <- binom.test(powerbin$p.sig[i], n=powerbin$nsim[i], p=0.05)
+  powerbin$p.bin0.05[i] <- btest$p.value
+  powerbin$conf.low[i] <- btest$conf.int[1]
+  powerbin$conf.up[i] <- btest$conf.int[2]
+}
+```
+
+
+```{r}
+powerbin %>% 
+  ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
+  geom_line() +
+  geom_hline(yintercept = 0)  +
+  facet_grid(sampleSize~nSim, scales="free")+
+  labs(title= "Power") +
+  theme(panel.background = element_rect(color="black"))
+ggsave(here('figures', '6_powerBin.jpeg'), height=6, width=12)
+```
+
+## lm approximate pearson and the pearson residuals
+
+lm(alterna$resPA - resP ~ resP). 
+expecting intercept and slope in zero. 
+
+### Slope
+
+```{r}
+slope <- simpois %>%  filter(prop.zero == 0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
+  mutate(nSim = as.factor(nSim))
+```
+
+```{r}
+slope %>%
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+```{r}
+slope %>% filter(nSim %in% c("250","1000")) %>%
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim) +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+```{r}
+slope %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.slope = mean(resPA.slope),
+            median.slope = median(resPA.slope)) %>%
+  ggplot(aes(x=overdispersion, y=mean.slope, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+
+```{r}
+slopebin <- simbin %>%  filter(prop.zero == 0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
+  mutate(nSim = as.factor(nSim))
+```
+
+```{r}
+slopebin %>% filter(nSim %in% c("250","1000")) %>%
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim) +
+  theme(panel.background = element_rect(color = "black"))
+```
+
+```{r}
+slopebin %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.slope = mean(resPA.slope),
+            median.slope = median(resPA.slope)) %>%
+  ggplot(aes(x=overdispersion, y=mean.slope, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  labs(title="Binomial: mean slope", subtitle = "(App.Pear - Pear) ~ Pear")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+### intercept
+
+```{r}
+inter <- simpois %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.inter, resPA.interP) %>%
+  mutate(nSim = as.factor(nSim))
+```
+
+
+```{r}
+inter %>%
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim, scales="free") +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+
+```{r}
+inter %>% filter(nSim %in% c("250","1000")) %>%
+  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
+  geom_boxplot() +
+  facet_grid(sampleSize ~ nSim) +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+
+```{r}
+inter %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.inter = mean(resPA.inter),
+            median.inter = median(resPA.inter)) %>%
+  ggplot(aes(x=overdispersion, y=mean.inter, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+
+```{r}
+interbin <- simbin %>%  filter(prop.zero ==0) %>%
+  select(sampleSize, intercept, nSim, overdispersion, resPA.inter, resPA.interP) %>%
+  mutate(nSim = as.factor(nSim))
+
+inter %>% filter(nSim %in% c("250","1000")) %>%
+  group_by(nSim, sampleSize, intercept, overdispersion) %>%
+  summarise(mean.inter = mean(resPA.inter),
+            median.inter = median(resPA.inter)) %>%
+  ggplot(aes(x=overdispersion, y=mean.inter, col=intercept)) +
+  geom_line()+ geom_point()+
+  facet_grid(sampleSize ~ nSim)   +
+  geom_hline(yintercept = 0, linetype="dotted")+
+  labs(title="Binomial: mean intercept", subtitle = "(App.Pear - Pear) ~ Pear")+
+  theme(panel.background = element_rect(color = "black"))
+```
+
+
+# Results with all simulations, including the ones with zero SD
+
+## dispersion stat
+```{r}
+dis <- simpois %>% select(sampleSize,intercept,nSim, ends_with("dispersion"),
+                       ends_with(".stat")) %>%
+  pivot_longer(4:9,names_to = "test", values_to = "disp.statistics")
+
+dis %>% #filter(disp.statistics <10) %>%
+  ggplot(aes(x = as.factor(nSim), y = disp.statistics, col = test))+
+  geom_hline(yintercept = 1, linetype="dashed")+
+  geom_boxplot() +
+  facet_grid(sampleSize ~intercept, scales = "free") +
+  scale_y_sqrt() +
+  theme(panel.background = element_rect(color="black"))
+ 
+dis %>% filter(disp.statistics <10) %>%
+  ggplot(aes(x = as.factor(nSim), y = disp.statistics, col = sampleSize))+
+  geom_hline(yintercept = 1, linetype="dashed")+
+  geom_boxplot() +
+  facet_grid(intercept ~ test, scales = "free") +
+  scale_y_sqrt()+
+  theme(panel.background = element_rect(color="black"))
+
+dis %>% filter(nSim %in% c(250,1000)) %>%
+  ggplot(aes(x = as.factor(nSim), y = disp.statistics, col = sampleSize))+
+  geom_boxplot() +
+  facet_grid(intercept ~ test, scales = "free") +
+  geom_hline(yintercept = 1, linetype="dashed")+
+  scale_y_sqrt()+
+  theme(panel.background = element_rect(color="black"))
+```
+
+
+
+## absolute difference with Pearson dispersion 
+
+```{r}
+
+```
+
+

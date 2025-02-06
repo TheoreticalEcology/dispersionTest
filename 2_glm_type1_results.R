@@ -8,6 +8,9 @@ theme_set(theme_cowplot())
 library(here)
 library(patchwork)
 
+# plot Colors
+source(here("plotColors.R"))
+
 
 ##############-###
 #### Binomial ####
@@ -146,6 +149,7 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
+  scale_color_manual(values = col.intercept)+
   ggtitle("GLM Binomial") +
   xlab("Sample size") +
   ylab("Type I error") +
@@ -167,6 +171,7 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
+  scale_color_manual(values = col.intercept)+
   ggtitle("GLM Poisson") +
   xlab("Sample size") +
   ylab("Type I error") +
@@ -181,7 +186,7 @@ f.pois
 
 ## both distributions
 
-f.pois + f.bin+
+f.pois + f.bin +
   plot_layout(ncol=1, )
 ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
@@ -189,7 +194,7 @@ ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
 
 ##### ALTERNATIVA TYPE I ERROR FIGURE #####
 #library(ggbreak)
-#library(ggh4x)
+library(ggh4x)
 
 dats <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
   mutate(model = fct_relevel(model, "Poisson", "Binomial")) 
@@ -234,6 +239,7 @@ dats %>%
   geom_hline(yintercept = 0, col="gray")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
+  scale_color_manual(values = col.intercept)+
   xlab("Sample size") +
   ylab("Type I error") +
   theme(panel.background  = element_rect(color = "black"),

@@ -48,132 +48,131 @@ getApproximatePearson <- function(simulationOutput, alternative = c("two.sided",
 
 # poisson
 
-out.pois<- list()
-#load(here("data","6_approxPear_pois.Rdata"))
-
-for(s in nSim) {
-  for (k in sampleSize){
-    for (i in intercept){
-    
-    # function to varying sampleSize
-    calculateStatistics <- function(control = 0){
-      # data
-      testData <- createData(overdispersion = control,
-                             sampleSize = k,
-                             intercept = i,
-                             numGroups = 10,
-                             randomEffectVariance = 0,
-                             family = poisson())
-      # model
-      fittedModel <-glm(observedResponse ~ 
-                          Environment1, data = testData, family = poisson()) 
-      #results
-      out <- list()
-      
-      simulationOutput <- simulateResiduals(fittedModel, n = s)
-      
-      #Pearson
-      out$Pear.p <- testDispersion(fittedModel, plot = F, 
-                                       type="PearsonChisq")$p.value
-      out$Pear.stat <- testDispersion(fittedModel, plot = F, 
-                                      type="PearsonChisq")$statistic
-      #DHARMa default
-      out$DHA.p <- testDispersion(simulationOutput, type = "DHARMa",
-                                  plot = F)$p.value
-      out$DHA.stat  <- testDispersion(simulationOutput, type = "DHARMa",
-                                      plot = F)$statistic
-      
-      # Alternative
-      alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
-      out$Alt.p <- alterna$p.value
-      out$Alt.stat <- alterna$statistic
-      out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
-      
-      resP = residuals(fittedModel, type = "pearson")
-      m2 <- summary(lm(alterna$resPA - resP ~ resP))
-      out$resPA.inter = m2$coefficients[1,1]
-      out$resPA.interP = m2$coefficients[1,4]
-      out$resPA.slope = m2$coefficients[2,1]
-      out$resPA.slopeP = m2$coefficients[2,4]
-      
-      return(unlist(out))
-    }
-    
-    out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
-                         nRep = nRep, parallel = T, exportGlobal = T)
-    out.pois[[length(out.pois) + 1]] <- out
-    names(out.pois)[length(out.pois)] <- paste(s, k, i, sep="_")
-    # saving sim results
-    save(out.pois, file=here("data","6_approxPear_pois.Rdata"))
-  }
-}
-}
+# out.pois<- list()
+# #load(here("data","6_approxPear_pois.Rdata"))
+# 
+# for(s in nSim) {
+#   for (k in sampleSize){
+#     for (i in intercept){
+#     
+#     # function to varying sampleSize
+#     calculateStatistics <- function(control = 0){
+#       # data
+#       testData <- createData(overdispersion = control,
+#                              sampleSize = k,
+#                              intercept = i,
+#                              numGroups = 10,
+#                              randomEffectVariance = 0,
+#                              family = poisson())
+#       # model
+#       fittedModel <-glm(observedResponse ~ 
+#                           Environment1, data = testData, family = poisson()) 
+#       #results
+#       out <- list()
+#       
+#       simulationOutput <- simulateResiduals(fittedModel, n = s)
+#       
+#       #Pearson
+#       out$Pear.p <- testDispersion(fittedModel, plot = F, 
+#                                        type="PearsonChisq")$p.value
+#       out$Pear.stat <- testDispersion(fittedModel, plot = F, 
+#                                       type="PearsonChisq")$statistic
+#       #DHARMa default
+#       out$DHA.p <- testDispersion(simulationOutput, type = "DHARMa",
+#                                   plot = F)$p.value
+#       out$DHA.stat  <- testDispersion(simulationOutput, type = "DHARMa",
+#                                       plot = F)$statistic
+#       
+#       # Alternative
+#       alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
+#       out$Alt.p <- alterna$p.value
+#       out$Alt.stat <- alterna$statistic
+#       out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
+#       
+#       resP = residuals(fittedModel, type = "pearson")
+#       m2 <- summary(lm(alterna$resPA - resP ~ resP))
+#       out$resPA.inter = m2$coefficients[1,1]
+#       out$resPA.interP = m2$coefficients[1,4]
+#       out$resPA.slope = m2$coefficients[2,1]
+#       out$resPA.slopeP = m2$coefficients[2,4]
+#       
+#       return(unlist(out))
+#     }
+#     
+#     out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
+#                          nRep = nRep, parallel = T, exportGlobal = T)
+#     out.pois[[length(out.pois) + 1]] <- out
+#     names(out.pois)[length(out.pois)] <- paste(s, k, i, sep="_")
+#     # saving sim results
+#     save(out.pois, file=here("data","6_approxPear_pois.Rdata"))
+#   }
+# }
+# }
 
 # binomial
 
 out.bin <- list()
 #load(here("data","6_approxPear_bin.Rdata"))
 
-for (k in sampleSize){
-  for (i in nSim){
+for(s in nSim) {
+  for (k in sampleSize){
+    for (i in intercept){
+      
+      # function to varying sampleSize
+      calculateStatistics <- function(control = 0){
+        # data
+        testData <- createData(overdispersion = control,
+                               sampleSize = k,
+                               intercept = i,
+                               numGroups = 10,
+                               randomEffectVariance = 0,
+                               binomialTrials = 10,
+                               family = binomial())
+        # model
+        fittedModel <-glm(cbind(observedResponse1, observedResponse0)  ~
+                            Environment1, data = testData, family = binomial())
 
-    # function to varying sampleSize
-    calculateStatistics <- function(control = 0){
-      # data
-      testData <- createData(overdispersion = 0,
-                             sampleSize = k,
-                             intercept = control,
-                             numGroups = 10,
-                             randomEffectVariance = 0,
-                             binomialTrials = 10,
-                             family = binomial())
-      # model
-      fittedModel <-glm(cbind(observedResponse1, observedResponse0)  ~
-                          Environment1, data = testData, family = binomial())
-
-      #results
-      out <- list()
+        #results
+        out <- list()
+        
+        simulationOutput <- simulateResiduals(fittedModel, n = s)
+        
+        #Pearson
+        out$Pear.p <- testDispersion(fittedModel, plot = F, 
+                                     type="PearsonChisq")$p.value
+        out$Pear.stat <- testDispersion(fittedModel, plot = F, 
+                                        type="PearsonChisq")$statistic
+        #DHARMa default
+        out$DHA.p <- testDispersion(simulationOutput, type = "DHARMa",
+                                    plot = F)$p.value
+        out$DHA.stat  <- testDispersion(simulationOutput, type = "DHARMa",
+                                        plot = F)$statistic
+        
+        # Alternative
+        alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
+        out$Alt.p <- alterna$p.value
+        out$Alt.stat <- alterna$statistic
+        out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
+        
+        resP = residuals(fittedModel, type = "pearson")
+        m2 <- summary(lm(alterna$resPA - resP ~ resP))
+        out$resPA.inter = m2$coefficients[1,1]
+        out$resPA.interP = m2$coefficients[1,4]
+        out$resPA.slope = m2$coefficients[2,1]
+        out$resPA.slopeP = m2$coefficients[2,4]
+        
+        return(unlist(out))
+      }
       
-      simulationOutput <- simulateResiduals(fittedModel, n = s)
-      
-      #Pearson
-      out$Pear.p <- testDispersion(fittedModel, plot = F, 
-                                   type="PearsonChisq")$p.value
-      out$Pear.stat <- testDispersion(fittedModel, plot = F, 
-                                      type="PearsonChisq")$statistic
-      #DHARMa default
-      out$DHA.p <- testDispersion(simulationOutput, type = "DHARMa",
-                                  plot = F)$p.value
-      out$DHA.stat  <- testDispersion(simulationOutput, type = "DHARMa",
-                                      plot = F)$statistic
-      
-      # Alternative
-      alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
-      out$Alt.p <- alterna$p.value
-      out$Alt.stat <- alterna$statistic
-      out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
-      
-      resP = residuals(fittedModel, type = "pearson")
-      m2 <- summary(lm(alterna$resPA - resP ~ resP))
-      out$resPA.inter = m2$coefficients[1,1]
-      out$resPA.interP = m2$coefficients[1,4]
-      out$resPA.slope = m2$coefficients[2,1]
-      out$resPA.slopeP = m2$coefficients[2,4]
-      
-      return(unlist(out))
+      out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
+                           nRep = nRep, parallel = T, exportGlobal = T)
+      out.bin[[length(out.bin) + 1]] <- out
+      names(out.bin)[length(out.bin)] <- paste(s, k, i, sep="_")
+      # saving sim results
+      save(out.bin, file=here("data","6_approxPear_bin.Rdata"))
     }
-
-    out <- runBenchmarks(calculateStatistics, controlValues = intercept,
-                         nRep = nRep, parallel = T, exportGlobal = T)
-    out.bin[[length(out.bin) + 1]] <- out
-    names(out.bin)[length(out.bin)] <- paste(k, i, sep="_")
-    # saving sim results
-    save(out.bin, file=here("data","6_approxPear_bin.Rdata"))
   }
 }
-
-
-
 
 
 

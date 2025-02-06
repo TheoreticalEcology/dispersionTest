@@ -12,6 +12,10 @@ library(patchwork)
 load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
 # created in script 2_glm_type1_results.R
 
+# plot Colors
+source(here("plotColors.R"))
+
+
 ##############-###
 #### Binomial ####
 ##############-###
@@ -228,7 +232,7 @@ sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibration)) +
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   ylab("Power") + xlab("Overdispersion") +
-  scale_color_discrete( labels = c("Sim-based residuals",
+  scale_color_manual(values = col.tests[c(4,1,2)], labels = c("Sim-based residuals",
                                             "Pearson Chi-squared",
                                             "Pearson Param. Bootstrap.")) +
   facet_grid(model~sampleSize, 

@@ -506,7 +506,7 @@ fig.pow <- pow %>% filter(intercept == 0,
   annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
            alpha = .1,fill = "blue")+
   ylab("Power")+
-  scale_color_discrete(
+  scale_color_manual(values = col.tests[4:2],
     labels=c("Sim-based conditional","Sim-based unconditional",
              "Pearson Param. Boostrap")) +
   theme(panel.background = element_rect(color="black"),
@@ -532,8 +532,8 @@ fig.disp <- disp %>% filter(intercept == 0,
                                                      `Binomial` = "Binomial",
                                                      `Poisson` = "Poisson"))) +
   ylab("Dispersion statistics")+
-  geom_hline(yintercept = 1, linetype="dotted")+
-  scale_color_discrete(
+  geom_hline(yintercept = 1, linetype="dotted") +
+  scale_color_manual(values = col.tests[4:2],
     labels=c("Sim-based conditional","Sim-based unconditional",  
              "Pearson Param. Bootstrap.")) +
   theme(panel.background = element_rect(color="black"),
