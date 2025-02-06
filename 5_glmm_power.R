@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## Melina Leite
-# Dez 24
+# jan 25
 
 library(DHARMa)
 library(tidyverse)
@@ -10,10 +10,10 @@ library(lme4)
 
 # varying parameters
 overdispersion <- seq(0,1,0.10)
-intercept <- c(-3,-1.5,0,1.5,3)
+intercept <- c(-3,-1.5,0,1.5,3) # reinclude -3
 ## sample size depend on ngroups (see it within the loop)
-ngroups <- 50 # 10, 50 and 100
-nRep = 100
+ngroups <- c(10,50,100) # 10, 50 and 100
+nRep = 1000
 
 
 #########################
@@ -30,13 +30,13 @@ nRep = 100
 #     - DHARMa refit conditional (boostrapped Pearson residuals)
 
 out.bin <- list()
-load(here("data", "5_glmmBin_power.Rdata")) # loading out.bin
+#load(here("data", "5_glmmBin_power.Rdata")) # loading out.bin
 
 for(m in ngroups){
 
-  if(m == 10) sampleSize <- c(20,50,100,200,500,1000,10000)
-  if(m == 50) sampleSize <- c(100,200,500,1000) # 10,000 excluded
-  if(m == 100) sampleSize <- c(200,500,1000,10000)
+  if(m == 10) sampleSize <- c(50,100,200,500,1000) # reinclude 50
+  if(m == 50) sampleSize <- c(100,200,500,1000) 
+  if(m == 100) sampleSize <- c(200,500,1000)
 
   for (k in sampleSize){
 
@@ -104,26 +104,17 @@ for(m in ngroups){
 ##### Poisson GLMM #####
 #########################
 
-# 1) Simulating 1000 Poisson datasets with different sample sizes, intercepts and overdispersion. Fixing the random effects variance to 1.
-# 2) fitting them to correct GLMM models
-# 5) calculating power for the dispersion tests:
-#     - Pearson-chisq, naive df
-#     - DHARMa unconditional (simulated residuals)
-#     - DHARMa conditional (simulated residuals)
-#     - DHARMa refit unconditional (boostrapped Pearson residuals)
-#     - DHARMa refit conditional (boostrapped Pearson residuals)
 
-
-#intercept <- c(-1.5,0,1.5,3) # -3 excluded! for m=10
-
-#out.pois <- list()
-load(here("data", "5_glmmPois_power.Rdata")) # loading out.pois
+out.pois <- list()
+#load(here("data", "5_glmmPois_power.Rdata")) # loading out.pois
 
 for(m in ngroups){
   
-  if(m == 10) sampleSize <- c(50,100,200,500,1000) # 20, 10,000 excluded
-  if(m == 50) sampleSize <- c(100,200,500,1000) # 10,000 excluded
-  if(m == 100) sampleSize <- c(200,500,1000,10000)
+  if(m == 10) sampleSize <- c(50,100,200,500,1000)
+  if(m == 50) sampleSize <- c(100,200,500,1000) 
+  if(m == 100) sampleSize <- c(200,500,1000)
+  
+ # if(m ==10) intercept <- c(-1.5,0,1.5,3) # exclude -3 for m=10 (doesn't work)
   
   for (k in sampleSize){
     

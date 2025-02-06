@@ -21,7 +21,7 @@ tspent <- map_dbl(out.bin, "time")
 stime <- map(out.bin, "time")
 tspent[map(stime, attr, "units") == "mins"] <- tspent[map(stime, attr, "units") 
                                                       == "mins"]/60
-mean(tspent) # 1
+summary(tspent) # 1
 
 #simulations
 simuls.bin <- map_dfr(out.bin, "simulations", .id="model") %>%
@@ -50,12 +50,11 @@ p.bin %>% filter(test != "Pear.p.val") %>%
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Chi-squared",
              "Pearson ParBoot. conditional",
              "Pearson ParBoot. unconditional"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Binomial", subtitle = "100 sim; Ntrials=10") +
+  ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
