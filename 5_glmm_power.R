@@ -12,7 +12,7 @@ library(lme4)
 overdispersion <- seq(0,1,0.10)
 intercept <- c(-3,-1.5,0,1.5,3) # reinclude -3
 ## sample size depend on ngroups (see it within the loop)
-ngroups <- c(10,50,100) # 10, 50 and 100
+ngroups <- c(50,100) # 10, 50 and 100
 nRep = 1000
 
 
