@@ -80,6 +80,7 @@ bindata <- bind_rows(list(p.binA %>% mutate(test = "approxPear"),
                      p.bin)) 
 
 bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
+                   !test %in% c("refCO.p.val", "Pear.p.val"),  
                    sampleSize != 10000) %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -168,6 +169,7 @@ poisdata <- bind_rows(list(p.poisA %>% mutate(test = "approxPear"),
                           p.pois)) 
 
 poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
+                    !test %in% c("refCO.p.val", "Pear.p.val"), 
                    sampleSize != 10000) %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
