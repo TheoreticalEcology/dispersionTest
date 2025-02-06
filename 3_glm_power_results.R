@@ -227,14 +227,28 @@ sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 
 ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibration)) +
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_linetype_discrete(name="")+
-  scale_color_discrete( name="", labels = c("Sim-based residuals",
+  ylab("Power") + xlab("Overdispersion") +
+  scale_color_discrete( labels = c("Sim-based residuals",
                                             "Pearson Chi-squared",
                                             "Pearson Param. Bootstrap.")) +
-  facet_grid(model~sampleSize) +
-  geom_hline(yintercept = 0.5, linetype = "dotted")+
+  facet_grid(model~sampleSize, 
+            labeller = as_labeller(c("Binomial"= "Binomial",
+                                     "Poisson" = "Poisson",
+                                     "10" = "n = 10",
+                                     "100" = "n = 100",
+                                     "1000" = "n = 1000"))) +
+  geom_hline(yintercept = 0.5, linetype = "dotted") +
+  guides(
+    color = guide_legend(position="inside"),
+    linetype   = guide_legend(position ="inside")) +
   theme(panel.background = element_rect(color="black"),
-        legend.position = c(0.01,0.9))
+        legend.spacing.y = unit(0, "cm"),
+        legend.text = element_text(size=9),
+        legend.key.spacing.y = unit(-0.1, "lines"),
+        #legend.background = element_rect(color = "black"),
+        legend.title = element_blank(),
+        legend.box.background = element_rect(fill = "gray94", color="gray94"),
+        legend.position = c(0.01,0.37))
 
 ggsave(here("figures", "3_glm_both_power.jpeg"), width=10, height = 6)
 
