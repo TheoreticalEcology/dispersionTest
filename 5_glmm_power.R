@@ -20,14 +20,6 @@ nRep = 1000
 ##### Binomial GLMM #####
 #########################
 
-# 1) Simulating 1000 binomial prop datasets with different sample sizes, intercepts and overdispersion. Fixing the number of trials to 10, fixing the random effects variance to 1.
-# 2) fitting them to correct GLMM models
-# 5) calculating power for the dispersion tests:
-#     - Pearson-chisq, naive df
-#     - DHARMa unconditional (simulated residuals)
-#     - DHARMa conditional (simulated residuals)
-#     - DHARMa refit unconditional (boostrapped Pearson residuals)
-#     - DHARMa refit conditional (boostrapped Pearson residuals)
 
 out.bin <- list()
 #load(here("data", "5_glmmBin_power.Rdata")) # loading out.bin
@@ -76,9 +68,9 @@ for(m in ngroups){
       out$dhaCO.stat  <- testDispersion(res, type = "DHARMa",plot = F)$statistic
 
       # DHARMa refit unconditional
-      res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
-      out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
-      out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
+      # res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
+      # out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
+      # out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
 
       # DHARMa refit conditional
       res <- simulateResiduals(fittedModel, refit=T, re.form=NULL)
@@ -153,9 +145,9 @@ for(m in ngroups){
         out$dhaCO.stat  <- testDispersion(res, type = "DHARMa",plot = F)$statistic
         
         # DHARMa refit
-        res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
-        out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
-        out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
+        # res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
+        # out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
+        # out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
         
         # DHARMa refit conditional
         res <- simulateResiduals(fittedModel, refit=T, re.form=NULL)
