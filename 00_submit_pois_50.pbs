@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#PBS -N power_pois_50
+
+#PBS -q hartig
+
+#PBS -l nodes=2:ppn=16
+#PBS -l mem=64gb
+#PBS -l walltime=672:00:00
+
+#PBS -m be
+#PBS -M melina.leite@ib.usp.br
+
+#PBS -j oe
+#PBS -o  5_glmm_power_pois_50.txt 
+
+
+cd $PBS_O_WORKDIR
+
+conda activate r_env
+
+Rscript 5_glmm_power_pois_50.R
+
