@@ -5,7 +5,7 @@
 #PBS -q express
 
 #PBS -l nodes=1:ppn=1
-#PBS -l mem=64gb
+#PBS -l mem=1gb
 #PBS -l walltime=000:01:00
 
 #PBS -m be
