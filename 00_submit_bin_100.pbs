@@ -17,6 +17,8 @@
 
 cd $PBS_O_WORKDIR
 
+conda init
+
 conda activate r_env
 
 Rscript 5_glmm_power_bin_100.R
