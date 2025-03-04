@@ -17,7 +17,8 @@
 
 cd $PBS_O_WORKDIR
 
-conda init
+source ~/miniconda3/etc/profile.d/conda.sh
+
 
 conda activate r_env
 
