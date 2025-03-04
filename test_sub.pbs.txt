@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#PBS -N test
+
+#PBS -q express
+
+#PBS -l nodes=1:ppn=1
+#PBS -l mem=64gb
+#PBS -l walltime=000:01:00
+
+#PBS -m be
+#PBS -M melina.leite@ib.usp.br
+
+#PBS -j oe
+#PBS -o  test.txt 
+
+
+cd $PBS_O_WORKDIR
+
+
+source ~/miniconda3/etc/profile.d/conda.sh
+
+conda activate r_env
+
+Rscript test_script.R
+
