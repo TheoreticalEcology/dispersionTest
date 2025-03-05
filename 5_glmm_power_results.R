@@ -24,7 +24,7 @@ out.bin100 <- out.bin
 out.bin <- flatten(list(out.bin10, out.bin50, out.bin100))
 
 #time spent hours
-tspent <- map_dbl(out.bin, "time")
+(tspent <- map_dbl(out.bin, "time"))
 
 
 #simulations
@@ -50,11 +50,11 @@ p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 
 ## all groups
 p.bin %>% filter(test != "Pear.p.val") %>%
-  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups))+
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  # scale_color_discrete(
-  #   labels=c("Sim-based conditional","Sim-based unconditional",  
-  #            "Pearson ParBoot."))+
+  scale_color_discrete(
+    labels=c("Sim-based conditional","Sim-based unconditional",
+             "Pearson ParBoot."))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
@@ -130,7 +130,7 @@ d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
 
 # all groups
 d.bin %>% filter(test != "Pear.stat.dispersion") %>%
-  ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups))+
+  ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
@@ -257,7 +257,7 @@ p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 ###### figure power ####
 
 p.pois %>% filter(test != "Pear.p.val") %>%
-  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups))+
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(
     labels=c("Sim-based conditional","Sim-based unconditional",  
@@ -339,7 +339,7 @@ d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
 # all groups
 d.pois %>% filter(test != "Pear.stat.dispersion",
                   mean.stat <1000) %>%
-  ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups))+
+  ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_y_log10()+
   scale_color_discrete(
