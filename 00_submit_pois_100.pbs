@@ -5,7 +5,7 @@
 #PBS -q hartig
 
 #PBS -l nodes=1:ppn=24
-#PBS -l mem=64gb
+#PBS -l mem=13gb
 #PBS -l walltime=672:00:00
 
 #PBS -m be

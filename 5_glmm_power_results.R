@@ -9,6 +9,8 @@ library(cowplot);
 theme_set(theme_cowplot())
 library(patchwork)
 
+# plot Colors
+source(here("plotColors.R"))
 
 #############----###
 ##### Binomial #####
@@ -483,8 +485,8 @@ ggsave(here("figures", "5_glmm_type1.jpeg"), width = 12, heigh=6)
 
 # intercept = 0, sample 1000
 fig.pow <- pow %>% filter(intercept == 0, 
-                          !test %in% c("Pear.p.val", "refUN.p.val" ),
-               sampleSize %in% c(1000)) %>%
+                          !test %in% c("Pear.p.val"),
+               sampleSize %in% c(200)) %>%
   ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=sampleSize)) +
   geom_point() + geom_line() +
   #geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.01)+
@@ -513,7 +515,7 @@ fig.pow
 # intercept = 0, sample 1000
 fig.disp <- disp %>% filter(intercept == 0, 
                             !test %in% c("Pear.stat.dispersion"),
-               sampleSize == 1000) %>%
+               sampleSize == 200) %>%
   ggplot(aes(x=overdispersion, y= mean.stat, col=test, )) +
   geom_point() + geom_line() +
   facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
@@ -545,10 +547,26 @@ fig.pow + fig.disp + plot_layout(ncol=1)+
 ggsave(here("figures", "5_glmm_results.jpeg"), width = 10, heigh=12)
 
 
+## MAYBE A FIGURE PER TEST WOULD BE GOOD TO SEE THAT POWER FOR PEARSON DECREASES A LITTLE WITH INCREASING NUMBER OF GROUPS WHILE FOR DHARMA-CONDITIONAL IT DECREASES A LOT MORE
 
-
-
-
+## figure per test
+pow %>% filter(intercept == 0, 
+                          !test %in% c("Pear.p.val"),
+                          sampleSize %in% c(200)) %>%
+  ggplot(aes(x=overdispersion, y= prop.sig, col=ngroups)) +
+  geom_point() + geom_line() +
+  #geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.01)+
+  facet_grid(model~test) +
+  annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
+           alpha = .1,fill = "blue")+
+  ylab("Power")+
+  theme(panel.background = element_rect(color="black"),
+        legend.box.background = element_rect(fill = "gray94", color="gray94"),
+        legend.position = "bottom") +
+  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+  labs(tag="A)") +
+  geom_hline(yintercept = 0.05, linetype="dashed")+
+  geom_hline(yintercept = 0.5, linetype="dotted")
 
 
 
