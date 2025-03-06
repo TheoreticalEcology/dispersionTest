@@ -55,7 +55,9 @@ pu <- ggplot(dataU, aes(y=y_under, x=x))+geom_point() +
   geom_line(data=predUok, aes(x=x, y=predicted), col="blue") +
   geom_ribbon(data=predUok, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
               col="blue", fill="blue",alpha=0.2) +
-  ylab("Y") + xlab("X") +ylim(0,10)
+  ylab("Y") + xlab("X") + ylim(0,13)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank())
 pu
 #ggsave("underdisp_example.jpeg", height = 4, width = 5)
 
@@ -100,7 +102,9 @@ po<-ggplot(dataO, aes(y=y_over, x=x))+geom_point() +
   geom_line(data=predOok, aes(x=x, y=predicted), col="blue") +
   geom_ribbon(data=predOok, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
               col="blue", fill="blue",alpha=0.2) +
-  ylab("Y") + xlab("X") +ylim(0,15)
+  ylab("Y") + xlab("X") +ylim(0,15) +
+  theme(axis.text.x = element_blank(),
+        axis.ticks = element_blank())
 po
 #ggsave("overdisp_example.jpeg", height = 4, width = 5)
 

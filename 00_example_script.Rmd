@@ -1,0 +1,142 @@
+---
+title: "Dispersion tests for GLMs/GLMMs"
+author: "Melina de Souza Leite"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    highlight: kate
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+Acompanying script from Leite et al. 2025 for dispersion tests in GLM/GLMMs.
+
+Here we present some examples for testing for under/overdispersion for GLMs and GLMMs using the package `DHARMa`.
+
+Users can substitute the simulated data and model by their own data and model objects to use the dispersion test functions from the `DHARMa` package. 
+
+Loading used packages
+```{r, message=F}
+library(DHARMa) #dispersion test and other models' diagnostic
+library(lme4) # for GLMMs
+
+set.seed(06032025) # for reproducible examples
+```
+
+# GLMs Poisson
+
+## Well fitted data/model
+
+Generating example data:
+```{r}
+poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
+                       randomEffectVariance = 0, # no RE variance
+                       overdispersion = 0, # no overdispersion added
+                       family = poisson())
+
+plot(observedResponse ~ Environment1, data=poisData)
+```
+
+Modeling
+```{r}
+poisModel <- glm(observedResponse ~ Environment1, family = poisson,
+                 data = poisData)
+summary(poisModel)
+```
+
+Testing dispersion
+
+```{r}
+# Pearson Chi-squared test
+testDispersion(poisModel, type = "PearsonChisq")
+
+# Pearson Parametric bootstrapping 
+res <- simulateResiduals(poisModel, refit = T)
+testDispersion(res, type = "DHARMa")
+
+# Simulation based dispersion test
+res <- simulateResiduals(poisModel, refit = F)
+testDispersion(res, type = "DHARMa")
+```
+
+## Overdispersed data/model
+
+Generating example data:
+```{r}
+poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
+                       randomEffectVariance = 0, # no RE variance
+                       overdispersion = 1, # no overdispersion added
+                       family = poisson())
+
+plot(observedResponse ~ Environment1, data=poisData)
+```
+
+Modeling
+```{r}
+poisModel <- glm(observedResponse ~ Environment1, family = poisson,
+                 data = poisData)
+summary(poisModel)
+```
+
+Testing dispersion
+
+```{r}
+# Pearson Chi-squared test
+testDispersion(poisModel, type = "PearsonChisq")
+
+# Pearson Parametric bootstrapping 
+res <- simulateResiduals(poisModel, refit = T)
+testDispersion(res, type = "DHARMa")
+
+# Simulation based dispersion test
+res <- simulateResiduals(poisModel, refit = F)
+testDispersion(res, type = "DHARMa")
+```
+
+
+# GLMMs Poisson
+
+## Well fitted data/model
+
+Generating example data for Poisson GLM count data:
+```{r}
+poisDataMM <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
+                       randomEffectVariance = 1, # added RE variance
+                       overdispersion = 0, # no overdispersion added
+                       family = poisson())
+
+plot(observedResponse ~ Environment1,col=group, data=poisDataMM)
+```
+
+Modeling using `lme4`
+```{r}
+poisModelMM <- glmer(observedResponse ~ Environment1 + (1|group), family = poisson,
+                 data = poisDataMM)
+summary(poisModelMM)
+```
+
+Testing dispersion
+
+```{r}
+# Pearson Chi-squared test
+testDispersion(poisModelMM, type = "PearsonChisq")
+
+# Pearson Chi-squared test - greater test
+testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
+
+
+# Pearson Parametric bootstrapping 
+res <- simulateResiduals(poisModelMM, refit = T)
+testDispersion(res, type = "DHARMa")
+
+# Simulation-based conditional dispersion test
+res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
+# re.form=NULL is from lme4::simulate.merMod() for simulating conditional on REs.
+testDispersion(res, type = "DHARMa")
+```
+
