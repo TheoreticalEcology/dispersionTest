@@ -70,7 +70,7 @@ p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 ```
 
 Figure All groups (10, 50 and 100):
-```{r}
+```{r, fig.height=15, fig.width=15}
 ## all groups
 p.bin %>% filter(test != "Pear.p.val") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
@@ -88,7 +88,7 @@ p.bin %>% filter(test != "Pear.p.val") %>%
 ```
 
 10 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 p.bin %>% filter(ngroups == "10") %>%
 ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -106,7 +106,7 @@ ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
 ```
 
 50 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 p.bin %>% filter(ngroups == "50") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -124,7 +124,7 @@ p.bin %>% filter(ngroups == "50") %>%
 ```
 
 100 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 p.bin %>% filter(ngroups == "100") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -142,7 +142,7 @@ p.bin %>% filter(ngroups == "100") %>%
 ```
 
 ## Type 1 error
-```{r}
+```{r, fig.height=6, fig.width=8}
 p.bin %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   mutate(ngroups = fct_relevel(ngroups, "10", "50", "100")) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=intercept))+
@@ -179,7 +179,7 @@ d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
 ```
 
 all groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 d.bin %>% filter(test != "Pear.stat.dispersion") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -199,7 +199,7 @@ d.bin %>% filter(test != "Pear.stat.dispersion") %>%
 ```
 
 10 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 d.bin %>% filter(ngroups == "10") %>%
 ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -217,7 +217,7 @@ ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
 ```
 
 50 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 d.bin %>% filter(ngroups == "50") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -235,7 +235,7 @@ d.bin %>% filter(ngroups == "50") %>%
 ```
 
 100 groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 d.bin %>% filter(ngroups == "100") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -298,7 +298,7 @@ p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 ```
 
 All groups
-```{r}
+```{r, fig.height=15, fig.width=15}
 p.pois %>% filter(test != "Pear.p.val") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
@@ -316,7 +316,7 @@ p.pois %>% filter(test != "Pear.p.val") %>%
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 10 groups
 p.pois %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
@@ -335,7 +335,7 @@ p.pois %>% filter(ngroups == "10") %>%
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 50 groups
 p.pois %>% filter(ngroups == "50") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
@@ -354,7 +354,7 @@ p.pois %>% filter(ngroups == "50") %>%
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 100 groups
 p.pois %>% filter(ngroups == "100") %>%
 ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
@@ -373,7 +373,7 @@ ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
 ```
 
 ## Type 1 error
-```{r}
+```{r, fig.height=6, fig.width=8}
 p.pois %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   mutate(ngroups = fct_relevel(ngroups, "10", "50", "100")) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=intercept))+
@@ -407,7 +407,7 @@ d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # all groups
 d.pois %>% filter(test != "Pear.stat.dispersion",
                   mean.stat <1000) %>%
@@ -429,7 +429,7 @@ d.pois %>% filter(test != "Pear.stat.dispersion",
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 10 groups
 d.pois %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
@@ -449,7 +449,7 @@ d.pois %>% filter(ngroups == "10") %>%
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 50 groups
 d.pois %>% filter(ngroups == "50") %>%
   filter(mean.stat <110) %>% # excluding weird results 
@@ -470,7 +470,7 @@ d.pois %>% filter(ngroups == "50") %>%
 ```
 
 
-```{r}
+```{r, fig.height=15, fig.width=15}
 # 100 groups
 d.pois %>% filter(ngroups == "100") %>%
 ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
@@ -492,6 +492,10 @@ ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
 
 
 # Final figures
+
+Parameterers:  
+- intercept = 0. 
+- sampleSize = 500. 
 
 All simulations
 ```{r}
@@ -516,14 +520,14 @@ disp <- bind_rows(list(Poisson = d.pois, Binomial = d.bin), .id="model") %>%
 ```
 
 ## Type 1 error
+All sample sizes
 ```{r}
-# intercept = 0, sample 1000
 type1 <- pow %>% filter(test != "Pear.p.val", overdispersion == 0, 
                         intercept==0) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=ngroups))+
   geom_point(position=position_dodge(width=0.8)) + 
   geom_line(aes(x=as.numeric(as.factor(sampleSize))), position=position_dodge(width=0.8))+
-  ylab("Type I error")+ xlab("")+
+  ylab("Type I error")+ xlab("Sample size")+
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.1,
                 position=position_dodge(width=0.8))+
   facet_grid(model~test, labeller = as_labeller(c(`dhaCO.p.val` = "Conditional Sim-based" ,
@@ -541,10 +545,9 @@ ggsave(here("figures", "5_glmm_type1.jpeg"), width = 12, heigh=6)
 
 ## Power
 ```{r}
-# intercept = 0, sample 1000
 fig.pow <- pow %>% filter(intercept == 0, 
                           !test %in% c("Pear.p.val"),
-               sampleSize %in% c(200)) %>%
+               sampleSize %in% c(500)) %>%
   ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=sampleSize)) +
   geom_point() + geom_line() +
   #geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.01)+
@@ -571,10 +574,9 @@ fig.pow
 
 ## Dispersion statistics
 ```{r}
-# intercept = 0, sample 1000
 fig.disp <- disp %>% filter(intercept == 0, 
                             !test %in% c("Pear.stat.dispersion"),
-               sampleSize == 200) %>%
+               sampleSize == 500) %>%
   ggplot(aes(x=overdispersion, y= mean.stat, col=test, )) +
   geom_point() + geom_line() +
   facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
@@ -599,10 +601,7 @@ fig.disp
 ```
 
 ## Combined power & dispersion
-```{r}
-######  ####
-
-# intercept = 0, sample 1000
+```{r, fig.height=10, fig.width=8}
 fig.pow + fig.disp + plot_layout(ncol=1)+
   plot_annotation(title="Alternative dispersion test for GLMMs",
                   theme = theme(plot.title = element_text(hjust=0.5)))
@@ -611,84 +610,36 @@ ggsave(here("figures", "5_glmm_results.jpeg"), width = 10, heigh=12)
 
 ## Alternative figures / test
 
-MAYBE A FIGURE PER TEST WOULD BE GOOD TO SEE THAT POWER FOR PEARSON DECREASES A LITTLE WITH INCREASING NUMBER OF GROUPS WHILE FOR DHARMA-CONDITIONAL IT DECREASES A LOT MORE
-```{r}
+intercept 0
+Sample Size = 200
+
+```{r, fig.height=6, fig.width=8}
 pow %>% filter(intercept == 0, 
                           !test %in% c("Pear.p.val"),
-                          sampleSize %in% c(200)) %>%
+                          sampleSize %in% c(500)) %>%
   ggplot(aes(x=overdispersion, y= prop.sig, col=ngroups)) +
   geom_point() + geom_line() +
   #geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.01)+
-  facet_grid(model~test) +
+  facet_grid(model~test, labeller=
+               as_labeller(c(dhaCO.p.val = "Sim-based conditional",
+                             dhaUN.p.val = "Sim-based unconditional",  
+                             refCO.p.val = "Pearson Param. Bootstrap.",
+                             `Binomial` = "Binomial",
+                              `Poisson` = "Poisson"))) +
   annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
            alpha = .1,fill = "blue")+
   ylab("Power")+
   theme(panel.background = element_rect(color="black"),
         legend.box.background = element_rect(fill = "gray94", color="gray94"),
         legend.position = "bottom") +
-  guides(color=guide_legend(nrow=2, byrow=TRUE)) +
+  guides(color=guide_legend(nrow=1, byrow=TRUE)) +
   labs(tag="A)") +
   geom_hline(yintercept = 0.05, linetype="dashed")+
   geom_hline(yintercept = 0.5, linetype="dotted")
 ```
 
 
-```{r}
-## ALTERNATIVE ####
-## 
 
-library(ggh4x)
-
-pow %>% filter(intercept == 0, test != "Pear.p.val",
-               sampleSize %in% c(200,500,1000)) %>%
-  ggplot(aes(x=overdispersion, y= prop.sig, col=test)) +
-  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
-  facet_nested(sampleSize~model + ngroups) +
-  ylab("Power") +  
-  scale_color_discrete(
-    labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Param. Bootstrap.")) +
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom") +
-  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
-  ggtitle("GLMM Power")
-
-
-pow %>% filter(intercept == 0, test != "Pear.p.val",
-               overdispersion >= 0.2 & overdispersion <=0.5,
-               sampleSize %in% c(200,500,1000)) %>%
-  ggplot(aes(x=as.numeric(as.character(ngroups)), y= prop.sig, col=test)) +
-  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
-  facet_nested(overdispersion ~ model + sampleSize) +
-  scale_x_continuous(breaks=c(10,50,100))+
-  ylab("Power") +  xlab("number of groups (m)")+
-  scale_color_discrete(
-    labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Param. Bootstrap.")) +
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom") +
-  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
-  ggtitle("GLMM Power ")
-```
-
-
-```{r}
-pow %>% filter(intercept == 0, test != "Pear.p.val",
-               overdispersion %in% c(0.2,0.5),
-               sampleSize %in% c(200,500,1000)) %>%
-  ggplot(aes(x=as.numeric(as.character(ngroups)), y= prop.sig, col=test, linetype=as.factor(overdispersion))) +
-  geom_point(alpha=0.6) + geom_line(alpha=0.6) +
-  facet_grid(model~sampleSize) +
-  scale_x_continuous(breaks=c(10,50,100))+
-  ylab("Power") +  xlab("number of groups (m)")+
-  scale_color_discrete(
-    labels=c("Sim-based conditional","Sim-based unconditional",  
-             "Pearson Param. Bootstrap.")) +
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom") +
-  guides(color=guide_legend(nrow=3, byrow=TRUE)) +
-  ggtitle("GLMM Power for 0.5 of overdispersion")
-```
 
 
 ```{r}
