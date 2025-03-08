@@ -26,7 +26,22 @@ The following objects are masked from 'package:tidyr':
 Warning message:
 package 'lme4' was built under R version 4.4.3 
 parallel, set cores automatically to 23
-Error in checkForRemoteErrors(val) : 
-  14 nodes produced errors; first error: Response is constant
-Calls: runBenchmarks ... clusterApply -> staticClusterApply -> checkForRemoteErrors
-Execution halted
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
