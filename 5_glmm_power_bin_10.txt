@@ -1,19 +1,52 @@
 
-no change     /home/som43189/miniconda3/condabin/conda
-no change     /home/som43189/miniconda3/bin/conda
-no change     /home/som43189/miniconda3/bin/conda-env
-no change     /home/som43189/miniconda3/bin/activate
-no change     /home/som43189/miniconda3/bin/deactivate
-no change     /home/som43189/miniconda3/etc/profile.d/conda.sh
-no change     /home/som43189/miniconda3/etc/fish/conf.d/conda.fish
-no change     /home/som43189/miniconda3/shell/condabin/Conda.psm1
-no change     /home/som43189/miniconda3/shell/condabin/conda-hook.ps1
-no change     /home/som43189/miniconda3/lib/python3.12/site-packages/xontrib/conda.xsh
-no change     /home/som43189/miniconda3/etc/profile.d/conda.csh
-no change     /home/som43189/.bashrc
-No action taken.
+This is DHARMa 0.4.7. For overview type '?DHARMa'. For recent changes, type news(package = 'DHARMa')
+Warning message:
+package 'DHARMa' was built under R version 4.4.3 
+-- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+v dplyr     1.1.4     v readr     2.1.5
+v forcats   1.0.0     v stringr   1.5.1
+v ggplot2   3.5.1     v tibble    3.2.1
+v lubridate 1.9.4     v tidyr     1.3.1
+v purrr     1.0.4     
+-- Conflicts ------------------------------------------ tidyverse_conflicts() --
+x dplyr::filter() masks stats::filter()
+x dplyr::lag()    masks stats::lag()
+i Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+here() starts at /home/som43189/dispersionTest
+Warning message:
+package 'here' was built under R version 4.4.3 
+Loading required package: Matrix
 
-CondaError: Run 'conda init' before 'conda activate'
+Attaching package: 'Matrix'
 
-Error in library(DHARMa) : there is no package called 'DHARMa'
-Execution halted
+The following objects are masked from 'package:tidyr':
+
+    expand, pack, unpack
+
+Warning message:
+package 'lme4' was built under R version 4.4.3 
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
