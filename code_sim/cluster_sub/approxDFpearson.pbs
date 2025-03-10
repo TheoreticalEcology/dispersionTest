@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#PBS -N approxDFpearson
+
+#PBS -q hartig
+
+#PBS -l nodes=1:ppn=24
+#PBS -l mem=13gb
+#PBS -l walltime=100:00:00
+
+#PBS -m be
+
+#PBS -j oe
+#PBS -o  approxDFpearson.txt 
+
+
+cd $PBS_O_WORKDIR
+cd ../..
+
+source ~/miniconda3/etc/profile.d/conda.sh
+
+conda activate r_env
+
+Rscript code_results/8_glmm_approxDFpearson_results.R.R
+
