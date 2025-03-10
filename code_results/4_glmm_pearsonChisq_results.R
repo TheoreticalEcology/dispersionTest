@@ -10,9 +10,9 @@ theme_set(theme_cowplot())
 library(patchwork)
 
 
-# colors
-cols = c("#556B2F", "#A2CD5A", "#1874CD", "#104E8B", "#7EC0EE",
-                               "#CD5555", "#8B3A3A", "#FF8C69")
+# plot Colors
+source(here("code_results", "plotColors.R"))
+
 
 
 ## Binomial and Poisson ####
@@ -108,7 +108,7 @@ fig.power <-
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width = 0.01) +
   annotate("rect", xmin = -0.05, xmax = 0.05, ymin = 0, ymax = 1,
            alpha = .1,fill = "blue")+
-  scale_linetype_discrete(name= "Pearson test")+
+  scale_linetype_discrete(name= "Test")+ scale_color_discrete("Model")+
   facet_wrap(~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
                                                 `50`= "m = 50 groups",
                                                 `100`= "m = 100 groups",
@@ -116,7 +116,9 @@ fig.power <-
                                                 `Poisson` = "Poisson"))) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   theme(panel.background = element_rect(color="black"),
-    legend.position ="right") +
+    legend.position ="inside",
+    legend.position.inside = c(0.23,0.5),
+    legend.box.background = element_rect(color="gray94", fill="gray94")) +
   labs(tag="A)") +
   ylab("Power") + ylim(0,1)
 fig.power
@@ -135,16 +137,20 @@ fig.disp <- disper %>% filter(ngroups %in% c(10,50,100)) %>%
                                                 `50`= "m = 50 groups",
                                                 `100`= "m = 100 groups"))) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray") +
+  scale_color_discrete("Model")+
   annotate("rect", xmin = 0, xmax = 1, ymin = 0, ymax = 1,
            alpha = 0.1,fill = "red")+
   theme(panel.background = element_rect(color="black"),
-        legend.position = "none")+
+        legend.position ="inside",
+        legend.position.inside = c(0.018,0.83),
+        legend.box.background = element_rect(color="gray94", fill="gray94"))+
+        
   labs(tag="B)") +
   ylab("Dispersion statistics")+
   scale_y_log10()
 fig.disp
-fig.power + fig.disp + plot_layout(ncol=1, guides="collect")  +
-  plot_annotation(title="Pearson Chi-squared dispersion test for GLMMs",
+fig.power + fig.disp + plot_layout(ncol=1)  +
+  plot_annotation(title="Pearson Chi-squared dispersion tests for GLMMs",
                   theme = theme(plot.title = element_text(hjust=0.5)))
 
 

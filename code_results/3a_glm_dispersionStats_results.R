@@ -154,4 +154,4 @@ statval %>% filter(test != "Ref.stat.dispersion",
 
 
 pfig + statfig + plot_layout(ncol=1)
-ggsave(here("figures", "3_glm_dispPower_slopes.jpeg"), width=13,height = 10)
+ggsave(here("figures", "3a_glm_dispPower_slopes.jpeg"), width=13,height = 10)
