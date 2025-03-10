@@ -15,11 +15,11 @@
 
 
 cd $PBS_O_WORKDIR
-cd ../..
+cd ..
 
 source ~/miniconda3/etc/profile.d/conda.sh
 
 conda activate r_env
 
-Rscript code_results/8_glmm_approxDFpearson_results.R.R
+Rscript 8_glmm_approxDFpearson.R
 
