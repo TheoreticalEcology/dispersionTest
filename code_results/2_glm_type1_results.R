@@ -139,10 +139,12 @@ save(alpha.pois, alpha.bin, file=here("data", "2_callibrated_alphaLevels.Rdata")
 
 ##### Type I error rate for the dispersion tests #####
 
-f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
-  facet_wrap(~test, labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
-                                             `Pear.p.val` = "1a) Pearson Chi-squared" ,
-                                    `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
+f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), 
+                           col=intercept)) +
+  facet_wrap(~test, labeller = 
+               as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
+                            `Pear.p.val` = "1a) Pearson Chi-squared" ,
+                           `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
                 aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
@@ -186,51 +188,17 @@ f.pois
 
 ## both distributions
 
-f.pois + f.bin +
-  plot_layout(ncol=1, )
-ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 9)
-
-
-
-##### ALTERNATIVA TYPE I ERROR FIGURE #####
-#library(ggbreak)
-library(ggh4x)
-
 dats <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
   mutate(model = fct_relevel(model, "Poisson", "Binomial")) 
 
 dats %>%
-ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
-  facet_nested(model~test, labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
-                                                   `Pear.p.val` = "1a) Pearson Chi-squared" ,
-                                                   `Ref.p.val` = "1b) Pearson param. bootstrap",
-                                                  `Binomial` = "Binomial",
-                                                  `Poisson` = "Poisson"))) +
-  scale_y_continuous(limits=c(0,0.1))+
-  geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8),
-                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
-  geom_hline(yintercept = 0.05, linetype="dotted")+
-  geom_line(aes(x=as.numeric(as.factor(sampleSize))),
-            position = position_dodge(width=0.8))+
-  xlab("Sample size") +
-  ylab("Type I error") +
-  theme(panel.background  = element_rect(color = "black"),
-        legend.position = c(0.9,0.36),
-        legend.background  = element_rect(fill="#F0F0F0"),
-        axis.text.x = element_text(angle=45, hjust=1))
-
-#ggsave(here("figures", "2_glm_type1_alternative.jpeg"), width=10, height = 7)
-
-
-dats %>%
   ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
   facet_grid(model~test, scales="free",
-             labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based residuals" ,
-                                                    `Pear.p.val` = "1a) Pearson Chi-squared" ,
-                                                    `Ref.p.val` = "1b) Pearson param. bootstrap",
-                                                    `Binomial` = "Binomial",
-                                                    `Poisson` = "Poisson"))) +
+             labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based dispersion" ,
+                                       `Pear.p.val` = "1a) Pearson Chi-squared",
+                                `Ref.p.val` = "1b) Pearson param. bootstrap",
+                                         `Binomial` = "Binomial",
+                                      `Poisson` = "Poisson"))) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8),
@@ -247,59 +215,11 @@ dats %>%
         legend.background  = element_rect(fill="#F0F0F0"),
         axis.text.x = element_text(angle=45, hjust=1))
 
-ggsave(here("figures", "2_glm_type1_alternative.jpeg"), width=10, height = 7)
-
-
-
-
-# zero intercept
-data.fig <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), 
-                      .id="model")
-data.fig %>% filter(intercept == 0,
-                    sampleSize %in% c(10,100,1000)) %>%
-  ggplot(aes(x=test, y=prop.sig, col=test)) +
-  facet_grid(model~sampleSize)+
-  geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8),
-                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
-  geom_hline(yintercept = 0.05, linetype="dotted")+
-  theme(panel.background  = element_rect(color = "black"))
-
-
+ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 7)
 
 
 
 ##### Dispersion statistics #### 
-
-# boxplot
-box.bin <- ggplot(stats.bin, aes(x=as.factor(sampleSize), y=Dispersion, col=test))+
-  geom_boxplot()+
-  facet_grid(~intercept) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
-  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Binomial") +
-  ylim(0,5)+
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "none",
-        axis.text.x = element_text(angle=45, hjust=1)) 
-
-box.pois <- ggplot(stats.pois, aes(x=as.factor(sampleSize), y=Dispersion, col=test))+
-  geom_boxplot()+
-  facet_grid(~intercept) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
-  geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson") +
-  ylim(0,5)+
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom",
-        axis.text.x = element_text(angle=45, hjust=1))
-
-box.pois + box.bin + plot_layout(ncol=1)
-
 
 # summary stats
 
@@ -307,14 +227,13 @@ d.bin <- stats.bin %>% group_by(test, sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
             sd = sd(Dispersion, na.rm=T)) %>%
-  pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
-  ggplot(aes(x=sampleSize, y=Dispersion, col=test, linetype=stat))+
+ # pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
+  ggplot(aes(x=sampleSize, y=median, col=test))+
   geom_point()+ geom_line()+
-  #geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd))+
   scale_x_log10()+
   facet_grid(~intercept) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
+  scale_color_manual(values=col.tests[c(4,1,2)],
+    labels=c("Sim-based dispersion", "Pearson Chi-squared",
              "Pearson Param. Bootstrap."))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial") +
@@ -329,15 +248,15 @@ d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
             sd = sd(Dispersion, na.rm=T)) %>%
-  pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
-  ggplot(aes(x=sampleSize, y=Dispersion, col=test, linetype=stat))+
+  #pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
+  ggplot(aes(x=sampleSize, y=median, col=test))+
   geom_point()+ geom_line()+
   #geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd))+
   scale_x_log10()+
   facet_grid(~intercept) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+ 
+  scale_color_manual(values=col.tests[c(4,1,2)],
+                     labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                              "Pearson Param. Bootstrap."))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson") +
   theme(panel.background = element_rect(color="black"),
@@ -359,9 +278,9 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
   geom_density()+
   geom_hline(yintercept=1, linetype="dotted")+
   facet_grid(sampleSize ~ intercept, scales="free") +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+ 
+  scale_color_manual(values=col.tests[c(4,1,2)],
+                     labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                              "Pearson Param. Bootstrap."))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
@@ -373,10 +292,9 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
   geom_density()+
   geom_hline(yintercept=1, linetype="dotted")+
   facet_grid(sampleSize ~ intercept, scales="free") +
-  #scale_y_log10()+
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+ 
+  scale_color_manual(values=col.tests[c(4,1,2)],
+                     labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                              "Pearson Param. Bootstrap."))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
@@ -395,7 +313,7 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
   ggtitle("Binomial: ecdf p-values")
-ggsave(here("figures", "2_glmBin_ecdfPvals.jpeg"), width=10, height = 15)
+#ggsave(here("figures", "2_glmBin_ecdfPvals.jpeg"), width=10, height = 15)
 
 ggplot(pvals.pois, aes(x=p.val, col=test))+
   stat_ecdf()+
@@ -406,5 +324,5 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
   ggtitle("Poisson: ecdf p-values")
-ggsave(here("figures", "2_glmPois_ecdfPvals.jpeg"), width=10, height = 15)
+#ggsave(here("figures", "2_glmPois_ecdfPvals.jpeg"), width=10, height = 15)
 

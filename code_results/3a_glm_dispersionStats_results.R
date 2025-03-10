@@ -8,6 +8,9 @@ theme_set(theme_cowplot())
 library(here)
 library(patchwork)
 
+# plot Colors
+source(here("code_results", "plotColors.R"))
+
 
 ##############-###
 #### Binomial ####
@@ -91,9 +94,9 @@ stats.pois <- pois %>% dplyr::select(Pear.stat.dispersion,
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(slope, overdispersion,test) %>% 
   summarise(mean.stat = mean(Dispersion, na.rm=T))
-stats.pois$test <- factor(stats.pois$test, levels = c("Pear.stat.dispersion", 
-                                                      "Ref.stat.dispersion",
-                                                      "DHA.stat.dispersion"))
+stats.pois$test <- factor(stats.pois$test, levels = c("DHA.stat.dispersion",
+                                                      "Pear.stat.dispersion", 
+                                                      "Ref.stat.dispersion"))
 
 
 
@@ -104,16 +107,22 @@ stats.pois$test <- factor(stats.pois$test, levels = c("Pear.stat.dispersion",
 ##### Pvalues #####
 pval <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), 
                   .id="model") %>%
-  mutate(slope = as.numeric(slope))
+  mutate(slope = as.numeric(slope)) %>%
+  mutate(test = fct_relevel(test, "DHA.p.val",
+                            "Pear.p.val", 
+                            "Ref.p.val"))
  
 pfig <- pval %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
+  scale_color_manual(values = col.tests[c(4,1,2)],
+                    labels = c("Sim-based dispersion",
+                               "Pearson Chi-squared",
+                               "Pearson Param. Bootstrap.")) +
   facet_grid(model~slope) +
+  ylab("Power")+
   theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom") + 
-  labs(title= "GLM power dif slopes", 
-       subtitle = "n=500, intercept = 0, ntrial(binomial)=10")
+        legend.position = "none")
 pfig
 
 
@@ -125,9 +134,12 @@ statval <- bind_rows(list(Poisson = stats.pois, Binomial = stats.bin), .id="mode
 statfig <- statval %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point() + geom_line() +
+  scale_color_manual(values = col.tests[c(4,1,2)],
+                     labels = c("Sim-based dispersion",
+                                "Pearson Chi-squared",
+                                "Pearson Param. Bootstrap.")) +
   facet_grid(model~slope, scales="free") +
-  labs(title="GLM dispersion stats for dif slopes", 
-       subtitle  = "n=500, intercept=0,  ntrial(binomial)=10")+
+  ylab("Dispersion parameter") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")
 statfig

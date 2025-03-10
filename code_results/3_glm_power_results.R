@@ -13,7 +13,7 @@ load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
 # created in script 2_glm_type1_results.R
 
 # plot Colors
-source(here("plotColors.R"))
+source(here("code_results", "plotColors.R"))
 
 
 ##############-###
@@ -45,22 +45,6 @@ p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
 p.bin$intercept <- fct_relevel(p.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 
-
-ggplot(p.bin, aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
-  facet_grid(sampleSize~intercept) +
-  geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")
-ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 15)
-
-
-
-
 ##### Callibrated Power #####
 
 cp.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
@@ -77,17 +61,21 @@ cp.bin$intercept <- fct_relevel(cp.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 cp.bin$sampleSize <- as.factor(as.numeric(cp.bin$sampleSize))
 
 
-ggplot(cp.bin, aes(x=overdispersion, y=prop.sig, col=test))+
+##### figure ####
+bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
+  scale_color_manual( values= col.tests[c(4,1,2)],
+                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                               "Pearson Param. Bootstrap."))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Binomial: callibrated power", subtitle = "1000 sim; Ntrials=10") +
+  ggtitle("Binomial power", subtitle = "1000 sim; Ntrials = 10") +
   theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")
-ggsave(here("figures", "3_glmBin_powerCalibrated.jpeg"), width=10, height = 15)
+        legend.position = "bottom")+
+  guides(color=guide_legend(nrow=2, byrow=TRUE))
+ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 15)
+
 
 
 ##### figure statistics #####
@@ -104,9 +92,9 @@ st.bin$sampleSize <- as.factor(as.numeric(st.bin$sampleSize))
 
 ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
+  scale_color_manual( values= col.tests[c(4,1,2)],
+                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                               "Pearson Param. Bootstrap."))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "1000 sim; Ntrials=10") +
@@ -144,19 +132,6 @@ p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
 p.pois$intercept <- fct_relevel(p.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 
-ggplot(p.pois, aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
-  facet_grid(sampleSize~intercept) +
-  geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Poisson", subtitle = "1000 sim; Ntrials=10") +
-  theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")
-ggsave(here("figures", "3_glmPois_power.jpeg"), width=10, height = 15)
-
-
 ##### Calibrated power #####
 
 cp.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
@@ -173,19 +148,20 @@ cp.pois$intercept <- fct_relevel(cp.pois$intercept, "-3", "-1.5", "0", "1.5", "3
 cp.pois$sampleSize <- as.factor(as.numeric(cp.pois$sampleSize))
 
 
-
-ggplot(cp.pois, aes(x=overdispersion, y=prop.sig, col=test))+
+##### figure ####
+bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
+  scale_color_manual( values= col.tests[c(4,1,2)],
+                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                               "Pearson Param. Bootstrap."))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
-  ggtitle("Poisson: callibrated power", subtitle = "1000 sim; Ntrials=10") +
+  ggtitle("Poisson power", subtitle = "1000 sim") +
   theme(panel.background = element_rect(color="black"),
-        legend.position = "bottom")
-ggsave(here("figures", "3_glmPois_powerCalibrated.jpeg"), width=10, height = 15)
-
+        legend.position = "bottom")+
+  guides(color=guide_legend(nrow=2, byrow=TRUE))
+ggsave(here("figures", "3_glmPois_power.jpeg"), width=10, height = 15)
 
 
 ##### figure statistics #####
@@ -203,12 +179,12 @@ st.pois$sampleSize <- as.factor(as.numeric(st.pois$sampleSize))
 ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_y_log10()+
-  scale_color_discrete(
-    labels=c("Quantile Residuals", "Pearson Chi-squared",
-             "Pearson Param. Bootstrap."))+
+  scale_color_manual( values= col.tests[c(4,1,2)],
+                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
+                               "Pearson Param. Bootstrap."))+
   facet_grid(sampleSize~intercept, scales="free_y") +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
-  ggtitle("Poisson: dispersion statistics", subtitle = "1000 sim; Ntrials=10") +
+  ggtitle("Poisson: dispersion statistics", subtitle = "1000 simulations") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")
 ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
@@ -220,19 +196,20 @@ ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
 ## FIGURE POWER together ####
 
 # raw and callibrated
-pow <- bind_rows(list(Poisson_uncallibrated = p.pois, 
-                      Binomial_uncallibrated = p.bin,
-                      Poisson_callibrated = cp.pois, 
-                      Binomial_callibrated = cp.bin), .id= "model") %>%
-  separate(model, c("model", "callibration"))
+pow <- bind_rows(list(Poisson_uncalibrated = p.pois, 
+                      Binomial_uncalibrated = p.bin,
+                      Poisson_calibrated = cp.pois, 
+                      Binomial_calibrated = cp.bin), .id= "model") %>%
+  separate(model, c("model", "calibration")) %>%
+  mutate(model = fct_relevel(model, "Poisson", "Binomial"))
 
 # intercept = 0, some sample sizes
 sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 
-ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibration)) +
+ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibration)) +
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   ylab("Power") + xlab("Overdispersion") +
-  scale_color_manual(values = col.tests[c(4,1,2)], labels = c("Sim-based residuals",
+  scale_color_manual(values = col.tests[c(4,1,2)], labels = c("Sim-based dispersion",
                                             "Pearson Chi-squared",
                                             "Pearson Param. Bootstrap.")) +
   facet_grid(model~sampleSize, 
@@ -249,10 +226,9 @@ ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = callibrat
         legend.spacing.y = unit(0, "cm"),
         legend.text = element_text(size=9),
         legend.key.spacing.y = unit(-0.1, "lines"),
-        #legend.background = element_rect(color = "black"),
         legend.title = element_blank(),
         legend.box.background = element_rect(fill = "gray94", color="gray94"),
-        legend.position = c(0.01,0.37))
+        legend.position = c(0.01,0.87))
 
 ggsave(here("figures", "3_glm_both_power.jpeg"), width=10, height = 6)
 
@@ -287,19 +263,23 @@ ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Chi-sq)")+
   geom_hline(yintercept = 0, linetype="dotted")  +
   ylim(-0.4,0.4) +
-  geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),
-           colour="black")
+  geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, 
+                                 colour=""),
+           colour="black") +
+  theme(panel.background = element_rect(color="black"))
 ggsave(here("figures", "3_glm_DISP_diff_DHA-Pear.jpeg"), height=4, width=9)
 
 
 
 ##### DHARMa stats X Pearson Bootstrapping ####
-ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
+dispersion %>% filter(intercept == 0) %>%
+ggplot(aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
   geom_point(size=2) + geom_line()+
   facet_grid(~model)+
   ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Boot)")+
   ylim(-0.4,0.2)+
   geom_hline(yintercept = 0, linetype="dotted") +
   geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),
-            colour="black")
+            colour="black")+
+  theme(panel.background = element_rect(color="black"))
 ggsave(here("figures", "3_glm_DISP_diff_DHA-Ref.jpeg"), height=4, width=9)

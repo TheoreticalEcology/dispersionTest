@@ -9,9 +9,11 @@ library(cowplot);
 theme_set(theme_cowplot())
 library(patchwork)
 
-####################
+source(here("code_results", "plotColors.R"))
+
+##############-----#
 ##### Binomial #####
-####################
+###############----#
 
 load(here("data", "1_glmBin_pearsonChisq.Rdata"))
 
@@ -38,9 +40,9 @@ sims.mean.bin <- sims.bin %>% group_by(sim, controlValues,intercept) %>%
   group_by(controlValues,intercept,n) %>%
   summarise(mean.pearson = mean(Pear.stat))
 
-###################
+#################-#
 ##### Poisson #####
-###################
+#################-#
 
 
 load(here("data", "1_glmPois_pearsonChisq.Rdata"))
@@ -74,9 +76,9 @@ sims.mean <- bind_rows(list(Poisson = sims.mean.pois,
                        .id = "model")
 
 
-###################
+#################-#
 ##### Figures #####
-###################
+#################-#
 
 pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
                               col=as.factor(intercept))) +
@@ -87,10 +89,13 @@ pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
                 position = position_dodge(width=0.4)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
   ylim(0,1)+
-  scale_color_discrete("intercept")+
+  scale_color_manual("intercept",values = col.intercept)+
   xlab("sampleSize") + ylab("Prop of significant KS test") +
   labs(title="Binomial", tag = "B)") +
-  theme(panel.border  = element_rect(color = "black"))
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "inside",
+        legend.position.inside = c(0.7,0.8),
+        legend.box.background = element_rect(fill="gray94",color="gray94"))
 pbin
 
 ggplot(final.pois, aes(y=ks.sig/100, x=as.factor(controlValues),
@@ -101,12 +106,13 @@ ggplot(final.pois, aes(y=ks.sig/100, x=as.factor(controlValues),
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
                 position = position_dodge(width=0.4)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
-  scale_color_discrete("intercept") +
+  scale_color_manual("intercept",values = col.intercept)+
   xlab("sampleSize") + ylab("Prop of significant KS test") +
   labs(title="Poisson", tag = "A)") +
-  theme(panel.border  = element_rect(color = "black")) +
-  pbin + plot_layout(ncol=1, guides="collect")
-ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 6, height = 8)
+  theme(panel.border  = element_rect(color = "black"),
+        legend.position = "none") +
+  pbin + plot_layout(ncol=2)
+ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 9, height = 5)
 
 
 # distributions
@@ -114,105 +120,116 @@ ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 6, height = 8)
 sims.mean %>% filter(controlValues == 10) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  stat_density(geom="line",size=1.1, position="identity")+
+  stat_density(geom="line",size=1.5, position="identity")+
   stat_function(fun = dchisq, args = list(df = 8), aes(color = "Chi-squared")) +
   scale_color_manual(values = c("Binomial" ="olivedrab4", 
                                 "Poisson" = "mediumpurple3", 
                                 "Chi-squared" = "black"))+
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
-        legend.position = c(0.87,0.85),
-        legend.key = element_rect()) +
+        legend.position = "inside",
+        legend.box.background = element_rect(fill="gray94", color="gray94"),
+        legend.position.inside  = c(0.87,0.85),
+        legend.key = element_rect(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 20) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 18), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 50) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 48), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 100) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 98), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 200) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 198), col="black") +
   xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 500) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 498), col="black") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -10, 5)) +
   
   sims.mean %>% filter(controlValues == 1000) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 998), col="black") +
-  xlab("Pearson Stats") + ylab("Density") +
+  xlab("") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, -20, 5)) +
   
   sims.mean %>% filter(controlValues == 10000) %>%
   ggplot(aes(x=mean.pearson, col=model)) +
   facet_grid(controlValues~intercept)+
-  geom_density(size=1.1) +
+  geom_density(size=1.5) +
   scale_color_manual(values = c("olivedrab4", "mediumpurple3"))+
   stat_function(fun = dchisq, args = list(df = 9998), col="black") +
   xlab("Pearson Stats") + ylab("Density") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none",
+        axis.text.x = element_text(angle=45, hjust=1),
         strip.background.x = element_blank(),
-        strip.text.x = element_blank()) +
+        strip.text.x = element_blank(),
+        plot.margin = margin(-20, 5, 0, 5)) +
   
   plot_layout(ncol=1) + 
   plot_annotation(title="Pearson Statistics X Chi-squared distribution")
 
 ggsave(here("figures", "1_glm_pearsonChisq_distrib_MEAN.jpeg"), width=12,
-       height=20)
+       height=16)
 
 
 
