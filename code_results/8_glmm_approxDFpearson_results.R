@@ -51,16 +51,28 @@ p.pois %>%
 #ggsave(here("figures", "5_glmmPois_powerALL.jpeg"), width=12, height = 15)
 
 
+p.pois %>% filter(ngroups == "100") %>%
+  ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
+  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  facet_grid(sampleSize~intercept) +
+  geom_hline(yintercept = c(0.05,0.5), linetype="dotted") +
+  ylim(0,1)+
+  ggtitle("Poisson", subtitle = "1000 sim") +
+  theme(panel.background = element_rect(color="black"),
+        legend.position = "bottom") + 
+  guides(color=guide_legend(nrow=2, byrow=TRUE))
+
+
 
 ###### Type 1 error #####
 
 p.pois %>% filter(overdispersion == 0) %>% ungroup() %>%
   mutate(ngroups = fct_relevel(ngroups, "10", "50", "100")) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=intercept))+
-  geom_point( position = position_dodge(width = 0.9))+
+  geom_point( position = position_dodge(width = 0.3))+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(sampleSize)),
-            position = position_dodge(width = 0.9))+
+            position = position_dodge(width = 0.3))+
   facet_grid(ngroups~test)+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45, hjust=1),
