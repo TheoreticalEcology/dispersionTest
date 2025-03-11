@@ -1,2 +1,37 @@
 
-Fatal error: cannot open file 'code_sim/8_glmm_approxDFpearson.R': No such file or directory
+This is DHARMa 0.4.7. For overview type '?DHARMa'. For recent changes, type news(package = 'DHARMa')
+Warning message:
+package 'DHARMa' was built under R version 4.4.3 
+Loading required package: Matrix
+Warning message:
+package 'lme4' was built under R version 4.4.3 
+here() starts at /home/som43189/dispersionTest
+Warning message:
+package 'here' was built under R version 4.4.3 
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
+parallel, set cores automatically to 23
