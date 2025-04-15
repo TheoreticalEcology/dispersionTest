@@ -9,7 +9,7 @@ library(here)
 library(patchwork)
 
 # plot Colors
-source(here("plotColors.R"))
+source(here("code_results", "plotColors.R"))
 
 
 ##############-###
@@ -146,8 +146,8 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize),
                             `Pear.p.val` = "1a) Pearson Chi-squared" ,
                            `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
   geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8),
-                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_errorbar(position = position_dodge(width=0.8), col = "black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
@@ -168,8 +168,8 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
                                              `Pear.p.val` = "1a) Pearson Chi-squared" ,
                                     `Ref.p.val` = "1b) Pearson param. bootstrap"))) +
   geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8),
-                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_errorbar(position = position_dodge(width=0.8), col="black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
@@ -192,7 +192,8 @@ dats <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
   mutate(model = fct_relevel(model, "Poisson", "Binomial")) 
 
 dats %>%
-  ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept)) +
+  ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept,
+             group=intercept)) +
   facet_grid(model~test, scales="free",
              labeller = as_labeller(c(`DHA.p.val` = "2) Sim-based dispersion" ,
                                        `Pear.p.val` = "1a) Pearson Chi-squared",
@@ -200,13 +201,13 @@ dats %>%
                                          `Binomial` = "Binomial",
                                       `Poisson` = "Poisson"))) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
-  geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8),
-                aes(ymin=conf.low, ymax=conf.up), width = 0.1)+
+  geom_point(position = position_dodge(width=0.8), col="white") +
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_hline(yintercept = 0, col="gray")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
+  geom_errorbar(position = position_dodge(width=0.8), #col="black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
   scale_color_manual(values = col.intercept)+
   xlab("Sample size") +
   ylab("Type I error") +
