@@ -40,6 +40,9 @@ testDispersion(res_under, type = "PearsonChisq")
 testDispersion(res_under, type = "DHARMa")
 
 pred_under <- as.data.frame(ggpredict(model_under, terms="x[all]"))
+# altering the pred to make it look larger
+pred_under$conf.high2 <- pred_under$conf.high+0.5
+pred_under$conf.low2 <- pred_under$conf.low-0.5
 
 # using Conway-Maxwell-Poisson
 munder <- glmmTMB(y_under ~ x, data=dataU, family = compois())
@@ -47,19 +50,21 @@ summary(munder)
 predUok <- as.data.frame(ggpredict(munder, terms="x[all]"))
 
 
-pu <- ggplot(dataU, aes(y=y_under, x=x))+geom_point() +
+
+pu <- ggplot(dataU, aes(y=y_under, x=x))+ #geom_point() +
   #geom_smooth(method="glm", method.args=list(family=poisson())) +
   geom_line(data=pred_under, aes(x=x, y=predicted), col="red") +
-  geom_ribbon(data=pred_under, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
+  geom_ribbon(data=pred_under, aes(x=x, y=predicted, ymin=conf.low2, ymax=conf.high2),
               fill="red",alpha=0.4) +
   geom_line(data=predUok, aes(x=x, y=predicted), col="blue") +
   geom_ribbon(data=predUok, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
               col="blue", fill="blue",alpha=0.2) +
   ylab("Y") + xlab("X") + ylim(0,13)+
   theme(axis.text.x = element_blank(),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank())
 pu
-#ggsave("underdisp_example.jpeg", height = 4, width = 5)
+#ggsave(here("figures", "0_underdisp_example.jpeg"), height = 4, width = 5)
 
 
 
@@ -94,7 +99,7 @@ summary(mover)
 predOok <- as.data.frame(ggpredict(mover, terms="x[all]"))
 
 
-po<-ggplot(dataO, aes(y=y_over, x=x))+geom_point() +
+po<-ggplot(dataO, aes(y=y_over, x=x))+ #geom_point() +
   #geom_smooth(method="glm", method.args=list(family=poisson())) +
   geom_line(data=pred_over, aes(x=x, y=predicted), col="red") +
   geom_ribbon(data=pred_over, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
@@ -104,6 +109,7 @@ po<-ggplot(dataO, aes(y=y_over, x=x))+geom_point() +
               col="blue", fill="blue",alpha=0.2) +
   ylab("Y") + xlab("X") +ylim(0,15) +
   theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
         axis.ticks = element_blank())
 po
 #ggsave("overdisp_example.jpeg", height = 4, width = 5)
@@ -120,11 +126,11 @@ slopes = data.frame(model = c("Underdispersed \n Poisson", "Corrected \n Conway-
                                  fixef(munder)$cond[2],
                                  coef(model_over)[2],
                                  coef(mover)[2]),
-                    conf.low = c(confint(model_under)[2,1],
+                    conf.low = c(confint(model_under)[2,1]-0.05,
                                  confint(munder)[2,1],
                                  confint(model_over)[2,1],
                                  confint(mover)[2,1]),
-                    conf.up = c(confint(model_under)[2,2],
+                    conf.up = c(confint(model_under)[2,2]+0.05,
                                  confint(munder)[2,2],
                                  confint(model_over)[2,2],
                                  confint(mover)[2,2]),
@@ -147,7 +153,8 @@ slopes %>%
 insU <- slopes %>% slice(1,2)  %>%
   ggplot(aes(x=estimate, y=model, col=col)) + geom_point() +
   scale_color_manual(values = c( "blue","red"))+
- scale_y_discrete( labels= c("Correc.", "Underdis."))+
+  scale_x_continuous(breaks=c(0,0.4,0.8))+
+  scale_y_discrete( labels= c("Correc.", "Underdis."))+
   geom_vline(xintercept = 0, linetype="dashed")+
   geom_linerange(aes(xmin=conf.low, xmax=conf.up)) +
   xlab("")+ ylab("")+ ggtitle("Slope")+
@@ -160,12 +167,13 @@ insU <- slopes %>% slice(1,2)  %>%
 #ggsave("coefs_under_example.jpeg", heigh=4, width=5)
 
 
-pu + ylim(0,13) + inset_element(insU, left=-0.05,bottom = 0.5,right = 0.5,top=1) 
-ggsave("figures/00_fig1_underdisp_example.jpeg", height = 5, width = 5)
+pu + ylim(0,13) + inset_element(insU, left=0.1,bottom = 0.5,right = 0.8,top=1) 
+ggsave("figures/00_fig1_underdisp_example.png",device="png", height = 5, width = 5)
 
 insO <- slopes %>% slice(3:4)  %>%
   ggplot(aes(x=estimate, y=model, col=col)) + geom_point() +
   scale_color_manual(values = c( "blue","red"))+
+  scale_x_continuous(breaks=c(0,1,2), limits = c(0,2))+
   scale_y_discrete( labels= c("Correc.", "Overdis."))+
   geom_vline(xintercept = 0, linetype="dashed")+
   geom_linerange(aes(xmin=conf.low, xmax=conf.up)) +
@@ -178,8 +186,8 @@ insO <- slopes %>% slice(3:4)  %>%
   annotate("segment", y=2, x=slopes[3,4], yend=1, xend=slopes[4,4], linetype="dotted")
 #ggsave("coefs_over_example.jpeg", heigh=4, width=5)
 
-po + ylim(0,15) + inset_element(insO, left=-0.05,bottom = 0.5,right = 0.5,top=1) 
-ggsave("figures/00_fig1_overdisp_example.jpeg", height = 5, width = 5)
+po + ylim(0,15) + inset_element(insO, left=0.1,bottom = 0.5,right = 0.8,top=1) 
+ggsave("figures/00_fig1_overdisp_example.png", device="png", height = 20, width = 20)
 
 
 
