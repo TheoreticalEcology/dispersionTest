@@ -1,5 +1,5 @@
 ---
-title: "Dispersion tests for GLMs/GLMMs"
+title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
 author: "Melina de Souza Leite"
 date: "`r Sys.Date()`"
 output: 
@@ -13,26 +13,86 @@ editor_options:
   chunk_output_type: inline
 ---
 
+Acompanying example script from "Dispersion tests for generalized linear mixed-effects models".
 
-Acompanying script from Leite et al. 2025 for dispersion tests in GLM/GLMMs.
+Our aim is to give some instructions and show examples for testing for under/overdispersion for GLMs (base R functions `glm`) and GLMMs (package `lme4`) using the `DHARMa` package.
 
-Here we present some examples for testing for under/overdispersion for GLMs and GLMMs using the package `DHARMa`.
+Users can substitute the simulated data and model by their own data and model objects[^1] to use the dispersion test functions from the `DHARMa` package.
 
-Users can substitute the simulated data and model by their own data and model objects to use the dispersion test functions from the `DHARMa` package. 
+[^1]: Please verify the currently supported modeling packages in DHARMa.
 
-Loading used packages
+Loading used packages:
+
 ```{r, message=F}
 library(DHARMa) #dispersion test and other models' diagnostic
 library(lme4) # for GLMMs
 
-set.seed(06032025) # for reproducible examples
+set.seed(2025) # for reproducible examples
 ```
 
-# GLMs Poisson
+# Dispersion tests in `DHARMa`
 
-## Well fitted data/model
+Dispersion tests in `DHARMa` are performed using the function `testDispersion`. You can test for:
 
-Generating example data:
+- Both under- or overdispersion with the argument `alternative = "two.sided"` (two sided test).
+
+- Underdispersion only with `alternative = "less"`.
+
+- Overdispersion only with `alternative = "greater"`.
+
+#### Pearson Chi-squared test
+
+The Pearson Chi-squared test is peformed when using the argument `type = "PearsonChisq`, when providing the model object in the first argument position (`simulationOutput`), for example:
+
+```{r, eval=F, echo=T}
+testDispersion(model, type = "PearsonChisq") # substitute "model" by your model object name
+```
+
+Note that **Chi-squared test on Pearson residuals is biased for GLMMs towards underdispersion** (more details in the main study). Tests with `alternative = "two.sided"` or `alternative = "less"` are therefore not reliable. If you have random effects in your model, we recommend to test only for overdispersion with `alternative = 'greater'`.
+
+
+#### Pearson parametric bootstrapping
+
+For the Pearson parametric bootstrapping, it is necessary a first step in generating simulations from the model using the function `simulateResiduals` with the argument `refit = TRUE`. This way the function will record the Pearson residuals from the simulated data from parametric bootstrapping. 
+Afterwards, use the resulting object in `testDispersion` with `type = "DHARMa"`:
+
+```{r, eval=F, echo=T}
+res <- simulateResiduals(model, refit = T) 
+testDispersion(res, type = "DHARMa")
+```
+
+The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based dispersion test explained below.
+
+
+#### Simulation-based dispersion tests
+
+The simulation-based dispersion test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
+
+```{r, eval=F, echo=T}
+res <- simulateResiduals(model, refit = F)
+testDispersion(res, type = "DHARMa")
+```
+
+For **GLMMs**, the options for simulating results **conditionally on the random effects** is currently available only for models fitted with the `lme4` package by using the argument `re.form = NULL`, which is passed to the function `simulate.merMod()` in `lme4`:
+
+```{r, eval=F, echo=T}
+res <- simulateResiduals(modelGLMM, refit = F, re.form = NULL)
+testDispersion(res, type = "DHARMa")
+```
+ 
+Note that the default of the `simulateResiduals()` for GLMMs is to simulate **unconditionally on the random effects**, which would be equal to `re.form = NA` or `re.form = ~0`:
+
+```{r, eval=F, echo=T}
+res <- simulateResiduals(modelGLMM, refit = F, re.form = NA) # or re.form = ~0
+testDispersion(res, type = "DHARMa")
+```
+
+# Example GLM Poisson
+
+## Well fitted data
+
+Generating data:
+
 ```{r}
 poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
                        randomEffectVariance = 0, # no RE variance
@@ -42,101 +102,135 @@ poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
 plot(observedResponse ~ Environment1, data=poisData)
 ```
 
-Modeling
+Modeling with `glm` function from base R:
+
 ```{r}
 poisModel <- glm(observedResponse ~ Environment1, family = poisson,
                  data = poisData)
 summary(poisModel)
 ```
 
-Testing dispersion
+### Testing dispersion
 
+1. **Pearson Parametric boostrapping**: 
 ```{r}
-# Pearson Chi-squared test
-testDispersion(poisModel, type = "PearsonChisq")
-
-# Pearson Parametric bootstrapping 
-res <- simulateResiduals(poisModel, refit = T)
+res <- simulateResiduals(poisModel, refit = T) 
 testDispersion(res, type = "DHARMa")
+```
 
-# Simulation based dispersion test
+2. **Pearson Chi-squared test** (two-sided test)
+```{r}
+testDispersion(poisModel, type = "PearsonChisq")
+```
+
+3. **Simulation-based dispersion test**
+```{r}
 res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
-## Overdispersed data/model
+## Overdispersed data
 
-Generating example data:
+Generating overdispersed data:
+
 ```{r}
 poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
                        randomEffectVariance = 0, # no RE variance
-                       overdispersion = 1, # no overdispersion added
+                       overdispersion = 1, # overdispersion added
                        family = poisson())
 
 plot(observedResponse ~ Environment1, data=poisData)
 ```
 
 Modeling
+
 ```{r}
 poisModel <- glm(observedResponse ~ Environment1, family = poisson,
                  data = poisData)
 summary(poisModel)
 ```
+### Testing dispersion
 
-Testing dispersion
-
+1. **Pearson Parametric boostrapping**: 
 ```{r}
-# Pearson Chi-squared test
-testDispersion(poisModel, type = "PearsonChisq")
-
-# Pearson Parametric bootstrapping 
-res <- simulateResiduals(poisModel, refit = T)
+res <- simulateResiduals(poisModel, refit = T) 
 testDispersion(res, type = "DHARMa")
+```
 
-# Simulation based dispersion test
+2. **Pearson Chi-squared test** (two-sided test)
+```{r}
+testDispersion(poisModel, type = "PearsonChisq")
+```
+
+3. **Simulation-based dispersion test**
+```{r}
 res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
+# Example GLMMs Poisson
 
-# GLMMs Poisson
+## Well fitted data
 
-## Well fitted data/model
+Generating data with random intercepts:
 
-Generating example data for Poisson GLM count data:
 ```{r}
 poisDataMM <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
                        randomEffectVariance = 1, # added RE variance
                        overdispersion = 0, # no overdispersion added
                        family = poisson())
 
-plot(observedResponse ~ Environment1,col=group, data=poisDataMM)
+plot(observedResponse ~ Environment1, col = group, data = poisDataMM)
 ```
 
-Modeling using `lme4`
+Modeling using `lme4`:
+
 ```{r}
 poisModelMM <- glmer(observedResponse ~ Environment1 + (1|group), family = poisson,
                  data = poisDataMM)
 summary(poisModelMM)
 ```
 
-Testing dispersion
+### Testing dispersion
+
+1. **Pearson Parametric boostrapping**: 
+```{r}
+res <- simulateResiduals(poisModel, refit = T) 
+testDispersion(res, type = "DHARMa")
+```
+
+2a. **Pearson Chi-squared test** (two-sided test)
 
 ```{r}
-# Pearson Chi-squared test
-testDispersion(poisModelMM, type = "PearsonChisq")
+testDispersion(poisModel, type = "PearsonChisq")
+```
 
-# Pearson Chi-squared test - greater test
+2b. **Pearson Chi-squared test** (only overdispersion test - `alternative = "greater"`)
+```{r}
 testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
+```
 
 
-# Pearson Parametric bootstrapping 
-res <- simulateResiduals(poisModelMM, refit = T)
-testDispersion(res, type = "DHARMa")
 
-# Simulation-based conditional dispersion test
+3a. **Simulation-based conditional dispersion test**
+```{r}
 res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
-# re.form=NULL is from lme4::simulate.merMod() for simulating conditional on REs.
 testDispersion(res, type = "DHARMa")
+```
+
+3b. **Simulation-based unconditional dispersion test**
+
+```{r}
+# Simulation-based conditional dispersion test
+res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
+testDispersion(res, type = "DHARMa")
+```
+
+
+
+# Session info for code reproducibility 
+
+```{r}
+sessionInfo()
 ```
 
