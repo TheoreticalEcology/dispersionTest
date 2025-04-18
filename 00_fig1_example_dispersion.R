@@ -4,7 +4,6 @@ library(MASS)
 library(ggeffects)
 library(tidyverse);
 library(cowplot)
-theme_set(theme_cowplot() + theme(panel.background = element_rect(color="black")))
 library(patchwork)
 
 # Set seed for reproducibility
@@ -41,8 +40,8 @@ testDispersion(res_under, type = "DHARMa")
 
 pred_under <- as.data.frame(ggpredict(model_under, terms="x[all]"))
 # altering the pred to make it look larger
-pred_under$conf.high2 <- pred_under$conf.high+0.5
-pred_under$conf.low2 <- pred_under$conf.low-0.5
+pred_under$conf.high2 <- pred_under$conf.high+0.1
+pred_under$conf.low2 <- pred_under$conf.low-0.1
 
 # using Conway-Maxwell-Poisson
 munder <- glmmTMB(y_under ~ x, data=dataU, family = compois())
@@ -50,24 +49,35 @@ summary(munder)
 predUok <- as.data.frame(ggpredict(munder, terms="x[all]"))
 
 
+# FIGURE UNDERDISP ----
+theme_set(theme_cowplot() + 
+            theme(panel.background = element_rect(color="black"),
+                  axis.text.x = element_blank(),
+                  axis.ticks = element_blank(),
+                  axis.text.y = element_blank()))
+
 
 pu <- ggplot(dataU, aes(y=y_under, x=x))+ #geom_point() +
-  #geom_smooth(method="glm", method.args=list(family=poisson())) +
   geom_line(data=pred_under, aes(x=x, y=predicted), col="red") +
-  geom_ribbon(data=pred_under, aes(x=x, y=predicted, ymin=conf.low2, ymax=conf.high2),
+  geom_ribbon(data=pred_under, aes(x=x, y=predicted, 
+                                   ymin=conf.low2, ymax=conf.high2),
               fill="red",alpha=0.4) +
   geom_line(data=predUok, aes(x=x, y=predicted), col="blue") +
-  geom_ribbon(data=predUok, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
+  geom_ribbon(data=predUok, aes(x=x, y=predicted,
+                                ymin=conf.low, ymax=conf.high),
               col="blue", fill="blue",alpha=0.2) +
-  ylab("Y") + xlab("X") + ylim(0,13)+
-  theme(axis.text.x = element_blank(),
-        axis.ticks = element_blank(),
-        axis.text.y = element_blank())
+  ylab("Y") + xlab("X") + ylim(2,7.1) +
+  
+  annotate("rect", xmin=0.08, xmax=0.12, ymin=6.9, ymax=7.1, 
+           col="red", alpha=0.4,fill="red")+
+  
+  annotate("text", x=0.13, y=7, label="Underdispersed model", hjust=0)+
+  
+  annotate("rect", xmin=0.08, xmax=0.12, ymin=6.4, ymax=6.6, 
+           col="blue", alpha=0.4,fill="blue")+
+  annotate("text", x=0.13, y=6.5, label="Correct model", hjust=0)
 pu
-#ggsave(here("figures", "0_underdisp_example.jpeg"), height = 4, width = 5)
-
-
-
+ggsave("figures/00_fig1_underdisp_example.png",device="png", height = 7.5, width = 7.5,units="cm")
 
 #########################
 # OVERDISPERSION EXAMPLE
@@ -99,26 +109,34 @@ summary(mover)
 predOok <- as.data.frame(ggpredict(mover, terms="x[all]"))
 
 
+# FIGURE OVERDISPERSION ----
+
 po<-ggplot(dataO, aes(y=y_over, x=x))+ #geom_point() +
-  #geom_smooth(method="glm", method.args=list(family=poisson())) +
+  geom_line(data=predOok, aes(x=x, y=predicted), col="blue") +
+  geom_ribbon(data=predOok, aes(x=x, y=predicted, 
+                                ymin=conf.low, ymax=conf.high),
+              col="blue", fill="blue",alpha=0.2) +
   geom_line(data=pred_over, aes(x=x, y=predicted), col="red") +
   geom_ribbon(data=pred_over, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
               fill="red",alpha=0.4) +
-  geom_line(data=predOok, aes(x=x, y=predicted), col="blue") +
-  geom_ribbon(data=predOok, aes(x=x, y=predicted, ymin=conf.low, ymax=conf.high),
-              col="blue", fill="blue",alpha=0.2) +
-  ylab("Y") + xlab("X") +ylim(0,15) +
-  theme(axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank())
+  ylab("Y") + xlab("X") + ylim(0,10.2) +
+  
+  annotate("rect", xmin=0.08, xmax=0.12, ymin=9.8, ymax=10.2, 
+           col="red", alpha=0.4,fill="red")+
+  
+  annotate("text", x=0.13, y=10, label="Overdispersed model", hjust=0)+
+  
+  annotate("rect", xmin=0.08, xmax=0.12, ymin=8.8, ymax=9.2, 
+           col="blue", alpha=0.4,fill="blue")+
+  
+  annotate("text", x=0.13, y=9, label="Correct model", hjust=0)
+
 po
-#ggsave("overdisp_example.jpeg", height = 4, width = 5)
+ggsave("figures/00_fig1_overdisp_example.png",device="png", height = 7.5, width = 7.5,units="cm")
 
 
-### FIgures ####
 
-pu+po
-
+## figures with insets for slopes ICs
 
 slopes = data.frame(model = c("Underdispersed \n Poisson", "Corrected \n Conway-Maxwell-Poisson", 
                               "Overdispersed \n Poisson", "Corrected \n Negative Binomial"),
@@ -168,7 +186,7 @@ insU <- slopes %>% slice(1,2)  %>%
 
 
 pu + ylim(0,13) + inset_element(insU, left=0.1,bottom = 0.5,right = 0.8,top=1) 
-ggsave("figures/00_fig1_underdisp_example.png",device="png", height = 5, width = 5)
+#ggsave("figures/00_fig1_underdisp_example.png",device="png", height = 5, width = 5)
 
 insO <- slopes %>% slice(3:4)  %>%
   ggplot(aes(x=estimate, y=model, col=col)) + geom_point() +
@@ -187,9 +205,11 @@ insO <- slopes %>% slice(3:4)  %>%
 #ggsave("coefs_over_example.jpeg", heigh=4, width=5)
 
 po + ylim(0,15) + inset_element(insO, left=0.1,bottom = 0.5,right = 0.8,top=1) 
-ggsave("figures/00_fig1_overdisp_example.png", device="png", height = 20, width = 20)
+#ggsave("figures/00_fig1_overdisp_example.png", device="png", height = 20, width = 20)
 
 
+
+# Getting dispersion results ----
 
 library(broom);library(broom.mixed)
 tidy(model_under)
