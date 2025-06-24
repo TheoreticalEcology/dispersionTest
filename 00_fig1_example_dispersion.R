@@ -16,9 +16,9 @@ beta0 <- 1
 beta1 <- 0.7
 mu <- exp(beta0 + beta1 * x)
 
-#########################
-# UNDERDISPERSION EXAMPLE
-#########################
+#-
+#### UNDERDISPERSION EXAMPLE ####
+#-
 # For underdispersed data we can use a binomial distribution.
 # A binomial count with n_trials and success probability p has mean = n_trials*p
 # and variance = n_trials*p*(1-p). By setting p = mu/n_trials (with mu < n_trials),
@@ -47,7 +47,7 @@ pred_under$conf.low2 <- pred_under$conf.low-0.1
 munder <- glmmTMB(y_under ~ x, data=dataU, family = compois())
 summary(munder)
 predUok <- as.data.frame(ggpredict(munder, terms="x[all]"))
-
+r_ok <- simulateResiduals(munder)
 
 # FIGURE UNDERDISP ----
 theme_set(theme_cowplot() + 
@@ -79,6 +79,40 @@ pu <- ggplot(dataU, aes(y=y_under, x=x))+ #geom_point() +
 pu
 ggsave("figures/00_fig1_underdisp_example.png",device="png", height = 7.5, width = 7.5,units="cm")
 
+
+# FIGURE RESIDUALS ----
+
+plot(res_under)
+plot(r_ok)
+
+pear_under <- data.frame(model = rep(c("underdisp", "correct"), each=100),
+                         residual = c(residuals(model_under, type="pearson"),
+                                      residuals(munder, type="pearson")),
+                         predicted = c(predict(model_under),
+                                        predict(munder)))
+ggplot(pear_under, aes(x=predicted, y=residual, col=model)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype="dashed")+
+  theme_cowplot() +
+  theme(legend.position = "top")
+ggsave("figures/Pearson_residuals_underdisp.jpeg", device="png", height = 10,
+       width = 12,units="cm")
+
+quant_under <- data.frame(model = rep(c("underdisp", "correct"), each=100),
+                         residual = c(res_under$scaledResiduals,
+                                       r_ok$scaledResiduals),
+                         predicted = c(res_under$fittedPredictedResponse,
+                                       r_ok$fittedPredictedResponse))
+
+ggplot(quant_under, aes(x=predicted, y=residual, col=model)) +
+  geom_point() +
+  geom_hline(yintercept = 0.5, linetype="dashed")+
+  theme_cowplot() +
+  theme(legend.position = "top")
+ggsave("figures/Quantile_residuals_underdisp.jpeg", device="png", height = 10,
+       width = 12,units="cm")
+
+
 #########################
 # OVERDISPERSION EXAMPLE
 #########################
@@ -107,7 +141,7 @@ pred_over <- as.data.frame(ggpredict(model_over, terms="x[all]"))
 mover <- glm.nb(y_over ~ x, data=dataO)
 summary(mover)
 predOok <- as.data.frame(ggpredict(mover, terms="x[all]"))
-
+res_ok <- simulateResiduals(mover)
 
 # FIGURE OVERDISPERSION ----
 
@@ -132,8 +166,53 @@ po<-ggplot(dataO, aes(y=y_over, x=x))+ #geom_point() +
   annotate("text", x=0.13, y=9, label="Correct model", hjust=0)
 
 po
-ggsave("figures/00_fig1_overdisp_example.png",device="png", height = 7.5, width = 7.5,units="cm")
+ggsave("figures/00_fig1_overdisp_example.png", device="png", height = 7.5, width = 7.5,units="cm")
 
+# FIGURE RESIDUALS ----
+
+
+plot(res_over)
+plot(res_ok)
+
+pear_over <- data.frame(model = rep(c("overdisp", "correct"), each=100),
+                         residual = c(residuals(model_over, type="pearson"),
+                                      residuals(mover, type="pearson")),
+                         predicted = c(predict(model_over),
+                                       predict(mover)))
+ggplot(pear_over, aes(x=predicted, y=residual, col=model)) +
+  geom_point() +
+  geom_hline(yintercept = 0, linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "top")
+ggsave("figures/Pearson_residuals_overdisp.jpeg", device="png", height = 10,
+       width = 12,units="cm")
+
+
+quant_over <- data.frame(model = rep(c("overdisp", "correct"), each=100),
+                        residual = c(res_over$scaledResiduals,
+                                     res_ok$scaledResiduals),
+                        predicted = c(res_over$fittedPredictedResponse,
+                                      res_ok$fittedPredictedResponse))
+ggplot(quant_over, aes(x=predicted, y=residual, col=model)) +
+  geom_point() +
+  geom_hline(yintercept = 0.5, linetype="dashed")+
+  theme_cowplot()+
+  theme(legend.position = "top")
+ggsave("figures/Quantile_residuals_overdisp.jpeg", device="png", height = 10,
+       width = 12,units="cm")
+
+resdata <- data.frame(res_over = ,
+                      pred_over = ,
+                      res_ok = ,
+                      pred_ok = )
+ggplot(resdata, aes(x=pred_over, y=res_over))+
+  geom_point() +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  theme_cowplot() +
+  ggplot(resdata, aes(x=pred_ok, y=res_ok))+
+  geom_point(col="red") +
+  geom_hline(yintercept = 0.5, linetype="dotted") +
+  theme_cowplot()
 
 
 ## figures with insets for slopes ICs
