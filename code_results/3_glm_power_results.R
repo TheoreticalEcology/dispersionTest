@@ -66,8 +66,9 @@ bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
-                               "Pearson Param. Bootstrap."))+
+                      labels=c("Sim-based response variance", 
+                               "param. Pearson residuals",
+                               "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial power", subtitle = "1000 sim; Ntrials = 10") +
@@ -93,8 +94,9 @@ st.bin$sampleSize <- as.factor(as.numeric(st.bin$sampleSize))
 ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
-                               "Pearson Param. Bootstrap."))+
+                      labels=c("Sim-based response variance", 
+                               "param. Pearson residuals",
+                               "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "1000 sim; Ntrials=10") +
@@ -153,8 +155,9 @@ bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
-                               "Pearson Param. Bootstrap."))+
+                      labels=c("Sim-based response variance", 
+                               "param. Pearson residuals",
+                               "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson power", subtitle = "1000 sim") +
@@ -180,8 +183,9 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_y_log10()+
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based dispersion", "Pearson Chi-squared",
-                               "Pearson Param. Bootstrap."))+
+                      labels=c("Sim-based response variance", 
+                               "param. Pearson residuals",
+                               "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept, scales="free_y") +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 simulations") +
@@ -209,9 +213,10 @@ sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibration)) +
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   ylab("Power") + xlab("Overdispersion") +
-  scale_color_manual(values = col.tests[c(4,1,2)], labels = c("Sim-based dispersion",
-                                            "Pearson Chi-squared",
-                                            "Pearson Param. Bootstrap.")) +
+  scale_color_manual(values = col.tests[c(4,1,2)], 
+                     labels = c("Sim-based response variance", 
+                                "param. Pearson residuals",
+                                 "nonparam. Pearson residuals")) +
   facet_grid(model~sampleSize, 
             labeller = as_labeller(c("Binomial"= "Binomial",
                                      "Poisson" = "Poisson",
@@ -251,7 +256,7 @@ small.text <- data.frame(label = c("Sim-based higher than Pearson",
 ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   geom_point(size=2) + geom_line()+
   facet_grid(intercept~model, scales="free")+
-  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Chi-sq)")+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x param. Pearson)")+
   geom_hline(yintercept = 0, linetype="dotted") +
   theme(panel.background = element_rect(color="black"))
 
@@ -260,7 +265,7 @@ dispersion %>% filter(intercept == 0) %>%
 ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   geom_point(size=2) + geom_line()+
   facet_grid(~model)+
-  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Chi-sq)")+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x param. Pearson)")+
   geom_hline(yintercept = 0, linetype="dotted")  +
   ylim(-0.4,0.4) +
   geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, 
@@ -276,7 +281,7 @@ dispersion %>% filter(intercept == 0) %>%
 ggplot(aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
   geom_point(size=2) + geom_line()+
   facet_grid(~model)+
-  ylab("Relative diff. Dispersion stats \n (Sim-based x Pearson Boot)")+
+  ylab("Relative diff. Dispersion stats \n (Sim-based x nonparam. Pearson)")+
   ylim(-0.4,0.2)+
   geom_hline(yintercept = 0, linetype="dotted") +
   geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),

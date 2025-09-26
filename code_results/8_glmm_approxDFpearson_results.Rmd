@@ -404,9 +404,9 @@ ggplot(comb, aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape
          linetype=guide_legend(nrow=2, byrow=TRUE),
          shape=guide_legend(nrow=2, byrow=TRUE)) +
   xlab("Overdispersion") + ylab("Power")+
-  scale_color_discrete(labels = c("Sim-based conditional", 
+  scale_color_discrete(labels = c("conditional sim-based variance", 
                                    "Pearson Chi-sq KR2", 
-                                   "Pearson Param. Boot."))
+                                   "nonparam. Pearson residuals"))
 ggsave(here("figures", "8_glmm_approxDF_power2.jpeg"), width=8, height = 8)
 ```
 

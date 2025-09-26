@@ -24,7 +24,7 @@ theme_set(theme_cowplot() +
             theme(panel.background = element_rect(color = "black")))
 
 # plot Colors
-source(here("plotColors.R"))
+source(here("code_results", "plotColors.R"))
 ```
 
 # Simulated data
@@ -144,9 +144,9 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(labels=c("Approximate Pearson",  
-                                "Sim-based conditional",
-                                "Sim-based unconditional",
-                                "Pearson ParBoot."))+
+                                "conditional sim-based variance",
+                                "unconditional sim-based variance",
+                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ylab("Power") + xlab("Overdispersion")+
@@ -154,6 +154,7 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
+ggsave(here('figures', '7_aprroxPearson_bin_powerGLMM.jpeg'), height=10, width=10)
 ```
 
 
@@ -197,9 +198,9 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_discrete(labels=c("Approximate Pearson",  
-                                "Sim-based conditional",
-                                "Sim-based unconditional",
-                                "Pearson ParBoot."))+
+                                "conditional sim-based variance",
+                                "unconditional sim-based variance",
+                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
     ylab("Power") + xlab("Overdispersion")+
@@ -207,5 +208,6 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
+ggsave(here('figures', '7_aprroxPearson_pois_powerGLMM.jpeg'), height=10, width=10)
 ```
 

@@ -86,7 +86,7 @@ rm(list=ls())
 
 ## KS GOF test to compare Pearson Stats and Chi-squared distribution
 
-# 1) Simulating 1000 Binomial proportion datasets with different sample sizes and intercepts. Fixing number of trials in 10.
+# 1) Simulating 1000 Binomial proportion datasets with different sample sizes and intercepts.
 # 2) fitting them to correct GLM model
 # 3) calculating pearson statistics of the pearson residuals (sum(resˆ2)) 
 # 4) comparing distribution of these statistics with the Chi-squared distribution with the same DF.

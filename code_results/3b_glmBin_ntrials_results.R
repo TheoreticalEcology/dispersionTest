@@ -53,9 +53,9 @@ power <- p.bin %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(1,2,4)],
-                     labels = c("Pearson Chi-squared",
-                                "Pearson Param. Bootstrap.",
-                                "Sim-based dispersion")) +
+                     labels = c("param. Pearson residuals",
+                                "nonparam. Pearson residuals",
+                                "Sim-based response variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",
                                                "20" = "20 trials"))) +
@@ -77,9 +77,9 @@ type1 <- p.bin %>% filter(overdispersion == 0) %>%
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.05,
                 position = position_dodge(width = 0.2)) +
  scale_color_manual(values = col.tests[c(1,2,4)],
-                   labels = c("Pearson Chi-squared",
-                              "Pearson Param. Bootstrap.",
-                              "Sim-based dispersion"))  +
+                   labels = c("param. Pearson residuals",
+                              "nonparam. Pearson residuals",
+                              "Sim-based response variance"))  +
   ylab("Type I error") + xlab("Number of trials")+
   theme(panel.background = element_rect(color="black"),
         legend.position = "right")
@@ -103,9 +103,9 @@ disp <- stats.bin %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(1,2,4)],
-                     labels = c("Pearson Chi-squared",
-                                "Pearson Param. Bootstrap.",
-                                "Sim-based dispersion")) +
+                     labels = c("param. Pearson residuals",
+                                "nonparam. Pearson residuals",
+                                "Sim-based response variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",
                                                "20" = "20 trials"))) +
@@ -120,6 +120,6 @@ disp
 (power /disp) + 
   (type1 + plot_spacer()) +
   plot_layout(ncol = 1)
-ggsave(here("figures", "3b_glmBin_ntrials.jpeg"))
+ggsave(here("figures", "3b_glmBin_ntrials.jpeg"),width=10,height = 10)
 
 

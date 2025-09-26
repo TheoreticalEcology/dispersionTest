@@ -24,7 +24,7 @@ theme_set(theme_cowplot() +
             theme(panel.background = element_rect(color = "black")))
 
 # plot Colors
-source(here("plotColors.R"))
+source(here("code_results", "plotColors.R"))
 ```
 
 # Simulated data
@@ -57,7 +57,7 @@ simpois %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Poisson: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-#ggsave(here('figures', '6_propzero.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_Pois_propzero.jpeg'), height=10, width=10)
 ```
 
 
@@ -68,7 +68,7 @@ simbin %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Binomial: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_propzero_bin.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_Bin_propzero.jpeg'), height=10, width=10)
 ```
 
 # Results without zeros 
@@ -146,9 +146,9 @@ bind_rows(list(p.bin, p.pois), .id="model") %>%
   filter(nSim %in% c("250", "1000")) %>%
 ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
   facet_grid(model~test, 
-             labeller= as_labeller(c("Alt.p"= "Approximate Pearson",
-                                     "DHA.p" = "Sim-based residuals",
-                                     "Pear.p" = "Pearson Chi-squared",
+             labeller= as_labeller(c("Alt.p"= "Approximate Pearson residuals",
+                                     "DHA.p" = "sim-based response variance",
+                                     "Pear.p" = "param. Pearson residuals",
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_point(position = position_dodge(0.7)) + 
@@ -156,6 +156,7 @@ ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
                 position = position_dodge(0.7)) +
   geom_hline(yintercept = 0.05, linetype = "dotted") 
+ggsave(here('figures', '7_aprroxPearson_type1GLM.jpeg'), height=6, width=10)
 ```
 
 
@@ -358,10 +359,11 @@ ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=n
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_line() + 
-  scale_color_discrete(labels = c("Alternative Sim-based",
-                                  "Sim-based residuals",
-                                  "Pearson Chi-squared"))+
+  scale_color_discrete(labels = c("Approximate Pearson residuals",
+                                  "Sim-based response variance",
+                                  "param Pearson residuals"))+
   ylab("Mean dispersion") + xlab("Overdispersion")
+ggsave(here('figures', '7_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
 ```
 
 
@@ -458,10 +460,11 @@ ggplot(pows, aes(x=overdispersion, y=prop.sig, col=test, linetype=nSim))+
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_line() + 
-  scale_color_discrete(labels = c("Alternative Sim-based",
-                                  "Sim-based residuals",
-                                  "Pearson Chi-squared"))+
+  scale_color_discrete(labels = c("Approximate Pearson residuals",
+                                  "Sim-based response variance",
+                                  "param Pearson residuals"))+
   ylab("Power") + xlab("Overdispersion")
+ggsave(here('figures', '7_approxPearson_powerGLM.jpeg'), height=6, width=10)
 ```
 
 

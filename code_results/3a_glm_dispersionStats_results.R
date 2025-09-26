@@ -116,9 +116,9 @@ pfig <- pval %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(4,1,2)],
-                    labels = c("Sim-based dispersion",
-                               "Pearson Chi-squared",
-                               "Pearson Param. Bootstrap.")) +
+                    labels = c("Sim-based response variance", 
+                               "param. Pearson residuals",
+                               "nonparam. Pearson residuals")) +
   facet_grid(model~slope) +
   ylab("Power")+
   theme(panel.background = element_rect(color="black"),
@@ -135,9 +135,9 @@ statfig <- statval %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point() + geom_line() +
   scale_color_manual(values = col.tests[c(4,1,2)],
-                     labels = c("Sim-based dispersion",
-                                "Pearson Chi-squared",
-                                "Pearson Param. Bootstrap.")) +
+                     labels = c("Sim-based response variance", 
+                                "param. Pearson residuals",
+                                "nonparam. Pearson residuals")) +
   facet_grid(model~slope, scales="free") +
   ylab("Dispersion parameter") +
   theme(panel.background = element_rect(color="black"),
