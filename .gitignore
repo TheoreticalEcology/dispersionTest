@@ -7,3 +7,5 @@
 nohup.out
 
 *.Rout
+
+code_simulations/cluster_sub/*

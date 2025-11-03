@@ -1,5 +1,5 @@
 ### Dispersion Tests Project
-## Melina Leite
+## 
 # Nov 24
 
 library(DHARMa)
@@ -9,7 +9,7 @@ library(here)
 library(patchwork)
 
 # plot Colors
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 
 
 ##############-###

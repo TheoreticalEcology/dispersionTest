@@ -1,7 +1,6 @@
 # Dispersion Tests paper ----
 # testing table 1 functions found in R for dispersion tests
 
-# Melina Leite
 # september 2025
 
 # Data/models for testing ----

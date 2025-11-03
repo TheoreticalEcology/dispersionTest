@@ -1,5 +1,5 @@
 ### Dispersion Tests Project
-## Melina Leite
+## 
 # Dec 24
 
 library(DHARMa)
@@ -9,7 +9,7 @@ library(cowplot);
 theme_set(theme_cowplot())
 library(patchwork)
 
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 
 ##############-----#
 ##### Binomial #####

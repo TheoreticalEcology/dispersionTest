@@ -1,6 +1,6 @@
 ---
 title: "GLMM Alternative Simulation-based dispersion test: Approximation of Pearson residuals"
-author: "Melina Leite"
+author: ""
 date: "`r Sys.Date()`"
 output: 
   rmdformats::readthedown:
@@ -24,7 +24,7 @@ theme_set(theme_cowplot() +
             theme(panel.background = element_rect(color = "black")))
 
 # plot Colors
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 ```
 
 # Simulated data
@@ -113,7 +113,7 @@ p.binA$intercept <- fct_relevel(p.binA$intercept, "-1.5", "0", "1.5")
 #p.binA$ngroups <- fct_relevel(p.binA$ngroups, "10", "50", "100")
 p.binA$sampleSize <- as.factor(as.numeric(p.binA$sampleSize))
 
-load(here("data", "5_glmmBin_power_OLD.Rdata")) # simulated data
+load(here("data", "5_glmmBin_power.Rdata")) # simulated data
 #simulations
 simuls.bin <- map_dfr(out.bin, "simulations", .id="model") %>%
   separate(model, c("ngroups", "sampleSize", "intercept"), sep="_") %>%
@@ -121,7 +121,7 @@ simuls.bin <- map_dfr(out.bin, "simulations", .id="model") %>%
 
 # power
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
-                                      refUN.p.val, refCO.p.val, replicate,
+                                       refCO.p.val, replicate,
                                       ngroups,
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "p.val") %>%
@@ -154,12 +154,11 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here('figures', '7_aprroxPearson_bin_powerGLMM.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_approxPearson_bin_powerGLMM.jpeg'), height=10, width=10)
 ```
 
 
 ```{r}
-
 p.poisA <- simuls.poisA0 %>% 
   group_by(sampleSize, ngroups, intercept, overdispersion) %>%
   summarise(p.sig = sum(Alt.p<0.05,na.rm=T),
@@ -169,13 +168,13 @@ p.poisA$intercept <- fct_relevel(p.poisA$intercept, "-1.5", "0", "1.5")
 p.poisA$ngroups <- fct_relevel(p.poisA$ngroups, "10", "50", "100")
 p.poisA$sampleSize <- as.factor(as.numeric(p.poisA$sampleSize))
 
-load(here("data", "5_glmmPois_power_OLD.Rdata")) # simulated data
+load(here("data", "5_glmmPois_power.Rdata")) # simulated data
 simuls.pois <- map_dfr(out.pois, "simulations", .id="model") %>%
   separate(model, c("ngroups", "sampleSize", "intercept"), sep="_") %>%
   rename("overdispersion" = "controlValues")
 
 p.pois <- simuls.pois %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
-                                        refUN.p.val, refCO.p.val, replicate,
+                                        refCO.p.val, replicate,
                                         ngroups,
                                         overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "p.val") %>%
@@ -208,6 +207,6 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here('figures', '7_aprroxPearson_pois_powerGLMM.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_approxPearson_pois_powerGLMM.jpeg'), height=10, width=10)
 ```
 

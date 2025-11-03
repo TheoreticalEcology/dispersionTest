@@ -1,5 +1,5 @@
 ### Dispersion Tests Project
-## Melina Leite
+## 
 # Feb 25
 
 library(DHARMa)
@@ -63,7 +63,7 @@ simuls.bin <- map_dfr(out.bin, "simulations", .id="model") %>%
 
 # power
 p.bin <- simuls.bin %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
-                                      refUN.p.val, refCO.p.val, replicate,
+                                       refCO.p.val, replicate,
                                       ngroups,
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "p.val") %>%
@@ -152,7 +152,7 @@ simuls.pois <- map_dfr(out.pois, "simulations", .id="model") %>%
 
 # power
 p.pois <- simuls.pois %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
-                                        refUN.p.val, refCO.p.val, replicate,
+                                        refCO.p.val, replicate,
                                         ngroups,
                                         overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:5, names_to = "test", values_to = "p.val") %>%
@@ -184,3 +184,4 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
+

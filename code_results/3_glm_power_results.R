@@ -1,5 +1,5 @@
 ### Dispersion Tests Project
-## Melina Leite
+##
 # Dez 24
 
 library(DHARMa)
@@ -13,7 +13,7 @@ load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
 # created in script 2_glm_type1_results.R
 
 # plot Colors
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 
 
 ##############-###

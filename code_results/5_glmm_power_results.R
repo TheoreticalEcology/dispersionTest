@@ -1,5 +1,5 @@
 ### Dispersion tests for GLMMs: results for GLMMs
-## Melina Leite
+## 
 # Set 25
 
 library(DHARMa)
@@ -10,7 +10,7 @@ theme_set(theme_cowplot() +
             theme(panel.background = element_rect(color = "black")))
 
 # plot Colors
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 
 
 # Binomial Models ----
@@ -24,7 +24,7 @@ out.bin50 <- out.bin
 load(here("data", "5_glmmBin_power_100.Rdata")) # simulated data
 out.bin100 <- out.bin
 out.bin <- flatten(list(out.bin10, out.bin50, out.bin100))
-
+save(out.bin, file=here("data", "5_glmmBin_power.Rdata"))
 
 
 #time spent hours
@@ -253,7 +253,7 @@ d.bin %>% filter(ngroups == "100") %>%
 
 
 
-# Poisson Models
+# Poisson Models ----
 
 #Loading results
 
@@ -264,7 +264,7 @@ out.pois50 <- out.pois
 load(here("data", "5_glmmPois_power_100.Rdata")) # simulated data
 out.pois100 <- out.pois
 out.pois <- flatten(list(out.pois10, out.pois50, out.pois100))
-
+save(out.pois, file=here("data", "5_glmmPois_power.Rdata"))
 
 
 

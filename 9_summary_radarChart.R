@@ -1,6 +1,6 @@
 # Dispersion test paper
 # summarising figure
-# Melina 
+# 
 # set 25
 
 library(tidyverse)

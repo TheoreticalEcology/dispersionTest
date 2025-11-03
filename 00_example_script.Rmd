@@ -17,14 +17,14 @@ Acompanying example script from "Dispersion tests for generalized linear mixed-e
 
 Our aim is to give some instructions and show examples for testing for under/overdispersion for GLMs (base R functions `glm`) and GLMMs (package `lme4`) using the `DHARMa` package.
 
-Users can substitute the simulated data and model by their own data and model objects[^1] to use the dispersion test functions from the `DHARMa` package.
+Users can substitute the simulated data and model by their own data and model objects[^1] to use the dispersion test function from the `DHARMa` package.
 
 [^1]: Please verify the currently supported modeling packages in DHARMa.
 
 Loading used packages:
 
 ```{r, message=F}
-library(DHARMa) #dispersion test and other models' diagnostic
+library(DHARMa) # dispersion test and other models' diagnostic
 library(lme4) # for GLMMs
 
 set.seed(2025) # for reproducible examples
@@ -40,20 +40,20 @@ Dispersion tests in `DHARMa` are performed using the function `testDispersion`. 
 
 - Overdispersion only with `alternative = "greater"`.
 
-### Pearson Chi-squared test
+### Parametric Pearson residuals test
 
-The Pearson Chi-squared test is peformed when using the argument `type = "PearsonChisq`, when providing the model object in the first argument position (`simulationOutput`), for example:
+The parametric Pearson residuals test is peformed when using the argument `type = "PearsonChisq`, when providing the model object in the first argument position (`simulationOutput`), for example:
 
 ```{r, eval=F, echo=T}
 testDispersion(model, type = "PearsonChisq") # substitute "model" by your model object name
 ```
 
-Note that **Chi-squared test on Pearson residuals is biased for GLMMs towards underdispersion** (more details in the main study). Tests with `alternative = "two.sided"` or `alternative = "less"` are therefore not reliable. If you have random effects in your model, we recommend to test only for overdispersion with `alternative = 'greater'`.
+Note that **parametric Perason Pearson residuals test is biased for GLMMs towards underdispersion** (more details in the main study). Tests with `alternative = "two.sided"` or `alternative = "less"` are therefore not reliable. If you have random effects in your model, we recommend to test only for overdispersion with `alternative = 'greater'`.
 
 
-### Pearson parametric bootstrapping
+### Nonparametric Pearson residuals test
 
-For the Pearson parametric bootstrapping, it is necessary a first step in generating simulations from the model using the function `simulateResiduals` with the argument `refit = TRUE`. This way the function will record the Pearson residuals from the simulated data from parametric bootstrapping. 
+For the nonparametric Pearson residuals test, it is necessary a first step in generating simulations from the model using the function `simulateResiduals` with the argument `refit = TRUE`. This way, the function will record the Pearson residuals from the simulated data from parametric bootstrapping. 
 Afterwards, use the resulting object in `testDispersion` with `type = "DHARMa"`:
 
 ```{r, eval=F, echo=T}
@@ -61,12 +61,12 @@ res <- simulateResiduals(model, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based dispersion test explained below.
+The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based response variance test explained below.
 
 
-### Simulation-based dispersion tests
+### Simulation-based response variance test
 
-The simulation-based dispersion test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
+The simulation-based response variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
 
 ```{r, eval=F, echo=T}
 res <- simulateResiduals(model, refit = F)
@@ -112,21 +112,29 @@ summary(poisModel)
 
 ### Testing dispersion
 
-Notice that all tests present similar dispersion statistics and non-significant p-values, as expected.
+Note that all tests present similar dispersion statistics and non-significant p-values, as expected.
 
-1. **Pearson Parametric boostrapping**: 
+1. **Nonparametric Pearson residuals test**: 
 
 ```{r}
 res <- simulateResiduals(poisModel, refit = T) 
 testDispersion(res, type = "DHARMa")
 ```
 
-2. **Pearson Chi-squared test** (two-sided test)
+2. **Parametric Pearson residuals test** (two-sided test)
+
 ```{r}
 testDispersion(poisModel, type = "PearsonChisq")
 ```
 
-3. **Simulation-based dispersion test**
+The same result with:
+```{r}
+res <- simulateResiduals(poisModel, refit = F)
+testDispersion(res, type = "PearsonChisq")
+```
+
+3. **Simulation-based response variance test**
+
 ```{r}
 res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
@@ -157,18 +165,21 @@ summary(poisModel)
 
 Notice that all tests presented similar dispersion parameters and significant p-values, as expected. 
 
-1. **Pearson Parametric boostrapping**: 
+1. **Nonparametric Pearson residuals test**:
+
 ```{r}
 res <- simulateResiduals(poisModel, refit = T) 
 testDispersion(res, type = "DHARMa")
 ```
 
-2. **Pearson Chi-squared test** (two-sided test)
+2. **Parametric Pearson residuals test** (two-sided test)
+
 ```{r}
 testDispersion(poisModel, type = "PearsonChisq")
 ```
 
-3. **Simulation-based dispersion test**
+3. **Simulation-based response variance test**
+
 ```{r}
 res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
@@ -199,39 +210,39 @@ summary(poisModelMM)
 
 ### Testing dispersion
 
-Notice that all dispersion statistics presented values below the expected value of 1 (around 0.88), while the simulation-based unconditional test (3b) presented the lowest dispersion statistics (0.65). 
+Note that all dispersion statistics presented values below the expected value of 1 (around 0.88), while the simulation-based unconditional test presented the lowest dispersion statistics (0.65). 
 
-The two-sided Pearson Chi-squared test (2a) was marginaly significant (p = 0.06), but towards underdispersion (the opposite expectation). When testing only for overdispersion with the Pearson Chi-squared test (2b), the p-value was non-significant.
+The two-sided parametric Pearson residuals test was marginaly significant (p = 0.06), but towards underdispersion (the opposite expectation). When testing only for overdispersion with the same test, the p-value was non-significant.
 
-1. **Pearson Parametric boostrapping**: 
+1. **Nonparametric Pearson residuals test**:
+
 ```{r}
 res <- simulateResiduals(poisModelMM, refit = T) 
 testDispersion(res, type = "DHARMa")
 ```
 
-2a. **Pearson Chi-squared test** (two-sided test)
+2. **Parametric Pearson residuals test** (two-sided test)
 
 ```{r}
 testDispersion(poisModelMM, type = "PearsonChisq")
 ```
 
-2b. **Pearson Chi-squared test** (only overdispersion test - `alternative = "greater"`)
+3. **Parametric Pearson residuals test** (only overdispersion test - `alternative = "greater"`)
+
 ```{r}
 testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
+4. **Simulation-based response variance test: conditional simulations**
 
-
-3a. **Simulation-based conditional dispersion test**
 ```{r}
 res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
 testDispersion(res, type = "DHARMa")
 ```
 
-3b. **Simulation-based unconditional dispersion test**
+3b. **SSimulation-based response variance test: unconditional simulations**
 
 ```{r}
-# Simulation-based conditional dispersion test
 res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
 testDispersion(res, type = "DHARMa")
 ```
@@ -261,36 +272,35 @@ summary(poisModelMM)
 
 ### Testing dispersion
 
-Notice that the Pearson parametric bootstrapping test (1) presented some warning messages of convergence failure in models refited by the bootstrapping procedure. Convergence and other model fitting problems may arrise when applying parametric bootstrapping in GLMMs, even with a simple GLMM as the one of the example (just one random intercept). Convergence problems tend to be increase for more complex models. 
+Notice that the nonparameric Pearson residuals test presented some warning messages of convergence failure in models refited by the bootstrapping procedure. Convergence and other model fitting problems may arrise when applying parametric bootstrapping in GLMMs, even with a simple GLMM as the one of the example (just one random intercept). Convergence problems tend to be increase for more complex models. 
 
-The dispersion statistics were similar across tests, except for the simulation-based unconditional dispersion test (3b), which was also the only model to present a non-significant p-value (very low power).
+The dispersion statistics were similar across tests, except for the simulation-based unconditional test, which was also the only model to present a non-significant p-value (very low power).
 
-1. **Pearson Parametric boostrapping**: 
+1. **Nonparametric Pearson residuals test**: 
 ```{r}
 res <- simulateResiduals(poisModelMM, refit = T) 
 testDispersion(res, type = "DHARMa")
 ```
 
-2a. **Pearson Chi-squared test** (two-sided test)
+2. **Parametric Pearson residuals test** (two-sided test)
 
 ```{r}
 testDispersion(poisModelMM, type = "PearsonChisq")
 ```
 
-2b. **Pearson Chi-squared test** (only overdispersion test - `alternative = "greater"`)
+3. **Parametric Pearson residuals test** (only overdispersion test - `alternative = "greater"`)
 ```{r}
 testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
 
-
-3a. **Simulation-based conditional dispersion test**
+4. **Simulation-based response variance test: conditional simulations**
 ```{r}
 res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
 testDispersion(res, type = "DHARMa")
 ```
 
-3b. **Simulation-based unconditional dispersion test**
+5. **Simulation-based response variance test: unconditional simulations**
 
 ```{r}
 # Simulation-based conditional dispersion test

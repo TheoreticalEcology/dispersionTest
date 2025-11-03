@@ -1,6 +1,6 @@
 ---
 title: "Pearson Chi-squared test with approximated methods for residual degrees of freedom in GLMMs"
-author: "Melina Leite"
+author: ""
 date: "`r Sys.Date()`"
 output: 
   rmdformats::readthedown:
@@ -24,7 +24,7 @@ theme_set(theme_cowplot() +
             theme(panel.background = element_rect(color = "black")))
 
 # plot Colors
-source(here("code_results", "plotColors.R"))
+source(here("functions_others", "plotColors.R"))
 ```
 
 # Explanations
@@ -89,7 +89,7 @@ approximateDFpearson <- function(model, data, type=c("naive", "KR", "KR2", "sat"
 ```
 
 ```{r}
-source(here("code_sim", "0_approximateDFpearson.R"))
+source(here("functions_others", "approximateDFpearson.R"))
 ```
 
 # Loading simulation outputs
