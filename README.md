@@ -6,7 +6,7 @@ Code for the simulations and analyses of the study "Dispersion tests in generali
 
 Simulations were done sequentially with the scripts in "code_simulations". 
 
-Results were stored in "data"
+Results were stored in "data".
 
 Results and figures were created with the scrips in "code_results" and figures were saved in "figures". 
 
