@@ -9,6 +9,7 @@ output:
     thumbnails: false
     lightbox: true
     gallery: false
+    keep_md: true
 editor_options: 
   chunk_output_type: inline
 ---
