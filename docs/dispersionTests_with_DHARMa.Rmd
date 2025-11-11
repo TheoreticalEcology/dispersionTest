@@ -3,6 +3,9 @@ title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
 author: "Authors (revealed after peer review)"
 date: "`r Sys.Date()`"
 output: 
+  html_document:
+    theme: readable
+    keep_md: true
   rmdformats::readthedown:
     highlight: kate
     self_contained: true

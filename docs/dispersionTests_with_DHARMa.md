@@ -3,6 +3,9 @@ title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
 author: "Authors (revealed after peer review)"
 date: "2025-11-11"
 output: 
+  html_document:
+    theme: readable
+    keep_md: true
   rmdformats::readthedown:
     highlight: kate
     self_contained: true
@@ -712,13 +715,12 @@ sessionInfo()
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-167      cli_3.6.5         knitr_1.50        rlang_1.1.6      
-##  [5] xfun_0.51         reformulas_0.4.0  minqa_1.2.8       jsonlite_2.0.0   
+##  [5] xfun_0.51         reformulas_0.4.0  jsonlite_2.0.0    minqa_1.2.8      
 ##  [9] htmltools_0.5.8.1 sass_0.4.9        rmarkdown_2.29    grid_4.4.1       
-## [13] evaluate_1.0.3    jquerylib_0.1.4   MASS_7.3-64       rmdformats_1.0.4 
-## [17] fastmap_1.2.0     yaml_2.3.10       lifecycle_1.0.4   bookdown_0.42    
-## [21] compiler_4.4.1    Rcpp_1.1.0        rstudioapi_0.17.1 lattice_0.22-6   
-## [25] digest_0.6.37     nloptr_2.2.1      R6_2.6.1          Rdpack_2.6.3     
-## [29] splines_4.4.1     rbibutils_2.3     bslib_0.9.0       tools_4.4.1      
-## [33] boot_1.3-31       cachem_1.1.0
+## [13] evaluate_1.0.3    jquerylib_0.1.4   MASS_7.3-64       fastmap_1.2.0    
+## [17] yaml_2.3.10       lifecycle_1.0.4   compiler_4.4.1    Rcpp_1.1.0       
+## [21] rstudioapi_0.17.1 lattice_0.22-6    digest_0.6.37     nloptr_2.2.1     
+## [25] R6_2.6.1          Rdpack_2.6.3      splines_4.4.1     rbibutils_2.3    
+## [29] bslib_0.9.0       tools_4.4.1       boot_1.3-31       cachem_1.1.0
 ```
 
