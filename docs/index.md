@@ -113,7 +113,7 @@ poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
 plot(observedResponse ~ Environment1, data = poisData)
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 Modeling with `glm` function from base R:
 
@@ -158,7 +158,7 @@ res <- simulateResiduals(poisModel, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ```
 ## 
@@ -218,7 +218,7 @@ res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ```
 ## 
@@ -244,7 +244,7 @@ poisData <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
 plot(observedResponse ~ Environment1, data = poisData)
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 Modeling
 
@@ -289,7 +289,7 @@ res <- simulateResiduals(poisModel, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 ```
 ## 
@@ -329,7 +329,7 @@ res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-17-1.png)<!-- -->
 
 ```
 ## 
@@ -357,7 +357,7 @@ poisDataMM <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
 plot(observedResponse ~ Environment1, col = group, data = poisDataMM)
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
 
 Modeling using `lme4`:
 
@@ -413,7 +413,7 @@ res <- simulateResiduals(poisModelMM, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 ```
 ## 
@@ -469,7 +469,7 @@ res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-23-1.png)<!-- -->
 
 ```
 ## 
@@ -489,7 +489,7 @@ res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-24-1.png)<!-- -->
 
 ```
 ## 
@@ -517,7 +517,7 @@ poisDataMM <- createData(sampleSize = 200, intercept = 0, fixedEffects = 1,
 plot(observedResponse ~ Environment1, col = group, data = poisDataMM)
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-25-1.png)<!-- -->
 
 Modeling using `lme4`:
 
@@ -595,7 +595,7 @@ res <- simulateResiduals(poisModelMM, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
 
 ```
 ## 
@@ -650,7 +650,7 @@ res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-30-1.png)<!-- -->
 
 ```
 ## 
@@ -671,7 +671,7 @@ res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
 testDispersion(res, type = "DHARMa")
 ```
 
-![](dispersionTests_with_DHARMa_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
+![](index_files/figure-html/unnamed-chunk-31-1.png)<!-- -->
 
 ```
 ## 
