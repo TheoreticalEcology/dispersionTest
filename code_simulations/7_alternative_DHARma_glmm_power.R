@@ -29,7 +29,10 @@ getApproximatePearson <- function(simulationOutput, alternative = c("two.sided",
   noSimVar = expectedSD == 0
   expectedSD[noSimVar] = sd(c(rep(0, simulationOutput$nSim - 1),1))
   
-  spread <- function(x) sum(((x - simulationOutput$fittedPredictedResponse) / expectedSD )^2) 
+  ntrials <- simulationOutput[["fittedModel"]]@resp[["n"]]
+  
+  spread <- function(x) sum(((x - simulationOutput$fittedPredictedResponse*ntrials) / 
+                               expectedSD )^2) 
   out = testGeneric(simulationOutput, summary = spread, alternative = alternative, methodName = "DHARMa nonparametric dispersion test via sd of residuals fitted vs. simulated", plot = plot, ...)
   names(out$statistic) = "dispersion"
   out$noSimVar = noSimVar
@@ -105,51 +108,51 @@ for(m in ngroups){
 ##### Poisson GLMM #####
 #####################-##
 
-out.poisA <- list()
-#load(here("data", "7_glmmPois_alternative_power.Rdata")) # loading out.pois
-
-for(m in ngroups){
-  
-  if(m == 10) sampleSize <- c(50,100,200,500,1000) # 20, 10,000 excluded
-  if(m == 50) sampleSize <- c(100,200,500,1000) # 10,000 excluded
-  if(m == 100) sampleSize <- c(200,500,1000) # 10,000 excluded
-  
-  for (k in sampleSize){
-    
-    for (i in intercept){
-      
-      # function to varying sampleSize
-      calculateStatistics <- function(control = 0){
-        # data
-        testData <- createData(overdispersion = control,
-                               sampleSize = k,
-                               intercept = i,
-                               numGroups = m,
-                               randomEffectVariance = 1,
-                               family = poisson())
-        # model
-        fittedModel <- glmer(observedResponse  ~ 
-                               Environment1 + (1|group),
-                             data = testData, family = poisson()) 
-        #results
-        out <- list()
-        
-        # Alternative DHARMa test
-        simulationOutput <- simulateResiduals(fittedModel, re.form=NULL)
-        alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
-        out$Alt.p <- alterna$p.value
-        out$Alt.stat <- alterna$statistic
-        out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
-        
-        return(unlist(out))
-      }
-      
-      out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
-                           nRep=nRep, parallel = T, exportGlobal = T)
-      out.poisA[[length(out.poisA) + 1]] <- out
-      names(out.poisA)[length(out.poisA)] <- paste(m, k, i, sep="_")
-      # saving sim results
-      save(out.poisA, file=here("data","7_glmmPois_alternative_power.Rdata"))
-    }
-  }
-}
+# out.poisA <- list()
+# #load(here("data", "7_glmmPois_alternative_power.Rdata")) # loading out.pois
+# 
+# for(m in ngroups){
+#   
+#   if(m == 10) sampleSize <- c(50,100,200,500,1000) # 20, 10,000 excluded
+#   if(m == 50) sampleSize <- c(100,200,500,1000) # 10,000 excluded
+#   if(m == 100) sampleSize <- c(200,500,1000) # 10,000 excluded
+#   
+#   for (k in sampleSize){
+#     
+#     for (i in intercept){
+#       
+#       # function to varying sampleSize
+#       calculateStatistics <- function(control = 0){
+#         # data
+#         testData <- createData(overdispersion = control,
+#                                sampleSize = k,
+#                                intercept = i,
+#                                numGroups = m,
+#                                randomEffectVariance = 1,
+#                                family = poisson())
+#         # model
+#         fittedModel <- glmer(observedResponse  ~ 
+#                                Environment1 + (1|group),
+#                              data = testData, family = poisson()) 
+#         #results
+#         out <- list()
+#         
+#         # Alternative DHARMa test
+#         simulationOutput <- simulateResiduals(fittedModel, re.form=NULL)
+#         alterna <- getApproximatePearson(simulationOutput, "two.sided", plot = F)
+#         out$Alt.p <- alterna$p.value
+#         out$Alt.stat <- alterna$statistic
+#         out$prop.zero <- sum(alterna$noSimVar)/length(alterna$noSimVar)
+#         
+#         return(unlist(out))
+#       }
+#       
+#       out <- runBenchmarks(calculateStatistics, controlValues = overdispersion,
+#                            nRep=nRep, parallel = T, exportGlobal = T)
+#       out.poisA[[length(out.poisA) + 1]] <- out
+#       names(out.poisA)[length(out.poisA)] <- paste(m, k, i, sep="_")
+#       # saving sim results
+#       save(out.poisA, file=here("data","7_glmmPois_alternative_power.Rdata"))
+#     }
+#   }
+# }

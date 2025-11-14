@@ -477,13 +477,14 @@ Comparing the coefficients of the regression:
 
 expecting intercept and slope in zero. 
 
+resPA is calculated as the raw residual `residuals(model, type="response")` divided by the standard deviation of the simulations for the observation.
+
+**OBS**: for binomial, this doesn't make sence because the raw residual is the difference in the proportions and the expected standard deviation is in number of successes. 
+
 ### Slope
 
 ```{r}
 slopepois <- simpois %>%  filter(prop.zero == 0) %>%
-  select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
-  mutate(nSim = as.factor(nSim))
-slopebin <- simbin %>%  filter(prop.zero == 0) %>%
   select(sampleSize, intercept, nSim, overdispersion, resPA.slope, resPA.slopeP) %>%
   mutate(nSim = as.factor(nSim))
 ```
@@ -523,47 +524,12 @@ slopepois %>% filter(nSim %in% c("250","1000")) %>%
   theme(panel.background = element_rect(color = "black"))
 ```
 
-```{r}
-slopebin %>% 
-  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
-  geom_boxplot() +
-  facet_grid(sampleSize ~ nSim) +
-    labs(title = "Binomial:  slope") +
-  theme(panel.background = element_rect(color = "black"),
-        legend.position = "bottom")
-```
-
-```{r}
-slopebin %>% filter(nSim %in% c("250","1000")) %>%
-  ggplot(aes(x=as.factor(overdispersion), y=resPA.slope, col=intercept))+
-  geom_boxplot() +
-  facet_grid(sampleSize ~ nSim) +
-    labs(title = "Binomial:  slope") +
-  theme(panel.background = element_rect(color = "black"))
-```
-
-```{r}
-slopebin %>% filter(nSim %in% c("250","1000")) %>%
-  group_by(nSim, sampleSize, intercept, overdispersion) %>%
-  summarise(mean.slope = mean(resPA.slope),
-            median.slope = median(resPA.slope)) %>%
-  ggplot(aes(x=overdispersion, y=mean.slope, col=intercept)) +
-  geom_line()+ geom_point()+
-  facet_grid(sampleSize ~ nSim)   +
-  labs(title="Binomial: mean slope", subtitle = "(App.Pear - Pear) ~ Pear") +
-  theme(panel.background = element_rect(color = "black"))
-```
-
-
 
 
 ### intercept
 
 ```{r}
 interpois <- simpois %>%  filter(prop.zero ==0) %>%
-  select(sampleSize, intercept, nSim, overdispersion, resPA.inter, resPA.interP) %>%
-  mutate(nSim = as.factor(nSim))
-interbin <- simbin %>%  filter(prop.zero ==0) %>%
   select(sampleSize, intercept, nSim, overdispersion, resPA.inter, resPA.interP) %>%
   mutate(nSim = as.factor(nSim))
 ```
@@ -601,65 +567,21 @@ interpois %>% filter(nSim %in% c("250","1000")) %>%
   theme(panel.background = element_rect(color = "black"))
 ```
 
-```{r}
-interbin %>%
-  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
-  geom_boxplot() +
-  facet_grid(sampleSize ~ nSim, scales="free") +
-  geom_hline(yintercept = 0, linetype="dotted")+
-  labs(title="Binomial: intercept")+
-  theme(panel.background = element_rect(color = "black"))
-```
 
-```{r}
-interbin %>% filter(nSim %in% c("250","1000")) %>%
-  ggplot(aes(x=as.factor(overdispersion), y=resPA.inter, col=intercept))+
-  geom_boxplot() +
-  facet_grid(sampleSize ~ nSim) +
-  geom_hline(yintercept = 0, linetype="dotted")+
-    labs(title="binomial: intercept")+
-  theme(panel.background = element_rect(color = "black"))
-```
-
-```{r}
-interbin %>% filter(nSim %in% c("250","1000")) %>%
-  group_by(nSim, sampleSize, intercept, overdispersion) %>%
-  summarise(mean.inter = mean(resPA.inter),
-            median.inter = median(resPA.inter)) %>%
-  ggplot(aes(x=overdispersion, y=mean.inter, col=intercept)) +
-  geom_line()+ geom_point()+
-  facet_grid(sampleSize ~ nSim)   +
-  geom_hline(yintercept = 0, linetype="dotted")+
-  labs(title="Binomial: mean intercept", subtitle = "(App.Pear - Pear) ~ Pear")+
-  theme(panel.background = element_rect(color = "black"))
-```
 
 ### Figure for supplementary material
 
 ```{r}
-slopes <- bind_rows(list(Poisson = slopepois %>% 
+slopes <- slopepois %>% 
                            filter(nSim %in% c("250","1000")) %>%
                            group_by(nSim, sampleSize, intercept, overdispersion) %>%
                            summarise(mean.slope = mean(resPA.slope),
-                                     median.slope = median(resPA.slope)), 
-                          Binomial = slopebin %>% 
-                           filter(nSim %in% c("250","1000")) %>%
-                           group_by(nSim, sampleSize, intercept, overdispersion) %>%
-                           summarise(mean.slope = mean(resPA.slope),
-                                     median.slope = median(resPA.slope))),
-                          .id="model")
-intercepts <- bind_rows(list(Poisson = interpois %>% 
+                                     median.slope = median(resPA.slope))
+intercepts <-  interpois %>% 
                            filter(nSim %in% c("250","1000")) %>%
                            group_by(nSim, sampleSize, intercept, overdispersion) %>%
                            summarise(mean.inter = mean(resPA.inter),
-                                     median.inter = median(resPA.inter)),
-                          Binomial = interbin %>% 
-                           filter(nSim %in% c("250","1000")) %>%
-                           group_by(nSim, sampleSize, intercept, overdispersion) %>%
-                           summarise(mean.inter = mean(resPA.inter),
-                                     median.inter = median(resPA.inter))),
-                          .id="model")
-  
+                                     median.inter = median(resPA.inter))
 ```
 
 
@@ -670,21 +592,18 @@ figa <- ggplot(slopes, aes(x=overdispersion, y=mean.slope, col=intercept, linety
   geom_point()+
   geom_hline(yintercept = 0)+
   ylab("Mean slope") + labs(tag="A)")+
-  facet_grid(model~sampleSize, scales="free",
+  facet_grid(~sampleSize, scales="free",
             labeller = as_labeller(c("100" = "n = 100",
-                                     "1000" = "n = 1000",
-                                     "Poisson"="Poisson",
-                                     "Binomial" = "Binomial")))
+                                     "1000" = "n = 1000")))
 figb <- ggplot(intercepts, aes(x=overdispersion, y=mean.inter, col=intercept, linetype=nSim))+
   geom_line()+
   geom_point()+
   geom_hline(yintercept = 0)+
   ylab("Mean intercept") +labs(tag="B)")+
-  facet_grid(model~sampleSize, scales="free",
+  facet_grid(~sampleSize, scales="free",
             labeller = as_labeller(c("100" = "n = 100",
                                      "1000" = "n = 1000",
-                                     "Poisson"="Poisson",
-                                     "Binomial" = "Binomial"))  )
+                                     "Poisson"="Poisson"))  )
 
 figa + figb + plot_layout(ncol=1, guides="collect")
 ```
