@@ -43,8 +43,7 @@ getApproximatePearson <- function(simulationOutput, alternative = c("two.sided",
   names(out$statistic) = "dispersion"
   out$noSimVar = noSimVar
   out$expectedSD = expectedSD
-  out$resPA = simulationOutput$fittedResiduals / expectedSD # not working for binomial
-  return(out)
+  out$resPA = simulationOutput$fittedResiduals / expectedSD # doesn't make sense for binomial
 } 
 
 

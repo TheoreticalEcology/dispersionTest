@@ -57,7 +57,7 @@ simpois %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Poisson: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '7_Pois_propzero.jpeg'), height=10, width=10)
+ggsave(here('figures', '6_Pois_propzero.jpeg'), height=10, width=10)
 ```
 
 
@@ -68,7 +68,7 @@ simbin %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Binomial: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '7_Bin_propzero.jpeg'), height=10, width=10)
+ggsave(here('figures', '6_Bin_propzero.jpeg'), height=10, width=10)
 ```
 
 # Results without zeros 
@@ -156,7 +156,7 @@ ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
                 position = position_dodge(0.7)) +
   geom_hline(yintercept = 0.05, linetype = "dotted") 
-ggsave(here('figures', '7_aprroxPearson_type1GLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_type1GLM.jpeg'), height=6, width=10)
 ```
 
 
@@ -363,7 +363,7 @@ ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=n
                                   "Sim-based response variance",
                                   "param Pearson residuals"))+
   ylab("Mean dispersion") + xlab("Overdispersion")
-ggsave(here('figures', '7_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
 ```
 
 
@@ -464,7 +464,7 @@ ggplot(pows, aes(x=overdispersion, y=prop.sig, col=test, linetype=nSim))+
                                   "Sim-based response variance",
                                   "param Pearson residuals"))+
   ylab("Power") + xlab("Overdispersion")
-ggsave(here('figures', '7_approxPearson_powerGLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_powerGLM.jpeg'), height=6, width=10)
 ```
 
 
