@@ -9,3 +9,5 @@ nohup.out
 *.Rout
 
 code_simulations/cluster_sub/*
+docs/index2.pdf
+docs/index2.Rmd

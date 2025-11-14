@@ -1,7 +1,7 @@
 ---
 title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
-author: "Melina de Souza Leite"
-date: "2025-11-11"
+author: ""
+date: "2025-11-14"
 output: 
   rmdformats::readthedown:
     highlight: kate
@@ -14,9 +14,8 @@ editor_options:
   chunk_output_type: inline
 ---
 
-**Acompanying example script for the paper "Dispersion tests for generalized linear mixed-effects models", available so far as a preprint in XXX.**
+**Acompanying example script for the paper "Dispersion tests for generalized linear mixed-effects models".**
 
-The github repository for the paper and this example is: https://github.com/TheoreticalEcology/dispersionTest. 
 
 Our aim is to give instructions and show examples for testing for under/overdispersion for GLMs (base R functions `glm`) and GLMMs (package `lme4`) using the `DHARMa` package.
 
