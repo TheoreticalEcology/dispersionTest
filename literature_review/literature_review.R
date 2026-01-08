@@ -90,7 +90,7 @@ ggsave("figures/box1_trend_S1.1.jpeg", height = 4, width=8)
 
 
 # count + prop dispersion with GLM studies
-results %>% select(year, disp_within_count, disp_within_prop) %>%
+box1 <- results %>% select(year, disp_within_count, disp_within_prop) %>%
   pivot_longer(2:3, names_to = "model", values_to = "Proportion") %>%
 ggplot( aes(x=year, y=Proportion, col=model)) + 
   scale_color_manual(values=c("aquamarine3","coral"), labels=c("Count data", "Discrete proportions"),
@@ -101,10 +101,47 @@ ggplot( aes(x=year, y=Proportion, col=model)) +
                      limits=c(5,30),
                      name="Proportion of studies (%)") +
   theme(legend.position = "inside",
-        legend.text = element_text(size=13),
-        legend.position.inside = c(0.5,0.2))
+        axis.title = element_text(size=16),
+        legend.text = element_text(size=14),
+        legend.position.inside = c(0.5,0.2)) +
+labs(tag = "A)")
 # legend: Annual trends for the proportion of ecological studies using GLMs for count AND/OR discrete proportion data that mention dispersion and related words in the text.  
-ggsave("figures/box1_trend.jpeg", height = 4, width=5)
+#ggsave("figures/box1_trend.jpeg", height = 4, width=5)
+
+
+## Figure types dispersion check
+
+data <- data.frame(
+  categoria = c("DHARMa package", "AIC model comparison", "Pearson Parametric residuals",
+                "Other tests", "Non-explicit check", "Unknown"),
+  valor = c(25, 5, 4, 6,  29, 31)) %>%
+  mutate(categoria = fct_relevel(categoria, "Unknown", "Non-explicit check", "Other tests",
+                                 "Pearson Parametric residuals","AIC model comparison",
+                                 "DHARMa package")) %>%
+  mutate(ypos = cumsum(valor) - 0.5 * valor) %>%
+  mutate(ypos2 = c(6.8,27.5,32,37,52,89))
+
+pizza <- ggplot(data, aes(x = "", y = valor, fill = categoria)) +
+  scale_fill_manual(name="", values=c("gray", "yellow3", "#8B7500", "#EE8262", "darkred", "orange"))+
+  geom_bar(stat = "identity", width = 1, ,alpha=0.8,col="black") +
+  coord_polar("y", start = 0, clip = "off") +
+  geom_text(aes(y = ypos, x=c(1,1.3,1.3,1.3,1.15,1), label = valor), size = 5,
+            show.legend = F,hjust=0.5)+
+  geom_text(aes(y = ypos2, x=c(1,1.55,1.55,1.55,1,1), label = categoria), size = 5,
+            show.legend = F,hjust=c(0.22,0,0,0,0.6,0.7))+
+  theme_void() +
+  theme(legend.position="none",
+        plot.tag = element_text(face = "bold", size=14),
+        plot.tag.position = c(0,1),
+        plot.title = element_text(size=17, vjust=-7, hjust=-1),
+        plot.margin = margin(0, 5, 0, 0, "cm")) +
+  labs(tag = "B)", title="Dispersion problem checks in Ecological literature")
+
+box1 + pizza + plot_layout(widths = c(1,1))
+ggsave("figures/box1.jpeg", height = 6, width = 12)
+
+
+
 
 
 
