@@ -86,11 +86,11 @@ figB <- ggplot(results, aes(x=year, y=disp_within_glm)) +
   labs(tag="B)", title="Dispersion within GLMs/GLMMs")
 
 figA + figB 
-ggsave("figures/box1_trend_S1.1.jpeg", height = 4, width=8)
+ggsave("figures/box2_trend_S1.1.jpeg", height = 4, width=8)
 
 
 # count + prop dispersion with GLM studies
-box1 <- results %>% select(year, disp_within_count, disp_within_prop) %>%
+box2 <- results %>% select(year, disp_within_count, disp_within_prop) %>%
   pivot_longer(2:3, names_to = "model", values_to = "Proportion") %>%
 ggplot( aes(x=year, y=Proportion, col=model)) + 
   scale_color_manual(values=c("aquamarine3","coral"), labels=c("Count data", "Discrete proportions"),
@@ -103,8 +103,9 @@ ggplot( aes(x=year, y=Proportion, col=model)) +
   theme(legend.position = "inside",
         axis.title = element_text(size=16),
         legend.text = element_text(size=14),
+        plot.title = element_text(size=17, vjust=-3, hjust=1,,face = "plain"),
         legend.position.inside = c(0.5,0.2)) +
-labs(tag = "A)")
+labs(tag = "A)", title="Dispersion issues mentioned in GLM/GLMMs")
 # legend: Annual trends for the proportion of ecological studies using GLMs for count AND/OR discrete proportion data that mention dispersion and related words in the text.  
 #ggsave("figures/box1_trend.jpeg", height = 4, width=5)
 
@@ -122,23 +123,25 @@ data <- data.frame(
   mutate(ypos2 = c(6.8,27.5,32,37,52,89))
 
 pizza <- ggplot(data, aes(x = "", y = valor, fill = categoria)) +
-  scale_fill_manual(name="", values=c("gray", "yellow3", "#8B7500", "#EE8262", "darkred", "orange"))+
+  scale_fill_manual(name="", values=c("gray", "yellow3", "#8B7500", "#EE8262",
+                                      "darkred", "orange"))+
   geom_bar(stat = "identity", width = 1, ,alpha=0.8,col="black") +
   coord_polar("y", start = 0, clip = "off") +
-  geom_text(aes(y = ypos, x=c(1,1.3,1.3,1.3,1.15,1), label = valor), size = 5,
+  geom_text(aes(y = ypos, x=c(1,1.3,1.3,1.3,1.15,1), label = valor), size = 4.5,
             show.legend = F,hjust=0.5)+
-  geom_text(aes(y = ypos2, x=c(1,1.55,1.55,1.55,1,1), label = categoria), size = 5,
+  geom_text(aes(y = ypos2, x=c(1,1.55,1.55,1.55,1,1), label = categoria), size = 4.5,
             show.legend = F,hjust=c(0.22,0,0,0,0.6,0.7))+
   theme_void() +
   theme(legend.position="none",
         plot.tag = element_text(face = "bold", size=14),
         plot.tag.position = c(0,1),
-        plot.title = element_text(size=17, vjust=-7, hjust=-1),
+        plot.title = element_text(size=17, vjust=-1, hjust=-1),
+        plot.subtitle = element_text(size=10, vjust=-4, hjust=1.7),
         plot.margin = margin(0, 5, 0, 0, "cm")) +
-  labs(tag = "B)", title="Dispersion problem checks in Ecological literature")
+  labs(tag = "B)", title="Dispersion issues checks in ecological literature",subtitle = "out of 100 randomly selected papers in 2025")
 
-box1 + pizza + plot_layout(widths = c(1,1))
-ggsave("figures/box1.jpeg", height = 6, width = 12)
+box2 + pizza + plot_layout(widths = c(1,1))
+ggsave("figures/box2.jpeg", height = 6, width = 12)
 
 
 

@@ -58,8 +58,8 @@ ggplot(df2, aes(x=variable.n, y=test.n, fill=value, col=value))+
   theme(panel.background = element_rect(colour="white", fill="gray95"),
         axis.line=element_blank(),
         axis.ticks = element_blank(),
+        axis.text = element_text(size=12.5),
         legend.position = "none")
-
 
 
 
