@@ -39,8 +39,6 @@ df2$value.t[df2$value == 2] <- "+"
 
 ggplot(df2, aes(x=variable.n, y=test.n, fill=value, col=value))+
   geom_text(aes(label= value.t), size=15) +
-  #geom_point(shape=21,size=20) +
-  #scale_radius(range = c(3, 25),guide = "none" ) +
   scale_fill_gradient(low="coral1", high="aquamarine3", name = "Score") +
   scale_color_gradient(low="coral1", high="aquamarine3", name = "Score") +
   scale_y_continuous(name = "", breaks=1:3, limits=c(0.6,3.4),
