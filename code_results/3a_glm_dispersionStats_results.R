@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ##
-# Jan 25
+# mar 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -116,7 +116,7 @@ pfig <- pval %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(4,1,2)],
-                    labels = c("Sim-based response variance", 
+                    labels = c("Sim-based residual variance", 
                                "param. Pearson residuals",
                                "nonparam. Pearson residuals")) +
   facet_grid(model~slope) +
@@ -135,7 +135,7 @@ statfig <- statval %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point() + geom_line() +
   scale_color_manual(values = col.tests[c(4,1,2)],
-                     labels = c("Sim-based response variance", 
+                     labels = c("Sim-based residual variance", 
                                 "param. Pearson residuals",
                                 "nonparam. Pearson residuals")) +
   facet_grid(model~slope, scales="free") +

@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## 
-# jan 25
+# mar 26
 
 library(DHARMa)
 library(tidyverse)
@@ -58,23 +58,18 @@ for(m in ngroups){
         out$Pear.stat <- testDispersion(fittedModel, plot = F, 
                                         type="PearsonChisq")$statistic
         
-        # DHARMa default unconditional
-        res <- simulateResiduals(fittedModel, refit=F, re.form=NA)
+        # DHARMa unconditional
+        res <- simulateResiduals(fittedModel, refit=F, simulateREs = "unconditional")
         out$dhaUN.p.val <- testDispersion(res, type = "DHARMa",plot = F)$p.value
         out$dhaUN.stat  <- testDispersion(res, type = "DHARMa",plot = F)$statistic
         
         # DHARMa default conditional
-        res <- simulateResiduals(fittedModel, refit=F, re.form=NULL)
+        res <- simulateResiduals(fittedModel, refit=F, simulateREs = "conditional")
         out$dhaCO.p.val <- testDispersion(res, type = "DHARMa",plot = F)$p.value
         out$dhaCO.stat  <- testDispersion(res, type = "DHARMa",plot = F)$statistic
         
-        # DHARMa refit
-        # res <- simulateResiduals(fittedModel, refit=T, re.form=NA)
-        # out$refUN.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
-        # out$refUN.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
-        
         # DHARMa refit conditional
-        res <- simulateResiduals(fittedModel, refit=T, re.form=NULL)
+        res <- simulateResiduals(fittedModel, refit=T, simulateREs = "conditional")
         out$refCO.p.val <- testDispersion(res, plot = F, type = "DHARMa")$p.value
         out$refCO.stat <- testDispersion(res, plot = F, type = "DHARMa")$statistic
         

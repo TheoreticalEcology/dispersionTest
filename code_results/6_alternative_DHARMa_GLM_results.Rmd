@@ -147,7 +147,7 @@ bind_rows(list(p.bin, p.pois), .id="model") %>%
 ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
   facet_grid(model~test, 
              labeller= as_labeller(c("Alt.p"= "Approximate Pearson residuals",
-                                     "DHA.p" = "sim-based response variance",
+                                     "DHA.p" = "Sim-based residual variance",
                                      "Pear.p" = "param. Pearson residuals",
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
@@ -360,7 +360,7 @@ ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=n
                                      "1" = "Binomial"))) +
   geom_line() + 
   scale_color_discrete(labels = c("Approximate Pearson residuals",
-                                  "Sim-based response variance",
+                                  "Sim-based residual variance",
                                   "param Pearson residuals"))+
   ylab("Mean dispersion") + xlab("Overdispersion")
 ggsave(here('figures', '6_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
@@ -461,7 +461,7 @@ ggplot(pows, aes(x=overdispersion, y=prop.sig, col=test, linetype=nSim))+
                                      "1" = "Binomial"))) +
   geom_line() + 
   scale_color_discrete(labels = c("Approximate Pearson residuals",
-                                  "Sim-based response variance",
+                                  "Sim-based residual variance",
                                   "param Pearson residuals"))+
   ylab("Power") + xlab("Overdispersion")
 ggsave(here('figures', '6_approxPearson_powerGLM.jpeg'), height=6, width=10)

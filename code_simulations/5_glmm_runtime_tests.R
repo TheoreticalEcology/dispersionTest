@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## 
-# Oct 25
+# mar 26
 
 set.seed(1)
 library(DHARMa)
@@ -46,13 +46,11 @@ run_sim <- function(i) {
                                        plot = FALSE, type = "PearsonChisq"))[3]
   
   nonparamP <- system.time(testDispersion(simulateResiduals(fittedModel,
-                                                            refit = TRUE,
-                                                            re.form = NULL),
+                                                            refit = TRUE),
                                           plot = FALSE, type = "DHARMa"))[3]
   
   simbased <- system.time(testDispersion(simulateResiduals(fittedModel,
-                                                           refit = FALSE,
-                                                           re.form = NULL),
+                                                           refit = FALSE),
                                          plot = FALSE, type = "DHARMa"))[3]
   
   # retornar resultados

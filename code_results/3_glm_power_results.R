@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ##
-# Dez 24
+# Mar 26
 
 library(DHARMa)
 library(tidyverse)
@@ -66,7 +66,7 @@ bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based response variance", 
+                      labels=c("Sim-based residual variance", 
                                "param. Pearson residuals",
                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
@@ -94,7 +94,7 @@ st.bin$sampleSize <- as.factor(as.numeric(st.bin$sampleSize))
 ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based response variance", 
+                      labels=c("Sim-based residual variance", 
                                "param. Pearson residuals",
                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
@@ -155,7 +155,7 @@ bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based response variance", 
+                      labels=c("Sim-based residual variance", 
                                "param. Pearson residuals",
                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept) +
@@ -183,7 +183,7 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_y_log10()+
   scale_color_manual( values= col.tests[c(4,1,2)],
-                      labels=c("Sim-based response variance", 
+                      labels=c("Sim-based residual variance", 
                                "param. Pearson residuals",
                                "nonparam. Pearson residuals"))+
   facet_grid(sampleSize~intercept, scales="free_y") +
@@ -214,7 +214,7 @@ ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibrati
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   ylab("Power") + xlab("Overdispersion") +
   scale_color_manual(values = col.tests[c(4,1,2)], 
-                     labels = c("Sim-based response variance", 
+                     labels = c("Sim-based residual variance", 
                                 "param. Pearson residuals",
                                  "nonparam. Pearson residuals")) +
   facet_grid(model~sampleSize, 
@@ -269,9 +269,11 @@ ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   geom_hline(yintercept = 0, linetype="dotted")  +
   ylim(-0.4,0.4) +
   geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, 
-                                 colour=""),
+                                 colour=""), size=3.5,
            colour="black") +
-  theme(panel.background = element_rect(color="black"))
+  theme(panel.background = element_rect(color="black"),
+        text = element_text(size=12),
+        axis.text = element_text(size=10))
 ggsave(here("figures", "3_glm_DISP_diff_DHA-Pear.jpeg"), height=4, width=9)
 
 
@@ -285,6 +287,8 @@ ggplot(aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
   ylim(-0.4,0.2)+
   geom_hline(yintercept = 0, linetype="dotted") +
   geom_text(data=small.text, aes(x=x, y=y, label = label, group=model, colour=""),
-            colour="black")+
-  theme(panel.background = element_rect(color="black"))
+            colour="black", size=3.5)+
+  theme(panel.background = element_rect(color="black"),
+        text = element_text(size=12),
+        axis.text = element_text(size=10))
 ggsave(here("figures", "3_glm_DISP_diff_DHA-Ref.jpeg"), height=4, width=9)

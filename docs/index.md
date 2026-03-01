@@ -1,7 +1,7 @@
 ---
 title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
 author: ""
-date: "2025-11-14"
+date: "2026-03-01"
 output: 
   rmdformats::readthedown:
     highlight: kate
@@ -27,7 +27,7 @@ Loading used packages:
 
 
 ``` r
-library(DHARMa) # dispersion test and other models' diagnostic
+library(DHARMa) #v0.5.0 dispersion test and other models' diagnostic 
 library(lme4) # for GLMMs
 
 set.seed(2025) # for reproducible examples
@@ -66,12 +66,12 @@ res <- simulateResiduals(model, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based response variance test explained below.
+The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based residual variance test explained below.
 
 
-### Simulation-based response variance test
+### Simulation-based residual variance test
 
-The simulation-based response variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
+The simulation-based residual variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
 
 
 ``` r
@@ -79,21 +79,23 @@ res <- simulateResiduals(model, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
-For **GLMMs**, the options for simulating results **conditionally on the random effects** is currently available only for models fitted with the `lme4` package by using the argument `re.form = NULL`, which is passed to the function `simulate.merMod()` in `lme4`:
+For **GLMMs** and `DHARMa`v0.5.0, the options for simulating results **conditionally on the random effects** is the default for most of supported models.
 
 
 ``` r
-res <- simulateResiduals(modelGLMM, refit = F, re.form = NULL)
+res <- simulateResiduals(modelGLMM, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
  
-Note that the default of the `simulateResiduals()` for GLMMs is to simulate **unconditionally on the random effects**, which would be equal to `re.form = NA` or `re.form = ~0`:
+If you want to simulate **unconditionally on the random effects** you have to change the argument `simulateREs` to `unconditional`:
 
 
 ``` r
-res <- simulateResiduals(modelGLMM, refit = F, re.form = NA) # or re.form = ~0
+res <- simulateResiduals(modelGLMM, refit = F, , simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
+
+For user-specified simulations, please see the table in DHARMa Vignette (Conditional vs. unconditional simulations).
 
 # Example GLM Poisson
 
@@ -208,7 +210,7 @@ testDispersion(res, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Simulation-based response variance test**
+3. **Simulation-based residual variance test**
 
 
 ``` r
@@ -319,7 +321,7 @@ testDispersion(poisModel, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Simulation-based response variance test**
+3. **Simulation-based residual variance test**
 
 
 ``` r
@@ -408,6 +410,14 @@ The two-sided parametric Pearson residuals test was marginaly significant (p = 0
 
 ``` r
 res <- simulateResiduals(poisModelMM, refit = T) 
+```
+
+```
+## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model failed to converge with max|grad| = 0.0206872 (tol = 0.002, component 1)
+##   See ?lme4::convergence and ?lme4::troubleshooting.
+```
+
+``` r
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -419,7 +429,7 @@ testDispersion(res, type = "DHARMa")
 ## 	vs. simulated-refitted
 ## 
 ## data:  res
-## dispersion = 0.88397, p-value = 0.312
+## dispersion = 0.88568, p-value = 0.264
 ## alternative hypothesis: two.sided
 ```
 
@@ -459,11 +469,11 @@ testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ## alternative hypothesis: greater
 ```
 
-4. **Simulation-based response variance test: conditional simulations**
+4. **Simulation-based residual variance test: conditional simulations**
 
 
 ``` r
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
+res <- simulateResiduals(poisModelMM, refit = F, simulateREs = "conditional")
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -479,11 +489,11 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-3b. **SSimulation-based response variance test: unconditional simulations**
+3b. **Simulation-based residual variance test: unconditional simulations**
 
 
 ``` r
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
+res <- simulateResiduals(poisModelMM, refit = F, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -570,23 +580,8 @@ res <- simulateResiduals(poisModelMM, refit = T)
 ```
 
 ```
-## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-## Model failed to converge with max|grad| = 0.0206084 (tol = 0.002, component 1)
-```
-
-```
-## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-## Model failed to converge with max|grad| = 0.017267 (tol = 0.002, component 1)
-```
-
-```
-## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-## Model failed to converge with max|grad| = 0.0168244 (tol = 0.002, component 1)
-```
-
-```
-## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-## Model failed to converge with max|grad| = 0.0208834 (tol = 0.002, component 1)
+## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, : Model failed to converge with max|grad| = 0.0201348 (tol = 0.002, component 1)
+##   See ?lme4::convergence and ?lme4::troubleshooting.
 ```
 
 ``` r
@@ -601,7 +596,7 @@ testDispersion(res, type = "DHARMa")
 ## 	vs. simulated-refitted
 ## 
 ## data:  res
-## dispersion = 2.5017, p-value < 2.2e-16
+## dispersion = 2.5556, p-value < 2.2e-16
 ## alternative hypothesis: two.sided
 ```
 
@@ -641,10 +636,10 @@ testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
 
-4. **Simulation-based response variance test: conditional simulations**
+4. **Simulation-based residual variance test: conditional simulations**
 
 ``` r
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
+res <- simulateResiduals(poisModelMM)
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -660,12 +655,12 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-5. **Simulation-based response variance test: unconditional simulations**
+5. **Simulation-based residual variance test: unconditional simulations**
 
 
 ``` r
 # Simulation-based conditional dispersion test
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
+res <- simulateResiduals(poisModelMM, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -691,13 +686,13 @@ sessionInfo()
 ```
 
 ```
-## R version 4.4.1 (2024-06-14)
+## R version 4.5.2 (2025-10-31)
 ## Platform: aarch64-apple-darwin20
-## Running under: macOS 15.6.1
+## Running under: macOS Sequoia 15.6.1
 ## 
 ## Matrix products: default
-## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 ## 
 ## locale:
 ## [1] pt_BR.UTF-8/pt_BR.UTF-8/pt_BR.UTF-8/C/pt_BR.UTF-8/pt_BR.UTF-8
@@ -709,17 +704,17 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] lme4_1.1-37  Matrix_1.7-2 DHARMa_0.4.7
+## [1] lme4_1.1-38  Matrix_1.7-4 DHARMa_0.5.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-167      cli_3.6.5         knitr_1.50        rlang_1.1.6      
-##  [5] xfun_0.51         reformulas_0.4.0  minqa_1.2.8       jsonlite_2.0.0   
-##  [9] htmltools_0.5.8.1 sass_0.4.9        rmarkdown_2.29    grid_4.4.1       
-## [13] evaluate_1.0.3    jquerylib_0.1.4   MASS_7.3-64       rmdformats_1.0.4 
-## [17] fastmap_1.2.0     yaml_2.3.10       lifecycle_1.0.4   bookdown_0.42    
-## [21] compiler_4.4.1    Rcpp_1.1.0        rstudioapi_0.17.1 lattice_0.22-6   
-## [25] digest_0.6.37     nloptr_2.2.1      R6_2.6.1          Rdpack_2.6.3     
-## [29] splines_4.4.1     rbibutils_2.3     bslib_0.9.0       tools_4.4.1      
-## [33] boot_1.3-31       cachem_1.1.0
+##  [1] nlme_3.1-168      cli_3.6.5         knitr_1.51        rlang_1.1.7      
+##  [5] xfun_0.56         reformulas_0.4.4  otel_0.2.0        minqa_1.2.8      
+##  [9] jsonlite_2.0.0    htmltools_0.5.9   sass_0.4.10       rmarkdown_2.30   
+## [13] grid_4.5.2        evaluate_1.0.5    jquerylib_0.1.4   MASS_7.3-65      
+## [17] rmdformats_1.0.4  fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  
+## [21] bookdown_0.46     compiler_4.5.2    Rcpp_1.1.1        rstudioapi_0.18.0
+## [25] lattice_0.22-7    digest_0.6.39     nloptr_2.2.1      R6_2.6.1         
+## [29] Rdpack_2.6.6      splines_4.5.2     rbibutils_2.4.1   bslib_0.10.0     
+## [33] tools_4.5.2       boot_1.3-32       cachem_1.1.0
 ```
 

@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## 
-# Nov 24
+# mar 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -142,7 +142,7 @@ save(alpha.pois, alpha.bin, file=here("data", "2_callibrated_alphaLevels.Rdata")
 f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize), 
                            col=intercept)) +
   facet_wrap(~test, labeller = 
-               as_labeller(c(`DHA.p.val` = "3) Sim-based response variance" ,
+               as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
                             `Pear.p.val` = "1) param. Pearson residuals" ,
                            `Ref.p.val` = "2) nonparam. Pearson residuals"))) +
   geom_point(position = position_dodge(width=0.8)) +
@@ -165,7 +165,7 @@ f.bin
 f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize), 
                              col=intercept)) +
   facet_wrap(~test, labeller = 
-               as_labeller(c(`DHA.p.val` = "3) Sim-based response variance" ,
+               as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
                              `Pear.p.val` = "1) param. Pearson residuals" ,
                              `Ref.p.val` = "2) nonparam. Pearson residuals"))) +
   geom_point(position = position_dodge(width=0.8)) +
@@ -196,7 +196,7 @@ dats %>%
   ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept,
              group=intercept)) +
   facet_grid(model~test, scales="free",
-             labeller = as_labeller(c(`DHA.p.val` = "3) Sim-based response variance" ,
+             labeller = as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
                                        `Pear.p.val` = "1) param. Pearson residuals",
                                 `Ref.p.val` = "2) nonparam. Pearson residuals",
                                          `Binomial` = "Binomial",
@@ -235,7 +235,7 @@ d.bin <- stats.bin %>% group_by(test, sampleSize, intercept) %>%
   scale_x_log10()+
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
-    labels=c("Sim-based response variance", "param. Pearson residuals",
+    labels=c("Sim-based residual variance", "param. Pearson residuals",
              "nonparam. Pearson residuals"))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial") +
@@ -257,7 +257,7 @@ d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   scale_x_log10()+
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
-                     labels=c("Sim-based response variance", 
+                     labels=c("Sim-based residual variance", 
                               "param. Pearson residuals",
                               "nonparam. Pearson residuals"))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
@@ -282,7 +282,7 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
   geom_hline(yintercept=1, linetype="dotted")+
   facet_grid(sampleSize ~ intercept, scales="free") +
   scale_color_manual(values=col.tests[c(4,1,2)],
-                     labels=c("Sim-based response variance", 
+                     labels=c("Sim-based residual variance", 
                               "param. Pearson residuals",
                               "nonparam. Pearson residuals"))+
   theme(panel.background = element_rect(color="black"),
@@ -297,7 +297,7 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
   geom_hline(yintercept=1, linetype="dotted")+
   facet_grid(sampleSize ~ intercept, scales="free") +
   scale_color_manual(values=col.tests[c(4,1,2)],
-                     labels=c("Sim-based response variance", 
+                     labels=c("Sim-based residual variance", 
                               "param. Pearson residuals",
                               "nonparam. Pearson residuals"))+
   theme(panel.background = element_rect(color="black"),

@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## 
-# Mar 25
+# Mar 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -55,7 +55,7 @@ power <- p.bin %>%
   scale_color_manual(values = col.tests[c(1,2,4)],
                      labels = c("param. Pearson residuals",
                                 "nonparam. Pearson residuals",
-                                "Sim-based response variance")) +
+                                "Sim-based residual variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",
                                                "20" = "20 trials"))) +
@@ -79,7 +79,7 @@ type1 <- p.bin %>% filter(overdispersion == 0) %>%
  scale_color_manual(values = col.tests[c(1,2,4)],
                    labels = c("param. Pearson residuals",
                               "nonparam. Pearson residuals",
-                              "Sim-based response variance"))  +
+                              "Sim-based residual variance"))  +
   ylab("Type I error") + xlab("Number of trials")+
   theme(panel.background = element_rect(color="black"),
         legend.position = "right")
@@ -105,7 +105,7 @@ disp <- stats.bin %>%
   scale_color_manual(values = col.tests[c(1,2,4)],
                      labels = c("param. Pearson residuals",
                                 "nonparam. Pearson residuals",
-                                "Sim-based response variance")) +
+                                "Sim-based residual variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",
                                                "20" = "20 trials"))) +

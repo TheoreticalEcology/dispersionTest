@@ -1,7 +1,7 @@
 # Dispersion test paper
 # summarising figure
 # 
-# set 25
+# mar 26
 
 library(tidyverse)
 library(cowplot)
@@ -11,7 +11,7 @@ theme_set(theme_cowplot())
 # scores 1 to 3
 df <- tibble(
   test = c("parametric Pearson Residuals", "nonparametric Pearson Residuals",
-           "simulation-based response variance"),
+           "simulation-based residual variance"),
   Speed = c(3,1,2),
   GLM = c(3,3,3),
   `GLM (small-data)` = c(1,2,1),
@@ -25,7 +25,7 @@ df %>% pivot_longer(2:6, names_to = "variable", values_to = "value") %>%
   mutate(test = fct_relevel(test,
                             "parametric Pearson Residuals",
                             "nonparametric Pearson Residuals",
-                            "simulation-based response variance"
+                            "simulation-based residual variance"
                             ),
          variable = fct_relevel(variable,"GLM","GLM (small-data)",
                                 "GLMM (few RE groups)", "GLMM (many RE groups)", 
@@ -44,7 +44,7 @@ ggplot(df2, aes(x=variable.n, y=test.n, fill=value, col=value))+
   scale_y_continuous(name = "", breaks=1:3, limits=c(0.6,3.4),
                      labels= c("Parametric \n Pearson  residuals",
                                "Nonparametric \n Pearson residuals",
-                               "Simulation-based \n response variance"
+                               "Simulation-based \n residual variance"
                                )) +
   scale_x_continuous(name="",  breaks=1:5, limits=c(0.7,5.3),
                      labels= c("GLM \n", "GLM \n (\"small-data\")",

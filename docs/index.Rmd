@@ -26,7 +26,7 @@ Users can substitute the simulated data and model by their own data and model ob
 Loading used packages:
 
 ```{r, message=F}
-library(DHARMa) # dispersion test and other models' diagnostic
+library(DHARMa) #v0.5.0 dispersion test and other models' diagnostic 
 library(lme4) # for GLMMs
 
 set.seed(2025) # for reproducible examples
@@ -63,31 +63,33 @@ res <- simulateResiduals(model, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based response variance test explained below.
+The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based residual variance test explained below.
 
 
-### Simulation-based response variance test
+### Simulation-based residual variance test
 
-The simulation-based response variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
+The simulation-based residual variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
 
 ```{r, eval=F, echo=T}
 res <- simulateResiduals(model, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
 
-For **GLMMs**, the options for simulating results **conditionally on the random effects** is currently available only for models fitted with the `lme4` package by using the argument `re.form = NULL`, which is passed to the function `simulate.merMod()` in `lme4`:
+For **GLMMs** and `DHARMa`v0.5.0, the options for simulating results **conditionally on the random effects** is the default for most of supported models.
 
 ```{r, eval=F, echo=T}
-res <- simulateResiduals(modelGLMM, refit = F, re.form = NULL)
+res <- simulateResiduals(modelGLMM, refit = F)
 testDispersion(res, type = "DHARMa")
 ```
  
-Note that the default of the `simulateResiduals()` for GLMMs is to simulate **unconditionally on the random effects**, which would be equal to `re.form = NA` or `re.form = ~0`:
+If you want to simulate **unconditionally on the random effects** you have to change the argument `simulateREs` to `unconditional`:
 
 ```{r, eval=F, echo=T}
-res <- simulateResiduals(modelGLMM, refit = F, re.form = NA) # or re.form = ~0
+res <- simulateResiduals(modelGLMM, refit = F, , simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
+
+For user-specified simulations, please see the table in DHARMa Vignette (Conditional vs. unconditional simulations).
 
 # Example GLM Poisson
 
@@ -135,7 +137,7 @@ res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "PearsonChisq")
 ```
 
-3. **Simulation-based response variance test**
+3. **Simulation-based residual variance test**
 
 ```{r}
 res <- simulateResiduals(poisModel, refit = F)
@@ -180,7 +182,7 @@ testDispersion(res, type = "DHARMa")
 testDispersion(poisModel, type = "PearsonChisq")
 ```
 
-3. **Simulation-based response variance test**
+3. **Simulation-based residual variance test**
 
 ```{r}
 res <- simulateResiduals(poisModel, refit = F)
@@ -235,17 +237,17 @@ testDispersion(poisModelMM, type = "PearsonChisq")
 testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
-4. **Simulation-based response variance test: conditional simulations**
+4. **Simulation-based residual variance test: conditional simulations**
 
 ```{r}
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
+res <- simulateResiduals(poisModelMM, refit = F, simulateREs = "conditional")
 testDispersion(res, type = "DHARMa")
 ```
 
-3b. **SSimulation-based response variance test: unconditional simulations**
+3b. **Simulation-based residual variance test: unconditional simulations**
 
 ```{r}
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
+res <- simulateResiduals(poisModelMM, refit = F, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -296,17 +298,17 @@ testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
 
-4. **Simulation-based response variance test: conditional simulations**
+4. **Simulation-based residual variance test: conditional simulations**
 ```{r}
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NULL)
+res <- simulateResiduals(poisModelMM)
 testDispersion(res, type = "DHARMa")
 ```
 
-5. **Simulation-based response variance test: unconditional simulations**
+5. **Simulation-based residual variance test: unconditional simulations**
 
 ```{r}
 # Simulation-based conditional dispersion test
-res <- simulateResiduals(poisModelMM, refit = F, re.form = NA)
+res <- simulateResiduals(poisModelMM, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 
