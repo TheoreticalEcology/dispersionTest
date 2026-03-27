@@ -5,7 +5,7 @@ library(tidyverse)
 
 #### model 2c ----
 
-dat2c <- readxl::read_excel("empirical_data/data2_laumer_etal_2025_datasets.xlsx",
+dat2c <- readxl::read_excel("case_studies/data2_laumer_etal_2025_datasets.xlsx",
                            sheet = "model 2c")
 dat2c$z.log.AgeAtThatTime2 <- dat2c$z.log.AgeAtThatTime^2
 
@@ -167,7 +167,7 @@ broom.mixed::tidy(mod2cCMP)
 
 #### model 1a ----
 
-dat1 <- readxl::read_excel("empirical_data/data2_laumer_etal_2025_datasets.xlsx",
+dat1 <- readxl::read_excel("case_studies/data2_laumer_etal_2025_datasets.xlsx",
                            sheet = "model 1a")
 dat1$z.log.AgeAtThatTime_CS2 <- dat1$z.log.AgeAtThatTime_CS^2
 dat1$time = log(dat1$VisibleObsTime/6)
