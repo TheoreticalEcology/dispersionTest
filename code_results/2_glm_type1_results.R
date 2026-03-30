@@ -1,5 +1,5 @@
 ### Dispersion Tests Project
-## 
+## Melina Leite
 # mar 26
 
 library(DHARMa)
@@ -196,9 +196,9 @@ dats %>%
   ggplot(aes(y = prop.sig, x=as.factor(sampleSize), col=intercept,
              group=intercept)) +
   facet_grid(model~test, scales="free",
-             labeller = as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
-                                       `Pear.p.val` = "1) param. Pearson residuals",
-                                `Ref.p.val` = "2) nonparam. Pearson residuals",
+             labeller = as_labeller(c(`DHA.p.val` = "C) Sim-based residual variance" ,
+                                       `Pear.p.val` = "A) param. Pearson residuals",
+                                `Ref.p.val` = "B) nonparam. Pearson residuals",
                                          `Binomial` = "Binomial",
                                       `Poisson` = "Poisson"))) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+

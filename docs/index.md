@@ -1,7 +1,7 @@
 ---
 title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
-author: ""
-date: "2026-03-01"
+author: "Melina de Souza Leite"
+date: "2026-03-30"
 output: 
   rmdformats::readthedown:
     highlight: kate
@@ -91,7 +91,7 @@ If you want to simulate **unconditionally on the random effects** you have to ch
 
 
 ``` r
-res <- simulateResiduals(modelGLMM, refit = F, , simulateREs = "unconditional")
+res <- simulateResiduals(modelGLMM, refit = F, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 
@@ -178,10 +178,6 @@ testDispersion(poisModel, type = "PearsonChisq")
 ```
 
 ```
-## Note that the chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, I recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
-```
-
-```
 ## 
 ## 	Parametric dispersion test via mean Pearson-chisq statistic
 ## 
@@ -195,10 +191,6 @@ The same result with:
 ``` r
 res <- simulateResiduals(poisModel, refit = F)
 testDispersion(res, type = "PearsonChisq")
-```
-
-```
-## Note that the chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, I recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
 ```
 
 ```
@@ -306,10 +298,6 @@ testDispersion(res, type = "DHARMa")
 
 ``` r
 testDispersion(poisModel, type = "PearsonChisq")
-```
-
-```
-## Note that the chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, I recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
 ```
 
 ```
@@ -441,7 +429,7 @@ testDispersion(poisModelMM, type = "PearsonChisq")
 ```
 
 ```
-## Note that the chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, I recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
+## Note that the Chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, we recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
 ```
 
 ```
@@ -608,7 +596,7 @@ testDispersion(poisModelMM, type = "PearsonChisq")
 ```
 
 ```
-## Note that the chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, I recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
+## Note that the Chi2 test on Pearson residuals is biased for MIXED models towards underdispersion. Tests with alternative = two.sided or less are therefore not reliable. If you have random effects in your model, we recommend to test only with alternative = 'greater', i.e. test for overdispersion, or else use the DHARMa default tests which are unbiased. See help for details.
 ```
 
 ```
@@ -688,7 +676,7 @@ sessionInfo()
 ```
 ## R version 4.5.2 (2025-10-31)
 ## Platform: aarch64-apple-darwin20
-## Running under: macOS Sequoia 15.6.1
+## Running under: macOS Tahoe 26.3.1
 ## 
 ## Matrix products: default
 ## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
@@ -704,12 +692,12 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] lme4_1.1-38  Matrix_1.7-4 DHARMa_0.5.0
+## [1] lme4_2.0-1   Matrix_1.7-4 DHARMa_0.5.0
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] nlme_3.1-168      cli_3.6.5         knitr_1.51        rlang_1.1.7      
-##  [5] xfun_0.56         reformulas_0.4.4  otel_0.2.0        minqa_1.2.8      
-##  [9] jsonlite_2.0.0    htmltools_0.5.9   sass_0.4.10       rmarkdown_2.30   
+##  [5] xfun_0.57         reformulas_0.4.4  otel_0.2.0        minqa_1.2.8      
+##  [9] jsonlite_2.0.0    htmltools_0.5.9   sass_0.4.10       rmarkdown_2.31   
 ## [13] grid_4.5.2        evaluate_1.0.5    jquerylib_0.1.4   MASS_7.3-65      
 ## [17] rmdformats_1.0.4  fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  
 ## [21] bookdown_0.46     compiler_4.5.2    Rcpp_1.1.1        rstudioapi_0.18.0

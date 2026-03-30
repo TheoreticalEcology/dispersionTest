@@ -1,6 +1,6 @@
 ---
 title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
-author: ""
+author: "Melina de Souza Leite"
 date: "`r Sys.Date()`"
 output: 
   rmdformats::readthedown:
@@ -85,7 +85,7 @@ testDispersion(res, type = "DHARMa")
 If you want to simulate **unconditionally on the random effects** you have to change the argument `simulateREs` to `unconditional`:
 
 ```{r, eval=F, echo=T}
-res <- simulateResiduals(modelGLMM, refit = F, , simulateREs = "unconditional")
+res <- simulateResiduals(modelGLMM, refit = F, simulateREs = "unconditional")
 testDispersion(res, type = "DHARMa")
 ```
 

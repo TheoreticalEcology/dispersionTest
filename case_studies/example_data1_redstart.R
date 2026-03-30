@@ -116,6 +116,7 @@ coefs <- bind_rows(list(Poisson = tidy(modPois),
 coefs
 #knitr::kable(coefs) 
 
+
 ###### Dispersion tests ------
 tests <- c("sim-based res. variance", "parametric Pearson", "nonparametric Pearson")
 dPoisson = data.frame(test=c(tests),
@@ -140,6 +141,7 @@ dispersion_tests <- bind_rows(list(Poisson = dPoisson,
   mutate(Dispersion= round(Dispersion, 2), p.value=round(p.value, 3))
 dispersion_tests
 #knitr::kable(dispersion_tests) 
+
 
 ###### Residual spatial autocorrelation tests ------
 
