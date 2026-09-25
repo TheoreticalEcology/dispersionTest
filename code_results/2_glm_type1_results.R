@@ -143,8 +143,8 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize),
                            col=intercept)) +
   facet_wrap(~test, labeller = 
                as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
-                            `Pear.p.val` = "1) param. Pearson residuals" ,
-                           `Ref.p.val` = "2) nonparam. Pearson residuals"))) +
+                            `Pear.p.val` = "1) Chi-squared Pearson" ,
+                           `Ref.p.val` = "2) Param. bootstrap Pearson"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8), col = "black",
                 aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
@@ -166,8 +166,8 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
                              col=intercept)) +
   facet_wrap(~test, labeller = 
                as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
-                             `Pear.p.val` = "1) param. Pearson residuals" ,
-                             `Ref.p.val` = "2) nonparam. Pearson residuals"))) +
+                             `Pear.p.val` = "1) Chi-squared Pearson" ,
+                             `Ref.p.val` = "2) Param. bootstrap Pearson"))) +
   geom_point(position = position_dodge(width=0.8)) +
   geom_errorbar(position = position_dodge(width=0.8), col="black",
                 aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
@@ -197,8 +197,8 @@ dats %>%
              group=intercept)) +
   facet_grid(model~test, scales="free",
              labeller = as_labeller(c(`DHA.p.val` = "C) Sim-based residual variance" ,
-                                       `Pear.p.val` = "A) param. Pearson residuals",
-                                `Ref.p.val` = "B) nonparam. Pearson residuals",
+                                       `Pear.p.val` = "A) Chi-squared Pearson",
+                                `Ref.p.val` = "B) Param. bootstrap Pearson",
                                          `Binomial` = "Binomial",
                                       `Poisson` = "Poisson"))) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
@@ -217,7 +217,7 @@ dats %>%
         legend.background  = element_rect(fill="#F0F0F0"),
         axis.text.x = element_text(angle=45, hjust=1))
 
-ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 7)
+ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 7,bg="white")
 
 
 
@@ -235,8 +235,8 @@ d.bin <- stats.bin %>% group_by(test, sampleSize, intercept) %>%
   scale_x_log10()+
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
-    labels=c("Sim-based residual variance", "param. Pearson residuals",
-             "nonparam. Pearson residuals"))+
+    labels=c("Sim-based residual variance", "Chi-squared Pearson",
+             "param. bootstrap Pearson"))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial") +
   theme(panel.background = element_rect(color="black"),
@@ -258,8 +258,8 @@ d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
                      labels=c("Sim-based residual variance", 
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson") +
   theme(panel.background = element_rect(color="black"),
@@ -283,8 +283,8 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
   facet_grid(sampleSize ~ intercept, scales="free") +
   scale_color_manual(values=col.tests[c(4,1,2)],
                      labels=c("Sim-based residual variance", 
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
@@ -298,8 +298,8 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
   facet_grid(sampleSize ~ intercept, scales="free") +
   scale_color_manual(values=col.tests[c(4,1,2)],
                      labels=c("Sim-based residual variance", 
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   theme(panel.background = element_rect(color="black"),
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +

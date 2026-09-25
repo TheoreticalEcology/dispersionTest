@@ -117,8 +117,8 @@ pfig <- pval %>%
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(4,1,2)],
                     labels = c("Sim-based residual variance", 
-                               "param. Pearson residuals",
-                               "nonparam. Pearson residuals")) +
+                               "Chi-squared Pearson",
+                               "Param. bootstrap Pearson")) +
   facet_grid(model~slope) +
   ylab("Power")+
   theme(panel.background = element_rect(color="black"),
@@ -136,8 +136,8 @@ statfig <- statval %>%
   geom_point() + geom_line() +
   scale_color_manual(values = col.tests[c(4,1,2)],
                      labels = c("Sim-based residual variance", 
-                                "param. Pearson residuals",
-                                "nonparam. Pearson residuals")) +
+                                "Chi-squared Pearson",
+                                "Param. bootstrap Pearson")) +
   facet_grid(model~slope, scales="free") +
   ylab("Dispersion parameter") +
   theme(panel.background = element_rect(color="black"),

@@ -144,7 +144,7 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   scale_color_discrete(labels=c("Approximate Pearson",  
                                 "conditional sim-based variance",
                                 "unconditional sim-based variance",
-                                "nonparam. Pearson residuals"))+
+                                "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ylab("Power") + xlab("Overdispersion")+
@@ -195,7 +195,7 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   scale_color_discrete(labels=c("Approximate Pearson",  
                                 "conditional sim-based variance",
                                 "unconditional sim-based variance",
-                                "nonparam. Pearson residuals"))+
+                                "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
     ylab("Power") + xlab("Overdispersion")+

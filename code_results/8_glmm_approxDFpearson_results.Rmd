@@ -1,5 +1,5 @@
 ---
-title: "Pearson Chi-squared test with approximated methods for residual degrees of freedom in GLMMs"
+title: "Chi-squared Pearson dispersion test with approximated methods for residual degrees of freedom in GLMMs"
 author: ""
 date: "`r Sys.Date()`"
 output: 
@@ -37,19 +37,17 @@ source(here("functions_others", "plotColors.R"))
 
 **mantainer**: Samuel Watson - Prof stats Uni Birmingham <https://www.birmingham.ac.uk/staff/profiles/applied-health/watson-sam>
 
-To create the Pearson Chi-squared test with the approximate residual degrees of freedom, I first:
+To create the Chi-squared Pearson test with the approximate residual degrees of freedom, I first:
 
--   converted the lme4 function to the glmmrBase function\
--   and used the method small-sample_correction() to have the dfs correction:
+-   converted the `lme4` function to the `glmmrBase` function\
+-   and used the method `small-sample_correction()` to have the degrees of freedom (df) correction:
     -   Kenward-Roger\
     -   Kenward-Roger2\
     -   Satterthwaithe\
 -   I subtracted the sample size from this df to have the residual df.\
 -   I used two.sides test.
 
-From [Watson 2024](https://arxiv.org/abs/2303.12657): “The degrees of freedom correction is also given in Kenward and Roger (1997), which is the same degrees of freedom correction originally proposed by Satterthwaite (1946). The Kenward-Roger correction, though, can over-estimate the standard errors in very small samples in some cases. Kenward and Roger (2009) proposed an improved correction for covariance functions not linear in parameters (such as the autoregressive or exponential functions). The improved correction adds an additional adjustment factor. We have implemented these corrections in the package, which can returned directly from a Model object using the small_sample_correction() member function” 
-
-![](../figures/small_sample_correction.png)
+From [Watson 2024](https://arxiv.org/abs/2303.12657): “The degrees of freedom correction is also given in Kenward and Roger (1997), which is the same degrees of freedom correction originally proposed by Satterthwaite (1946). The Kenward-Roger correction, though, can over-estimate the standard errors in very small samples in some cases. Kenward and Roger (2009) proposed an improved correction for covariance functions not linear in parameters (such as the autoregressive or exponential functions). The improved correction adds an additional adjustment factor. We have implemented these corrections in the package, which can returned directly from a Model object using the small_sample_correction() member function.”
 
 The function:
 ```         
@@ -148,7 +146,7 @@ sum(simuls.nan$PearKR.rdf <0) / dim(simuls.pois)[1]
 sum(simuls.nan$PearKR2.rdf <0) / dim(simuls.pois)[1]
 ```
 
-Subsetting the simulation output only for the positive rdfs:
+Subseting the simulation output only for the positive residual dfs:
 
 ```{r}
 simuls.pois2 <- simuls.pois %>% filter(PearSat.rdf > 0 &
@@ -249,11 +247,11 @@ ggsave(here("figures", "8_glmm_approxDF_power.jpeg"), width=12, height = 12)
 
 
 - Power for the 3 correction methods is basically the same. 
+
 - Corrected power still very bad for small intercepts (-1.5 and 0), 
 
 
-
-figure for each N groups separated
+Figure for each N groups separated
 ```{r,echo=F, fig.height=8}
 p.pois %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
@@ -406,7 +404,7 @@ ggplot(comb, aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape
   xlab("Overdispersion") + ylab("Power")+
   scale_color_discrete(labels = c("conditional sim-based variance", 
                                    "Pearson Chi-sq KR2", 
-                                   "nonparam. Pearson residuals"))
+                                   "param. bootstrap Pearson"))
 ggsave(here("figures", "8_glmm_approxDF_power2.jpeg"), width=8, height = 8)
 ```
 

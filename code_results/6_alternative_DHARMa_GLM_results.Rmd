@@ -148,7 +148,7 @@ ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
   facet_grid(model~test, 
              labeller= as_labeller(c("Alt.p"= "Approximate Pearson residuals",
                                      "DHA.p" = "Sim-based residual variance",
-                                     "Pear.p" = "param. Pearson residuals",
+                                     "Pear.p" = "Chi-squared Pearson",
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_point(position = position_dodge(0.7)) + 
@@ -273,7 +273,7 @@ disbin2 %>% filter(nSim %in% c(250,1000)) %>%
 #ggsave(here('figures', '6_dispersion_difBin.jpeg'), height=12, width=10)
 ```
 
-### dipersion with overdispersion
+### Dispersion with overdispersion
 
 ```{r}
 disperpois <- simpois %>%  filter(prop.zero ==0) %>%
@@ -361,7 +361,7 @@ ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=n
   geom_line() + 
   scale_color_discrete(labels = c("Approximate Pearson residuals",
                                   "Sim-based residual variance",
-                                  "param Pearson residuals"))+
+                                  "Chi-squared Pearson"))+
   ylab("Mean dispersion") + xlab("Overdispersion")
 ggsave(here('figures', '6_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
 ```
@@ -462,7 +462,7 @@ ggplot(pows, aes(x=overdispersion, y=prop.sig, col=test, linetype=nSim))+
   geom_line() + 
   scale_color_discrete(labels = c("Approximate Pearson residuals",
                                   "Sim-based residual variance",
-                                  "param Pearson residuals"))+
+                                  "Chi-squared Pearson"))+
   ylab("Power") + xlab("Overdispersion")
 ggsave(here('figures', '6_approxPearson_powerGLM.jpeg'), height=6, width=10)
 ```

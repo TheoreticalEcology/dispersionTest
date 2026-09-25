@@ -67,8 +67,8 @@ bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
-                               "param. Pearson residuals",
-                               "nonparam. Pearson residuals"))+
+                               "Chi-squared Pearson",
+                               "Param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial power", subtitle = "1000 sim; Ntrials = 10") +
@@ -95,8 +95,8 @@ ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
-                               "param. Pearson residuals",
-                               "nonparam. Pearson residuals"))+
+                               "Chi-squared Pearson",
+                               "Param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "1000 sim; Ntrials=10") +
@@ -156,8 +156,8 @@ bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
-                               "param. Pearson residuals",
-                               "nonparam. Pearson residuals"))+
+                               "Chi-squared Pearson",
+                               "Param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson power", subtitle = "1000 sim") +
@@ -184,8 +184,8 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   scale_y_log10()+
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
-                               "param. Pearson residuals",
-                               "nonparam. Pearson residuals"))+
+                               "Chi-squared Pearson",
+                               "Param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept, scales="free_y") +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 simulations") +
@@ -215,8 +215,8 @@ ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibrati
   ylab("Power") + xlab("Overdispersion") +
   scale_color_manual(values = col.tests[c(4,1,2)], 
                      labels = c("Sim-based residual variance", 
-                                "param. Pearson residuals",
-                                 "nonparam. Pearson residuals")) +
+                                "Chi-squared Pearson",
+                                 "Param. bootstrap Pearson")) +
   facet_grid(model~sampleSize, 
             labeller = as_labeller(c("Binomial"= "Binomial",
                                      "Poisson" = "Poisson",

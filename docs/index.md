@@ -1,7 +1,7 @@
 ---
 title: "Testing for under-/overdispersion in GLMs/GLMMs with `DHARMa`"
 author: "Melina de Souza Leite"
-date: "2026-03-30"
+date: "2026-09-25"
 output: 
   rmdformats::readthedown:
     highlight: kate
@@ -14,7 +14,7 @@ editor_options:
   chunk_output_type: inline
 ---
 
-**Acompanying example script for the paper "Dispersion tests for generalized linear mixed-effects models".**
+**Acompanying example script for the paper "Dispersion tests in generalized linear mixed-effects models: A methods comparison and practical guide for ecologists".**
 
 
 Our aim is to give instructions and show examples for testing for under/overdispersion for GLMs (base R functions `glm`) and GLMMs (package `lme4`) using the `DHARMa` package.
@@ -43,21 +43,21 @@ Dispersion tests in `DHARMa` are performed using the function `testDispersion`. 
 
 - Overdispersion only with `alternative = "greater"`.
 
-### Parametric Pearson residuals test
+### Chi-squared Pearson dispersion test
 
-The parametric Pearson residuals test is peformed when using the argument `type = "PearsonChisq`, when providing the model object in the first argument position (`simulationOutput`), for example:
+The Chi-squared Pearson dispersion test is peformed when using the argument `type = "PearsonChisq"`, when providing the model object in the first argument position (`simulationOutput`), for example:
 
 
 ``` r
 testDispersion(model, type = "PearsonChisq") # substitute "model" by your model object name
 ```
 
-Note that **parametric Perason Pearson residuals test is biased for GLMMs towards underdispersion** (more details in the main study). Tests with `alternative = "two.sided"` or `alternative = "less"` are therefore not reliable. If you have random effects in your model, we recommend to test only for overdispersion with `alternative = 'greater'`.
+Note that **Chi-squared Pearson dispersio test is biased for GLMMs towards underdispersion** (more details in the main study). Tests with `alternative = "two.sided"` or `alternative = "less"` are therefore not reliable. If you have random effects in your model, we recommend to test only for overdispersion with `alternative = 'greater'`.
 
 
-### Nonparametric Pearson residuals test
+### Parametric bootstrap Pearson dispersion test
 
-For the nonparametric Pearson residuals test, it is necessary a first step in generating simulations from the model using the function `simulateResiduals` with the argument `refit = TRUE`. This way, the function will record the Pearson residuals from the simulated data from parametric bootstrapping. 
+For the parametric bootstrap Pearson dispersion test, it is necessary a first step in generating simulations from the model using the function `simulateResiduals` with the argument `refit = TRUE`. This way, the function will record the Pearson residuals from the simulated data from parametric bootstrapping. 
 Afterwards, use the resulting object in `testDispersion` with `type = "DHARMa"`:
 
 
@@ -66,12 +66,12 @@ res <- simulateResiduals(model, refit = T)
 testDispersion(res, type = "DHARMa")
 ```
 
-The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the simulation-based residual variance test explained below.
+The number of simulations is set in `simulateResiduals()` with the argument `n`, which is by default 250. If your model is complex and the computational time is too long for the parametric bootstrapping, we recommend you to decrease the number of simulations (however, don't go lower than 100), or use the Simulation-based residual variance dispersion test explained below.
 
 
-### Simulation-based residual variance test
+### Simulation-based residual variance dispersion test
 
-The simulation-based residual variance test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
+The Simulation-based residual variance dispersion test is available through the same functions as before, but for `simulateResiduals()` with argument `refit = F` (the default of the function):
 
 
 ``` r
@@ -150,7 +150,7 @@ summary(poisModel)
 
 Note that all tests present similar dispersion statistics and non-significant p-values, as expected.
 
-1. **Nonparametric Pearson residuals test**: 
+1. **Parametric bootstrap Pearson dispersion test**: 
 
 
 ``` r
@@ -170,7 +170,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-2. **Parametric Pearson residuals test** (two-sided test)
+2. **Chi-squared Pearson dispersion test** (two-sided test)
 
 
 ``` r
@@ -202,7 +202,7 @@ testDispersion(res, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Simulation-based residual variance test**
+3. **Simulation-based residual variance dispersion test**
 
 
 ``` r
@@ -273,7 +273,7 @@ summary(poisModel)
 
 Notice that all tests presented similar dispersion parameters and significant p-values, as expected. 
 
-1. **Nonparametric Pearson residuals test**:
+1. **Parametric bootstrap Pearson dispersion test**:
 
 
 ``` r
@@ -293,7 +293,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-2. **Parametric Pearson residuals test** (two-sided test)
+2. **Chi-squared Pearson dispersion test** (two-sided test)
 
 
 ``` r
@@ -309,7 +309,7 @@ testDispersion(poisModel, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Simulation-based residual variance test**
+3. **Simulation-based residual variance dispersion test**
 
 
 ``` r
@@ -391,9 +391,9 @@ summary(poisModelMM)
 
 Note that all dispersion statistics presented values below the expected value of 1 (around 0.88), while the simulation-based unconditional test presented the lowest dispersion statistics (0.65). 
 
-The two-sided parametric Pearson residuals test was marginaly significant (p = 0.06), but towards underdispersion (the opposite expectation). When testing only for overdispersion with the same test, the p-value was non-significant.
+The two-sided Chi-squared Pearson dispersion test was marginaly significant (p = 0.06), but towards underdispersion (the opposite expectation). When testing only for overdispersion with the same test, the p-value was non-significant.
 
-1. **Nonparametric Pearson residuals test**:
+1. **Parametric bootstrap Pearson dispersion test**:
 
 
 ``` r
@@ -421,7 +421,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-2. **Parametric Pearson residuals test** (two-sided test)
+2. **Chi-squared Pearson dispersion test** (two-sided test)
 
 
 ``` r
@@ -441,7 +441,7 @@ testDispersion(poisModelMM, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Parametric Pearson residuals test** (only overdispersion test - `alternative = "greater"`)
+3. **Chi-squared Pearson dispersion test** (only overdispersion test - `alternative = "greater"`)
 
 
 ``` r
@@ -457,7 +457,7 @@ testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ## alternative hypothesis: greater
 ```
 
-4. **Simulation-based residual variance test: conditional simulations**
+4. **Simulation-based residual variance dispersion test: conditional simulations**
 
 
 ``` r
@@ -477,7 +477,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-3b. **Simulation-based residual variance test: unconditional simulations**
+3b. **Simulation-based residual variance dispersion test: unconditional simulations**
 
 
 ``` r
@@ -561,7 +561,7 @@ Notice that the nonparameric Pearson residuals test presented some warning messa
 
 The dispersion statistics were similar across tests, except for the simulation-based unconditional test, which was also the only model to present a non-significant p-value (very low power).
 
-1. **Nonparametric Pearson residuals test**: 
+1. **Parametric bootstrap Pearson dispersion test**: 
 
 ``` r
 res <- simulateResiduals(poisModelMM, refit = T) 
@@ -588,7 +588,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-2. **Parametric Pearson residuals test** (two-sided test)
+2. **Chi-squared Pearson dispersion test** (two-sided test)
 
 
 ``` r
@@ -608,7 +608,7 @@ testDispersion(poisModelMM, type = "PearsonChisq")
 ## alternative hypothesis: two.sided
 ```
 
-3. **Parametric Pearson residuals test** (only overdispersion test - `alternative = "greater"`)
+3. **Chi-squared Pearson dispersion test** (only overdispersion test - `alternative = "greater"`)
 
 ``` r
 testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
@@ -624,7 +624,7 @@ testDispersion(poisModelMM, type = "PearsonChisq", alternative = "greater")
 ```
 
 
-4. **Simulation-based residual variance test: conditional simulations**
+4. **Simulation-based residual variance dispersion test: conditional simulations**
 
 ``` r
 res <- simulateResiduals(poisModelMM)
@@ -643,7 +643,7 @@ testDispersion(res, type = "DHARMa")
 ## alternative hypothesis: two.sided
 ```
 
-5. **Simulation-based residual variance test: unconditional simulations**
+5. **Simulation-based residual variance dispersion test: unconditional simulations**
 
 
 ``` r
@@ -674,16 +674,16 @@ sessionInfo()
 ```
 
 ```
-## R version 4.5.2 (2025-10-31)
-## Platform: aarch64-apple-darwin20
-## Running under: macOS Tahoe 26.3.1
+## R version 4.6.1 (2026-06-24)
+## Platform: aarch64-apple-darwin23
+## Running under: macOS Tahoe 26.5.1
 ## 
 ## Matrix products: default
-## BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib 
-## LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
+## BLAS:   /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRblas.0.dylib 
+## LAPACK: /Library/Frameworks/R.framework/Versions/4.6/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1
 ## 
 ## locale:
-## [1] pt_BR.UTF-8/pt_BR.UTF-8/pt_BR.UTF-8/C/pt_BR.UTF-8/pt_BR.UTF-8
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 ## 
 ## time zone: Europe/Berlin
 ## tzcode source: internal
@@ -692,17 +692,17 @@ sessionInfo()
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] lme4_2.0-1   Matrix_1.7-4 DHARMa_0.5.0
+## [1] lme4_2.0-6   Matrix_1.7-5 DHARMa_0.5.0
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] nlme_3.1-168      cli_3.6.5         knitr_1.51        rlang_1.1.7      
-##  [5] xfun_0.57         reformulas_0.4.4  otel_0.2.0        minqa_1.2.8      
-##  [9] jsonlite_2.0.0    htmltools_0.5.9   sass_0.4.10       rmarkdown_2.31   
-## [13] grid_4.5.2        evaluate_1.0.5    jquerylib_0.1.4   MASS_7.3-65      
+##  [1] nlme_3.1-169      cli_3.6.6         knitr_1.52        rlang_1.3.0      
+##  [5] xfun_0.61         reformulas_0.4.4  otel_0.2.0        minqa_1.2.8      
+##  [9] jsonlite_2.0.0    htmltools_0.5.9   sass_0.4.10       rmarkdown_2.32   
+## [13] grid_4.6.1        evaluate_1.0.5    jquerylib_0.1.4   MASS_7.3-65      
 ## [17] rmdformats_1.0.4  fastmap_1.2.0     yaml_2.3.12       lifecycle_1.0.5  
-## [21] bookdown_0.46     compiler_4.5.2    Rcpp_1.1.1        rstudioapi_0.18.0
-## [25] lattice_0.22-7    digest_0.6.39     nloptr_2.2.1      R6_2.6.1         
-## [29] Rdpack_2.6.6      splines_4.5.2     rbibutils_2.4.1   bslib_0.10.0     
-## [33] tools_4.5.2       boot_1.3-32       cachem_1.1.0
+## [21] bookdown_0.48     compiler_4.6.1    Rcpp_1.1.2        rstudioapi_0.19.0
+## [25] lattice_0.22-9    digest_0.6.39     nloptr_2.2.1      R6_2.6.1         
+## [29] Rdpack_2.6.6      splines_4.6.1     rbibutils_2.4.1   bslib_0.12.0     
+## [33] tools_4.6.1       boot_1.3-32       cachem_1.1.0
 ```
 

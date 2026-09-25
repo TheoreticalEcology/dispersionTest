@@ -61,7 +61,7 @@ p.bin %>% filter(test != "Pear.p.val") %>%
   scale_color_manual(values=col.tests[c(4:2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance", 
-                              "nonparam. Pearson residuals"))+
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial", subtitle = "1000 sim; Ntrials=10") +
@@ -80,8 +80,8 @@ p.bin %>% filter(ngroups == "10") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial", subtitle = "1000 sim; 10 groups; Ntrials=10") +
@@ -99,8 +99,8 @@ p.bin %>% filter(ngroups == "50") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial", subtitle = "1000 sim; 50 groups; Ntrials=10") +
@@ -118,8 +118,8 @@ p.bin %>% filter(ngroups == "100") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Binomial", subtitle = "1000 sim; 100 groups; Ntrials=10") +
@@ -142,7 +142,7 @@ p.bin %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   facet_grid(ngroups~test, 
              labeller = as_labeller(c(`dhaCO.p.val` = "conditional sim-based variance" ,
                                       `dhaUN.p.val` = "unconditional sim-based variance" ,
-                                      `refCO.p.val` = "nonparam. Pearson residuals",
+                                      `refCO.p.val` = "param. bootstrap Pearson",
                                       `10` = " m = 10",`50` = " m = 50",
                                       `100` = " m = 100")))+
   theme(panel.background = element_rect(color="black"),
@@ -180,8 +180,8 @@ d.bin %>% filter(test != "Pear.stat.dispersion") %>%
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   annotate("rect", xmin = 0, xmax = 1, ymin = 0.75, ymax = 1,
            alpha = .1,fill = "red")+
@@ -202,8 +202,8 @@ d.bin %>% filter(ngroups == "10") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "100 sim; 10 groups; Ntrials=10") +
@@ -222,8 +222,8 @@ d.bin %>% filter(ngroups == "50") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "100 sim; 50 groups; Ntrials=10") +
@@ -241,8 +241,8 @@ d.bin %>% filter(ngroups == "100") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Binomial: dispersion statistics", subtitle = "100 sim; 100 groups; Ntrials=10") +
@@ -302,7 +302,7 @@ p.pois %>% filter(test != "Pear.p.val") %>%
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "nonparam. Pearson residuals"))+
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson", subtitle = "1000 sim") +
@@ -320,8 +320,8 @@ p.pois %>% filter(ngroups == "10") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson", subtitle = "1000 sim; 10 groups") +
@@ -339,8 +339,8 @@ p.pois %>% filter(ngroups == "50") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson", subtitle = "1000 sim; 50 groups0") +
@@ -358,8 +358,8 @@ p.pois %>% filter(ngroups == "100") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 0.5, linetype="dotted") +
   ggtitle("Poisson", subtitle = "1000 sim; 100 groups") +
@@ -382,7 +382,7 @@ p.pois %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   facet_grid(ngroups~test, 
              labeller = as_labeller(c(`dhaCO.p.val` = "conditional sim-based variance" ,
                                       `dhaUN.p.val` = "uncondintional sim-based variance" ,
-                                      `refCO.p.val` = "nonparam. Pearson residuals",
+                                      `refCO.p.val` = "param. bootstrap Pearson",
                                       `10` = " m = 10",`50` = " m = 50",
                                       `100` = " m = 100")))+
   theme(panel.background = element_rect(color="black"),
@@ -420,7 +420,7 @@ d.pois %>% filter(test != "Pear.stat.dispersion",
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "nonparam. Pearson residuals"))+
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept, scales="free") +
   annotate("rect", xmin = 0, xmax = 1, ymin = 0.5, ymax = 1,
            alpha = .1,fill = "red")+
@@ -440,8 +440,8 @@ d.pois %>% filter(ngroups == "10") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 sim; 10 groups") +
@@ -461,8 +461,8 @@ d.pois %>% filter(ngroups == "50") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 sim; 50 groups") +
@@ -481,8 +481,8 @@ d.pois %>% filter(ngroups == "100") %>%
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "param. Pearson residuals",
-                              "nonparam. Pearson residuals"))+
+                              "Chi-squared Pearson",
+                              "param. bootstrap Pearson"))+
   facet_grid(sampleSize~intercept) +
   geom_hline(yintercept = 1, linetype="dotted", col="gray")+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 sim; 100 groups") +
@@ -536,7 +536,7 @@ type1 <- pow %>% filter(test != "Pear.p.val", overdispersion == 0,
                 position=position_dodge(width=0.8))+
   facet_grid(model~test, labeller = as_labeller(c(`dhaCO.p.val` = "conditional sim-based variance" ,
                                                   `dhaUN.p.val` = "unconditional sim-based variance" ,
-                                                  `refCO.p.val` = "nonparam. Pearson residuals",
+                                                  `refCO.p.val` = "param. bootstrap Pearson",
                                                   `Binomial` = "Binomial",
                                                   `Poisson` = "Poisson"))) +
   geom_hline(yintercept = 0.05, linetype="dashed")+
@@ -566,7 +566,7 @@ fig.pow <- pow %>% filter(intercept == 0,
   scale_color_manual(values = col.tests[4:2],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "nonparam. Pearson residuals")) +
+                              "param. bootstrap Pearson")) +
   theme(panel.background = element_rect(color="black"),
         legend.box.background = element_rect(fill = "gray94", color="gray94"),
         legend.position = "none") +
@@ -594,7 +594,7 @@ fig.disp <- disp %>% filter(intercept == 0,
   scale_color_manual(values = col.tests[4:2],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
-                              "nonparam. Pearson residuals")) +
+                              "param. bootstrap Pearson")) +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom",
         legend.box.background = element_rect(fill = "gray94", color="gray94"))+

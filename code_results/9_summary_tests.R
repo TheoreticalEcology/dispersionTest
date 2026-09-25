@@ -10,7 +10,7 @@ theme_set(theme_cowplot())
 
 # scores 1 to 3
 df <- tibble(
-  test = c("parametric Pearson Residuals", "nonparametric Pearson Residuals",
+  test = c("Chi-squared Pearson", "param. bootstrap Pearson",
            "simulation-based residual variance"),
   Speed = c(3,1,2),
   GLM = c(3,3,3),
@@ -23,8 +23,8 @@ df <- tibble(
 
 df %>% pivot_longer(2:6, names_to = "variable", values_to = "value") %>%
   mutate(test = fct_relevel(test,
-                            "parametric Pearson Residuals",
-                            "nonparametric Pearson Residuals",
+                            "Chi-squared Pearson",
+                            "param. bootstrap Pearson",
                             "simulation-based residual variance"
                             ),
          variable = fct_relevel(variable,"GLM","GLM (small-data)",
@@ -42,8 +42,8 @@ ggplot(df2, aes(x=variable.n, y=test.n, fill=value, col=value))+
   scale_fill_gradient(low="coral1", high="aquamarine3", name = "Score") +
   scale_color_gradient(low="coral1", high="aquamarine3", name = "Score") +
   scale_y_continuous(name = "", breaks=1:3, limits=c(0.6,3.4),
-                     labels= c("Parametric \n Pearson  residuals",
-                               "Nonparametric \n Pearson residuals",
+                     labels= c("Chi-squared \n Pearson",
+                               "Param. bootstrap \n Pearson",
                                "Simulation-based \n residual variance"
                                )) +
   scale_x_continuous(name="",  breaks=1:5, limits=c(0.7,5.3),

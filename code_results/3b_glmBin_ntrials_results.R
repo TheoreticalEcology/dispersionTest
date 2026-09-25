@@ -53,8 +53,8 @@ power <- p.bin %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(1,2,4)],
-                     labels = c("param. Pearson residuals",
-                                "nonparam. Pearson residuals",
+                     labels = c("Chi-squared Pearson",
+                                "Param. bootstrap Pearson",
                                 "Sim-based residual variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",
@@ -77,8 +77,8 @@ type1 <- p.bin %>% filter(overdispersion == 0) %>%
   geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.05,
                 position = position_dodge(width = 0.2)) +
  scale_color_manual(values = col.tests[c(1,2,4)],
-                   labels = c("param. Pearson residuals",
-                              "nonparam. Pearson residuals",
+                   labels = c("Chi-squared Pearson",
+                              "Param. bootstrap Pearson",
                               "Sim-based residual variance"))  +
   ylab("Type I error") + xlab("Number of trials")+
   theme(panel.background = element_rect(color="black"),
@@ -103,8 +103,8 @@ disp <- stats.bin %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test)) +
   geom_point() + geom_line()+
   scale_color_manual(values = col.tests[c(1,2,4)],
-                     labels = c("param. Pearson residuals",
-                                "nonparam. Pearson residuals",
+                     labels = c("Chi-squared Pearson",
+                                "Param. bootstrap Pearson",
                                 "Sim-based residual variance")) +
   facet_grid(~ntrial, labeller = as_labeller(c("10" = "10 trials",
                                                "5" = "5 trials",

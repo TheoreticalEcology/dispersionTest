@@ -226,7 +226,7 @@ sims.mean %>% filter(controlValues == 10) %>%
         plot.margin = margin(-20, 5, 0, 5)) +
   
   plot_layout(ncol=1) + 
-  plot_annotation(title="Pearson Statistics X Chi-squared distribution")
+  plot_annotation(title="Pearson statistics X Chi-squared distribution")
 
 ggsave(here("figures", "1_glm_pearsonChisq_distrib_MEAN.jpeg"), width=12,
        height=16)

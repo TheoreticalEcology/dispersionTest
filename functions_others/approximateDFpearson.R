@@ -1,4 +1,8 @@
 # function to approximate the residual degrees of freedom of a glmm
+# Melina Leite
+# September 2026
+
+
 # using the package glmmrBase 
 # only for lme4 Poisson
 

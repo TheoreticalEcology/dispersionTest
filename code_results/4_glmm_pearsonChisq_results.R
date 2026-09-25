@@ -150,7 +150,7 @@ fig.disp <- disper %>% filter(ngroups %in% c(10,50,100)) %>%
   scale_y_log10()
 fig.disp
 fig.power + fig.disp + plot_layout(ncol=1)  +
-  plot_annotation(title="Pearson Chi-squared dispersion tests for GLMMs",
+  plot_annotation(title="Chi-squared Pearson dispersion tests for GLMMs",
                   theme = theme(plot.title = element_text(hjust=0.5)))
 
 
