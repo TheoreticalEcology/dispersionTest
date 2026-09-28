@@ -1,6 +1,6 @@
 ### Dispersion tests for GLMMs: results for GLMMs
-## 
-# Set 25
+## Melina Leite
+# Sep 26
 
 library(DHARMa)
 library(here)
@@ -11,6 +11,7 @@ theme_set(theme_cowplot() +
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 
 
 # Binomial Models ----
@@ -48,6 +49,13 @@ p.bin <- simuls.bin %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]))
 p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.bin)) {
+  btest <- binom.test(p.bin$p.sig[i], n=p.bin$nsim[i], p=0.05)
+  p.bin$p.bin0.05[i] <- btest$p.value
+  p.bin$conf.low[i] <- btest$conf.int[1]
+  p.bin$conf.up[i] <- btest$conf.int[2]
+}
 p.bin$intercept <- fct_relevel(p.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.bin$ngroups <- fct_relevel(p.bin$ngroups, "10", "50", "100")
 p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
@@ -58,6 +66,12 @@ p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 p.bin %>% filter(test != "Pear.p.val") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_shape_manual(values = c(1, 2, 0)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4:2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance", 
@@ -69,14 +83,19 @@ p.bin %>% filter(test != "Pear.p.val") %>%
         legend.position = "bottom") + 
   ylab("Power")+
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_powerALL.jpeg"), width=12, height = 12)
+ggsave(here("figures", "5_glmmBin_powerALL.pdf"), width=12, height = 12)
 
 
 #10 groups
 
 p.bin %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -88,14 +107,19 @@ p.bin %>% filter(ngroups == "10") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_power_10g.jpeg"), width=12, height = 15)
+#ggsave(here("figures", "5_glmmBin_power_10g.pdf"), width=12, height = 15)
 
 
 #50 groups
 
 p.bin %>% filter(ngroups == "50") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -107,14 +131,19 @@ p.bin %>% filter(ngroups == "50") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_power_50g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmBin_power_50g.pdf"), width=12, height = 9)
 
 
 #100 groups
 
 p.bin %>% filter(ngroups == "100") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -126,7 +155,7 @@ p.bin %>% filter(ngroups == "100") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_power_100g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmBin_power_100g.pdf"), width=12, height = 9)
 
 
 ## Type 1 error
@@ -134,7 +163,12 @@ p.bin %>% filter(ngroups == "100") %>%
 p.bin %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   mutate(ngroups = fct_relevel(ngroups, "10", "50", "100")) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=intercept))+
-  geom_point( position = position_dodge(width = 0.3))+
+  geom_point( position = position_dodge(width = 0.3), shape=1)+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width = 0.3),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   scale_color_manual(values=col.intercept)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(sampleSize)),
@@ -153,7 +187,7 @@ p.bin %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
         legend.position.inside =  c(0.01,0.87),
         legend.background = element_rect(color="gray94", fill="gray94")) +
   ggtitle("Binomial") + ylab("Type I error") + xlab("Sample size")
-ggsave(here("figures", "5_glmmBin_type1.jpeg"),  width=9, height = 7)
+ggsave(here("figures", "5_glmmBin_type1.pdf"),  width=9, height = 7)
 
 
 
@@ -166,7 +200,8 @@ d.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispersio
                                       overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:4, names_to = "test", values_to = "dispersion") %>%
   group_by(sampleSize,ngroups,intercept,overdispersion, test) %>%
-  summarise(mean.stat = mean(dispersion, na.rm=T))
+  summarise(mean.stat = mean(dispersion, na.rm=T),
+            mcse = mcse_mean(dispersion))
 d.bin$intercept <- fct_relevel(d.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 d.bin$ngroups <- fct_relevel(d.bin$ngroups, "10", "50", "100")
 d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
@@ -177,6 +212,12 @@ d.bin$sampleSize <- as.factor(as.numeric(d.bin$sampleSize))
 d.bin %>% filter(test != "Pear.stat.dispersion") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_shape_manual(values = c(1, 2, 0)) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -191,14 +232,19 @@ d.bin %>% filter(test != "Pear.stat.dispersion") %>%
         legend.position = "bottom") + 
   ylab("Dispersion statistic")+
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here("figures", "5_glmmBin_dispersionStatsALL.jpeg"), width=12, height = 12)
+ggsave(here("figures", "5_glmmBin_dispersionStatsALL.pdf"), width=12, height = 12)
 
 
 #10 groups
 
 d.bin %>% filter(ngroups == "10") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -211,14 +257,19 @@ d.bin %>% filter(ngroups == "10") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_dispersionStats_10g.jpeg"), width=12, height = 15)
+#ggsave(here("figures", "5_glmmBin_dispersionStats_10g.pdf"), width=12, height = 15)
 
 
 #50 groups
 
 d.bin %>% filter(ngroups == "50") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -230,14 +281,19 @@ d.bin %>% filter(ngroups == "50") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_dispersionStats_50g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmBin_dispersionStats_50g.pdf"), width=12, height = 9)
 
 
 #100 groups
 
 d.bin %>% filter(ngroups == "100") %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -249,7 +305,7 @@ d.bin %>% filter(ngroups == "100") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmBin_dispersionStats_100g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmBin_dispersionStats_100g.pdf"), width=12, height = 9)
 
 
 
@@ -289,6 +345,13 @@ p.pois <- simuls.pois %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]))
 p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.pois)) {
+  btest <- binom.test(p.pois$p.sig[i], n=p.pois$nsim[i], p=0.05)
+  p.pois$p.bin0.05[i] <- btest$p.value
+  p.pois$conf.low[i] <- btest$conf.int[1]
+  p.pois$conf.up[i] <- btest$conf.int[2]
+}
 p.pois$intercept <- fct_relevel(p.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.pois$ngroups <- fct_relevel(p.pois$ngroups, "10", "50", "100")
 p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
@@ -299,6 +362,12 @@ p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 p.pois %>% filter(test != "Pear.p.val") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_shape_manual(values = c(1, 2, 0)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -309,14 +378,19 @@ p.pois %>% filter(test != "Pear.p.val") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here("figures", "5_glmmPois_powerALL.jpeg"), width=12, height = 12)
+ggsave(here("figures", "5_glmmPois_powerALL.pdf"), width=12, height = 12)
 
 
 
 # 10 groups
 p.pois %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -328,14 +402,19 @@ p.pois %>% filter(ngroups == "10") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_power_10g.jpeg"), width=12, height = 12)
+#ggsave(here("figures", "5_glmmPois_power_10g.pdf"), width=12, height = 12)
 
 
 
 # 50 groups
 p.pois %>% filter(ngroups == "50") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -347,14 +426,19 @@ p.pois %>% filter(ngroups == "50") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_power_50g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmPois_power_50g.pdf"), width=12, height = 9)
 
 
 
 # 100 groups
 p.pois %>% filter(ngroups == "100") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype= ngroups))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -366,7 +450,7 @@ p.pois %>% filter(ngroups == "100") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_power_100g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmPois_power_100g.pdf"), width=12, height = 9)
 
 
 ## Type 1 error
@@ -374,7 +458,12 @@ p.pois %>% filter(ngroups == "100") %>%
 p.pois %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
   mutate(ngroups = fct_relevel(ngroups, "10", "50", "100")) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=intercept))+
-  geom_point( position = position_dodge(width = 0.9))+
+  geom_point( position = position_dodge(width = 0.9), shape=1)+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width = 0.9),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(sampleSize)),
             position = position_dodge(width = 0.9))+
@@ -393,7 +482,7 @@ p.pois %>% filter(overdispersion == 0, test != "Pear.p.val") %>% ungroup() %>%
         legend.position.inside =  c(0.01,0.87),
         legend.background = element_rect(color="gray94", fill="gray94")) +
   ggtitle("Poisson") + ylab("Type I error") + xlab("Sample size")
-ggsave(here("figures", "5_glmmPois_type1.jpeg"), width=9, height = 7)
+ggsave(here("figures", "5_glmmPois_type1.pdf"), width=9, height = 7)
 
 
 ## dispersion stat
@@ -404,7 +493,8 @@ d.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion, dhaUN.stat.dispers
                                         overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:4, names_to = "test", values_to = "dispersion") %>%
   group_by(sampleSize, ngroups, intercept,overdispersion, test) %>%
-  summarise(mean.stat = mean(dispersion, na.rm=T))
+  summarise(mean.stat = mean(dispersion, na.rm=T),
+            mcse = mcse_mean(dispersion))
 d.pois$intercept <- fct_relevel(d.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 d.pois$ngroups <- fct_relevel(d.pois$ngroups, "10", "50", "100")
 d.pois$sampleSize <- as.factor(as.numeric(d.pois$sampleSize))
@@ -416,6 +506,12 @@ d.pois %>% filter(test != "Pear.stat.dispersion",
                   mean.stat <1000) %>%
   ggplot( aes(x=overdispersion, y=mean.stat, col=test, linetype=ngroups, shape=ngroups))+
   geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  scale_shape_manual(values = c(1, 2, 0)) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_y_log10()+
   scale_color_manual(values=col.tests[c(4,3,2)],
                      labels=c("conditional sim-based variance",
@@ -430,13 +526,18 @@ d.pois %>% filter(test != "Pear.stat.dispersion",
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))+
   ylab("Dispersion statistic")
-ggsave(here("figures", "5_glmmPois_dispersionStatsALL.jpeg"), width=12, height = 12)
+ggsave(here("figures", "5_glmmPois_dispersionStatsALL.pdf"), width=12, height = 12)
 
 
 # 10 groups
 d.pois %>% filter(ngroups == "10") %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -449,7 +550,7 @@ d.pois %>% filter(ngroups == "10") %>%
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_dispersionStats_10g.jpeg"), width=12, height = 12)
+#ggsave(here("figures", "5_glmmPois_dispersionStats_10g.pdf"), width=12, height = 12)
 
 
 
@@ -457,7 +558,12 @@ d.pois %>% filter(ngroups == "10") %>%
 d.pois %>% filter(ngroups == "50") %>%
   filter(mean.stat <110) %>% # excluding weird results 
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -470,14 +576,19 @@ d.pois %>% filter(ngroups == "50") %>%
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_dispersionStats_50g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmPois_dispersionStats_50g.pdf"), width=12, height = 9)
 
 
 
 # 100 groups
 d.pois %>% filter(ngroups == "100") %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values=col.tests[c(4,3,1,2)],
                      labels=c("conditional sim-based variance",
                               "unconditional sim-based variance",  
@@ -490,7 +601,7 @@ d.pois %>% filter(ngroups == "100") %>%
         legend.position = "bottom") + 
   scale_y_log10() + #ylim(0,3) +
   guides(color=guide_legend(nrow=4, byrow=TRUE))
-#ggsave(here("figures", "5_glmmPois_dispersionStats_100g.jpeg"), width=12, height = 9)
+#ggsave(here("figures", "5_glmmPois_dispersionStats_100g.pdf"), width=12, height = 9)
 
 
 
@@ -507,14 +618,6 @@ pow <- bind_rows(list(Poisson = p.pois, Binomial = p.bin), .id="model") %>%
   ungroup() %>%
   mutate(model= fct_relevel(model, "Poisson", "Binomial"),
          ngroups = fct_relevel(ngroups, "10", "50", "100"))
-# add sig test
-for (i in 1:nrow(pow)) {
-  btest <- binom.test(pow$p.sig[i], n=pow$nsim[i], p=0.05)
-  pow$p.bin0.05[i] <- btest$p.value
-  pow$conf.low[i] <- btest$conf.int[1]
-  pow$conf.up[i] <- btest$conf.int[2]
-}
-
 
 
 disp <- bind_rows(list(Poisson = d.pois, Binomial = d.bin), .id="model") %>%
@@ -529,11 +632,14 @@ disp <- bind_rows(list(Poisson = d.pois, Binomial = d.bin), .id="model") %>%
 type1 <- pow %>% filter(test != "Pear.p.val", overdispersion == 0, 
                         intercept==0) %>%
   ggplot(aes(x=sampleSize, y=prop.sig, col=ngroups))+
-  geom_point(position=position_dodge(width=0.8)) + 
+  geom_point(position=position_dodge(width=0.8), shape=1) + 
   geom_line(aes(x=as.numeric(as.factor(sampleSize))), position=position_dodge(width=0.8))+
   ylab("Type I error")+ xlab("Sample size")+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.1,
-                position=position_dodge(width=0.8))+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position=position_dodge(width=0.8),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   facet_grid(model~test, labeller = as_labeller(c(`dhaCO.p.val` = "conditional sim-based variance" ,
                                                   `dhaUN.p.val` = "unconditional sim-based variance" ,
                                                   `refCO.p.val` = "param. bootstrap Pearson",
@@ -544,7 +650,7 @@ type1 <- pow %>% filter(test != "Pear.p.val", overdispersion == 0,
         legend.position = "bottom",
         axis.text.x = element_text(angle=45, hjust=1)) 
 type1
-ggsave(here("figures", "5_glmm_type1.jpeg"), width = 12, heigh=6)
+ggsave(here("figures", "5_glmm_type1.pdf"), width = 12, height=6)
 
 
 ## Power
@@ -553,8 +659,11 @@ fig.pow <- pow %>% filter(intercept == 0,
                           !test %in% c("Pear.p.val"),
                           sampleSize %in% c(500)) %>%
   ggplot(aes(x=overdispersion, y= prop.sig, col=test, linetype=sampleSize)) +
-  geom_point() + geom_line() +
-  #geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.01)+
+  geom_point(shape=1) + geom_line() +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
                                                      `50`= "m = 50 groups",
                                                      `100`= "m = 100 groups",
@@ -583,7 +692,11 @@ fig.disp <- disp %>% filter(intercept == 0,
                             !test %in% c("Pear.stat.dispersion"),
                             sampleSize == 500) %>%
   ggplot(aes(x=overdispersion, y= mean.stat, col=test, )) +
-  geom_point() + geom_line() +
+  geom_point(shape=1) + geom_line() +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   facet_grid(model~ngroups, labeller = as_labeller(c(`10`= "m = 10 groups",
                                                      `50`= "m = 50 groups",
                                                      `100`= "m = 100 groups",
@@ -611,4 +724,4 @@ fig.disp
 fig.pow + fig.disp + plot_layout(ncol=1)+
   plot_annotation(title="Alternative dispersion tests for GLMMs",
                   theme = theme(plot.title = element_text(hjust=0.5)))
-ggsave(here("figures", "5_glmm_results.jpeg"), width = 10, heigh=12)
+ggsave(here("figures", "5_glmm_results.pdf"), width = 10, height=12)

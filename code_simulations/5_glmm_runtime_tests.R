@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
-## 
-# mar 26
+## Melina Leite
+# Sep 26
 
 set.seed(1)
 library(DHARMa)
@@ -11,11 +11,17 @@ library(parallel)
 library(cowplot)
 theme_set(theme_cowplot())
 
-# calculating runtime for GLMM tests
+# calculating runtime for GLMM tests:
 
 # parametric pearson 
 # nonparametric pearson
 # simulation-based response variance - conditional
+
+# tests take a while to run, if you want to use the saved results load the file:
+# load(here("data", "5_glmmm_runtime_test.Rdata"))
+# and ignore lines 67-78
+
+
 
 # parameters
 overdispersion <- 0.5
@@ -27,9 +33,9 @@ nRep = 1000
 # paralell
 nCores <- 7
 
-# função para rodar uma simulação
+# function to run one simulation
 run_sim <- function(i) {
-  # gerar dados
+  # generating data
   testData <- createData(overdispersion = overdispersion,
                          sampleSize = sampleSize,
                          intercept = intercept,
@@ -37,11 +43,11 @@ run_sim <- function(i) {
                          randomEffectVariance = 1,
                          family = poisson())
   
-  # ajustar modelo
+  # adjusting model
   fittedModel <- glmer(observedResponse ~ Environment1 + (1 | group),
                        data = testData, family = poisson())
   
-  # medir tempos
+  # measuring runtime
   paramP <- system.time(testDispersion(simulateResiduals(fittedModel),
                                        plot = FALSE, type = "PearsonChisq"))[3]
   
@@ -53,11 +59,11 @@ run_sim <- function(i) {
                                                            refit = FALSE),
                                          plot = FALSE, type = "DHARMa"))[3]
   
-  # retornar resultados
+  # return results
   return(c(paramP = paramP, nonparamP = nonparamP, simbased = simbased))
 }
 
-# configurar cluster
+# Parallelize: cluster 
 cl <- makeCluster(nCores)
 clusterEvalQ(cl, {
   library(lme4)
@@ -65,27 +71,28 @@ clusterEvalQ(cl, {
 })
 clusterExport(cl, c("createData", "overdispersion", "intercept", "sampleSize", "ngroups"))
 
-# rodar simulações em paralelo
+# run simulations in parallel
 results_list <- parLapply(cl, 1:nRep, run_sim)
 
-# encerrar cluster
+# end cluster
 stopCluster(cl)
 
-# combinar resultados em data.frame
+# Combine results in data.frame
 times <- as.data.frame(do.call(rbind, results_list)) %>%
   pivot_longer(1:3, names_to = "test", values_to = "time_s") %>%
-  mutate(test = fct_recode(test, `param. Pearson` = "paramP.elapsed", 
-                           `nonparam. Pearson` ="nonparamP.elapsed", 
+  mutate(test = fct_recode(test, `Chi-squared Pearson` = "paramP.elapsed", 
+                           `param. boot. Pearson` ="nonparamP.elapsed", 
                            `sim-based variance`="simbased.elapsed")) %>%
-  mutate(test = fct_relevel(test, "param. Pearson","sim-based variance",
-                            "nonparam. Pearson"))
+  mutate(test = fct_relevel(test, "Chi-squared Pearson","sim-based variance",
+                            "param. boot. Pearson"))
 save(times, file=here("data", "5_glmmm_runtime_test.Rdata"))
+
 
 # stats
 times %>% group_by(test) %>% summarise(mean = mean(time_s)) 
 2790/0.07
 
-# plot runing time
+# plot runtime
 times %>%
   ggplot(aes(x=test, y=time_s)) + 
   scale_y_log10()+
@@ -97,4 +104,4 @@ times %>%
   xlab("Dispersion test") +
   ylab("Runtime (seconds)")+
   theme(panel.background = element_rect(color="black"))
-ggsave(here("figures", "5_glmm_runtime_test.jpeg"))
+ggsave(here("figures", "5_glmm_runtime_test.pdf"), height = 6, width=6.5)

@@ -1,6 +1,6 @@
 ---
 title: "GLMM Alternative Simulation-based dispersion test: Approximation of Pearson residuals"
-author: ""
+author: "Melina Leite"
 date: "`r Sys.Date()`"
 output: 
   rmdformats::readthedown:
@@ -14,7 +14,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache=F)
+knitr::opts_chunk$set(echo = TRUE, cache=FALSE, warning = FALSE)
 
 library(DHARMa)
 library(here)
@@ -32,11 +32,9 @@ source(here("functions_others", "plotColors.R"))
 ```{r}
 load(here("data", "7_glmmBin_alternative_power.Rdata")) # simulated data
 
-#time spent + stupid way to convert mins to hours for some times
+# time spent
 tspent <- map_dbl(out.binA, "time")
 stime <- map(out.binA, "time")
-#tspent[map(stime, attr, "units") == "mins"] <- tspent[map(stime, attr, "units") 
- #                                                     == "mins"]/60
 summary(tspent) # secs
 
 simuls.binA <- map_dfr(out.binA, "simulations", .id="model") %>%
@@ -47,12 +45,10 @@ simuls.binA <- map_dfr(out.binA, "simulations", .id="model") %>%
 ```{r}
 load(here("data", "7_glmmPois_alternative_power.Rdata")) # simulated data
 
-#time spent + stupid way to convert mins to hours for some times
+#time spent
 tspent <- map_dbl(out.poisA, "time")
 stime <- map(out.poisA, "time")
-#tspent[map(stime, attr, "units") == "mins"] <- tspent[map(stime, attr, "units") 
-#                                                     == "mins"]/60
-summary(tspent) # 1
+summary(tspent) # 
 
 #simulations
 simuls.poisA <- map_dfr(out.poisA, "simulations", .id="model") %>%
@@ -109,6 +105,13 @@ p.binA <- simuls.binA %>%
   summarise(p.sig = sum(Alt.p<0.05,na.rm=T),
             nsim = length(Alt.p[!is.na(Alt.p)]))
 p.binA$prop.sig <- p.binA$p.sig/p.binA$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.binA)) {
+  btest <- binom.test(p.binA$p.sig[i], n=p.binA$nsim[i], p=0.05)
+  p.binA$p.bin0.05[i] <- btest$p.value
+  p.binA$conf.low[i] <- btest$conf.int[1]
+  p.binA$conf.up[i] <- btest$conf.int[2]
+}
 p.binA$intercept <- fct_relevel(p.binA$intercept, "-1.5", "0", "1.5")
 p.binA$sampleSize <- as.factor(as.numeric(p.binA$sampleSize))
 
@@ -128,6 +131,13 @@ p.bin <- simuls.bin %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]))
 p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.bin)) {
+  btest <- binom.test(p.bin$p.sig[i], n=p.bin$nsim[i], p=0.05)
+  p.bin$p.bin0.05[i] <- btest$p.value
+  p.bin$conf.low[i] <- btest$conf.int[1]
+  p.bin$conf.up[i] <- btest$conf.int[2]
+}
 p.bin$intercept <- fct_relevel(p.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 
@@ -140,7 +150,12 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
                    !test %in% c( "Pear.p.val"),  
                    sampleSize != 10000) %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_discrete(labels=c("Approximate Pearson",  
                                 "conditional sim-based variance",
                                 "unconditional sim-based variance",
@@ -152,7 +167,7 @@ bindata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here('figures', '7_approxPearson_bin_powerGLMM.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_approxPearson_bin_powerGLMM.pdf'), height=10, width=10)
 ```
 
 
@@ -162,6 +177,13 @@ p.poisA <- simuls.poisA0 %>%
   summarise(p.sig = sum(Alt.p<0.05,na.rm=T),
             nsim = length(Alt.p[!is.na(Alt.p)]))
 p.poisA$prop.sig <- p.poisA$p.sig/p.poisA$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.poisA)) {
+  btest <- binom.test(p.poisA$p.sig[i], n=p.poisA$nsim[i], p=0.05)
+  p.poisA$p.bin0.05[i] <- btest$p.value
+  p.poisA$conf.low[i] <- btest$conf.int[1]
+  p.poisA$conf.up[i] <- btest$conf.int[2]
+}
 p.poisA$intercept <- fct_relevel(p.poisA$intercept, "-1.5", "0", "1.5")
 p.poisA$sampleSize <- as.factor(as.numeric(p.poisA$sampleSize))
 
@@ -179,6 +201,13 @@ p.pois <- simuls.pois %>% dplyr::select(Pear.p.val, dhaUN.p.val, dhaCO.p.val,
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]))
 p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.pois)) {
+  btest <- binom.test(p.pois$p.sig[i], n=p.pois$nsim[i], p=0.05)
+  p.pois$p.bin0.05[i] <- btest$p.value
+  p.pois$conf.low[i] <- btest$conf.int[1]
+  p.pois$conf.up[i] <- btest$conf.int[2]
+}
 p.pois$intercept <- fct_relevel(p.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 
@@ -191,7 +220,12 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
                     !test %in% c("Pear.p.val"), 
                    sampleSize != 10000) %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_discrete(labels=c("Approximate Pearson",  
                                 "conditional sim-based variance",
                                 "unconditional sim-based variance",
@@ -203,6 +237,6 @@ poisdata %>% filter(ngroups==100, intercept %in% c("-1.5", "0", "1.5"),
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom") + 
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here('figures', '7_approxPearson_pois_powerGLMM.jpeg'), height=10, width=10)
+ggsave(here('figures', '7_approxPearson_pois_powerGLMM.pdf'), height=10, width=10)
 ```
 

@@ -1,7 +1,9 @@
-# Dispersion Tests paper ----
-# testing table 1 functions found in R for dispersion tests
+# Dispersion Tests paper
+# Melina Leite
+# Sep 26
 
-# september 2025
+
+# testing Table 1 functions (main text) found in R for dispersion tests
 
 # Data/models for testing ----
 library(DHARMa)

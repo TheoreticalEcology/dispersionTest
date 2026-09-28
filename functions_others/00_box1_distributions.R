@@ -1,8 +1,11 @@
+# Dispersion test paper
+# Melina Leite
+# Sep 2026
 
 # Figure with distributions for the example Box1
 library(tidyverse)
 library(COMPoissonReg)
-library(mpcmp)
+library(mpcmp) # from github devtools::install_github("thomas-fung/mpcmp")
 
 set.seed(2)
 
@@ -35,7 +38,7 @@ ggplot(distribs, aes(x=values, fill=distrib)) + geom_bar() +
   geom_text(data = notes, 
             aes(x = x, y = y, label = label))
   
-ggsave("figures/box1_distributions.png", heigh=9, width = 28, units="cm")
+ggsave("figures/box1_distributions.pdf", heigh=9, width = 28, units="cm")
 
 
 

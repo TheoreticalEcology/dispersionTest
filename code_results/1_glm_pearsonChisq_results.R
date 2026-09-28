@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
-## 
-# Dec 24
+## Melina Leite
+# Sep 26
 
 library(DHARMa)
 library(tidyverse)
@@ -22,12 +22,16 @@ load(here("data", "1_glmBin_pearsonChisq.Rdata"))
 names(final.res.bin) <- 1:length(final.res.bin)
 
 final.bin <- bind_rows(final.res.bin, .id="sim") %>% group_by(controlValues,intercept) %>%
-  summarise(ks.sig = sum(ks.p<0.05))
+  summarise(ks.sig = sum(ks.p<0.05, na.rm=T),
+            nsim = length(ks.p[!is.na(ks.p)]))
+final.bin$prop.sig <- final.bin$ks.sig/final.bin$nsim
 
+# binom.test: Monte Carlo CI for the proportion of significant tests
 for (i in 1:nrow(final.bin)) {
-  confs <- binom.test(final.bin$ks.sig[i], 100)$conf.int
-  final.bin$conf.low[i] <-  round(confs[1],2)
-  final.bin$conf.up[i] <-  round(confs[2],2)
+  btest <- binom.test(final.bin$ks.sig[i], n=final.bin$nsim[i], p=0.05)
+  final.bin$p.bin0.05[i] <- btest$p.value
+  final.bin$conf.low[i] <- btest$conf.int[1]
+  final.bin$conf.up[i] <- btest$conf.int[2]
 }
 
 # shape distributions
@@ -52,12 +56,16 @@ names(final.res.pois) <- 1:length(final.res.pois)
 
 final.pois <- bind_rows(final.res.pois, .id="sim") %>% 
   group_by(controlValues,intercept) %>%
-  summarise(ks.sig = sum(ks.p<0.05))
+  summarise(ks.sig = sum(ks.p<0.05, na.rm=T),
+            nsim = length(ks.p[!is.na(ks.p)]))
+final.pois$prop.sig <- final.pois$ks.sig/final.pois$nsim
 
+# binom.test: Monte Carlo CI for the proportion of significant tests
 for (i in 1:nrow(final.pois)) {
-  confs <- binom.test(final.pois$ks.sig[i], 100)$conf.int
-  final.pois$conf.low[i] <-  round(confs[1],2)
-  final.pois$conf.up[i] <-  round(confs[2],2)
+  btest <- binom.test(final.pois$ks.sig[i], n=final.pois$nsim[i], p=0.05)
+  final.pois$p.bin0.05[i] <- btest$p.value
+  final.pois$conf.low[i] <- btest$conf.int[1]
+  final.pois$conf.up[i] <- btest$conf.int[2]
 }
 
 
@@ -80,17 +88,20 @@ sims.mean <- bind_rows(list(Poisson = sims.mean.pois,
 ##### Figures #####
 #################-#
 
-pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
+pbin <- ggplot(final.bin, aes(y=prop.sig, x=as.factor(controlValues),
                               col=as.factor(intercept))) +
-  geom_point(position = position_dodge(width=0.4)) +
+  geom_point(position = position_dodge(width=0.4), shape=1) +
   geom_line(aes(x=as.numeric(as.factor(controlValues))),
             position = position_dodge(width=0.4))+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
-                position = position_dodge(width=0.4)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width=0.4),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
   ylim(0,1)+
   scale_color_manual("intercept",values = col.intercept)+
-  xlab("sampleSize") + ylab("Prop of significant KS test") +
+  xlab("Sample size") + ylab("Prop of significant KS test") +
   labs(title="Binomial", tag = "B)") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "inside",
@@ -98,21 +109,24 @@ pbin <- ggplot(final.bin, aes(y=ks.sig/100, x=as.factor(controlValues),
         legend.box.background = element_rect(fill="gray94",color="gray94"))
 pbin
 
-ggplot(final.pois, aes(y=ks.sig/100, x=as.factor(controlValues),
+ggplot(final.pois, aes(y=prop.sig, x=as.factor(controlValues),
                        col=as.factor(intercept))) +
-  geom_point(position = position_dodge(width=0.4)) +
+  geom_point(position = position_dodge(width=0.4), shape=1) +
   geom_line(aes(x=as.numeric(as.factor(controlValues))),
             position = position_dodge(width=0.4)) +
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),width = 0.1,
-                position = position_dodge(width=0.4)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width=0.4),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
   scale_color_manual("intercept",values = col.intercept)+
-  xlab("sampleSize") + ylab("Prop of significant KS test") +
+  xlab("Sample size") + ylab("Prop of significant KS test") +
   labs(title="Poisson", tag = "A)") +
   theme(panel.border  = element_rect(color = "black"),
         legend.position = "none") +
   pbin + plot_layout(ncol=2)
-ggsave(here("figures", "1_glmBOTH_pearsonChisq.jpeg"), width = 9, height = 5)
+ggsave(here("figures", "1_glmBOTH_pearsonChisq.pdf"), width = 9, height = 5)
 
 
 # distributions
@@ -228,7 +242,7 @@ sims.mean %>% filter(controlValues == 10) %>%
   plot_layout(ncol=1) + 
   plot_annotation(title="Pearson statistics X Chi-squared distribution")
 
-ggsave(here("figures", "1_glm_pearsonChisq_distrib_MEAN.jpeg"), width=12,
+ggsave(here("figures", "1_glm_pearsonChisq_distrib_MEAN.pdf"), width=12,
        height=16)
 
 

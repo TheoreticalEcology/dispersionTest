@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
-##
-# Mar 26
+## Melina Leite
+# Sep 26
 
 library(DHARMa)
 library(tidyverse)
@@ -14,6 +14,7 @@ load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 
 
 ##############-###
@@ -42,6 +43,13 @@ p.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]) )
 p.bin$prop.sig <- p.bin$p.sig/p.bin$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.bin)) {
+  btest <- binom.test(p.bin$p.sig[i], n=p.bin$nsim[i], p=0.05)
+  p.bin$p.bin0.05[i] <- btest$p.value
+  p.bin$conf.low[i] <- btest$conf.int[1]
+  p.bin$conf.up[i] <- btest$conf.int[2]
+}
 p.bin$intercept <- fct_relevel(p.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.bin$sampleSize <- as.factor(as.numeric(p.bin$sampleSize))
 
@@ -57,6 +65,13 @@ cp.bin <- simuls.bin %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate
   summarise(p.sig = sum(significance, na.rm = T),
             nsim = length(p.val[!is.na(p.val)]) )
 cp.bin$prop.sig <- cp.bin$p.sig/cp.bin$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(cp.bin)) {
+  btest <- binom.test(cp.bin$p.sig[i], n=cp.bin$nsim[i], p=0.05)
+  cp.bin$p.bin0.05[i] <- btest$p.value
+  cp.bin$conf.low[i] <- btest$conf.int[1]
+  cp.bin$conf.up[i] <- btest$conf.int[2]
+}
 cp.bin$intercept <- fct_relevel(cp.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 cp.bin$sampleSize <- as.factor(as.numeric(cp.bin$sampleSize))
 
@@ -64,7 +79,12 @@ cp.bin$sampleSize <- as.factor(as.numeric(cp.bin$sampleSize))
 ##### figure ####
 bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
                                "Chi-squared Pearson",
@@ -75,7 +95,7 @@ bind_rows(list(uncalibrated=p.bin, calibrated= cp.bin), .id="model") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")+
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here("figures", "3_glmBin_power.jpeg"), width=10, height = 15)
+ggsave(here("figures", "3_glmBin_power.pdf"), width=10, height = 15)
 
 
 
@@ -86,13 +106,19 @@ st.bin <- simuls.bin %>% dplyr::select(Pear.stat.dispersion,DHA.stat.dispersion,
                                             overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Disp.stats")  %>%
   group_by(sampleSize,intercept,overdispersion, test) %>%
-    summarise(mean.stat = mean(Disp.stats, na.rm=T))
+    summarise(mean.stat = mean(Disp.stats, na.rm=T),
+              mcse = mcse_mean(Disp.stats))
 st.bin$intercept <- fct_relevel(st.bin$intercept, "-3", "-1.5", "0", "1.5", "3")
 st.bin$sampleSize <- as.factor(as.numeric(st.bin$sampleSize))
 
 
 ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
                                "Chi-squared Pearson",
@@ -102,7 +128,7 @@ ggplot(st.bin, aes(x=overdispersion, y=mean.stat, col=test))+
   ggtitle("Binomial: dispersion statistics", subtitle = "1000 sim; Ntrials=10") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")
-ggsave(here("figures", "3_glmBin_dispersionStats.jpeg"), width=10, height = 15)
+ggsave(here("figures", "3_glmBin_dispersionStats.pdf"), width=10, height = 15)
 
 
 ###############-##
@@ -131,6 +157,13 @@ p.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicat
   summarise(p.sig = sum(p.val<0.05,na.rm=T),
             nsim = length(p.val[!is.na(p.val)]) )
 p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(p.pois)) {
+  btest <- binom.test(p.pois$p.sig[i], n=p.pois$nsim[i], p=0.05)
+  p.pois$p.bin0.05[i] <- btest$p.value
+  p.pois$conf.low[i] <- btest$conf.int[1]
+  p.pois$conf.up[i] <- btest$conf.int[2]
+}
 p.pois$intercept <- fct_relevel(p.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 p.pois$sampleSize <- as.factor(as.numeric(p.pois$sampleSize))
 
@@ -146,6 +179,13 @@ cp.pois <- simuls.pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replica
   summarise(p.sig = sum(significance, na.rm = T),
             nsim = length(p.val[!is.na(p.val)]) )
 cp.pois$prop.sig <- cp.pois$p.sig/cp.pois$nsim
+# binom.test: Monte Carlo CI for the proportion of significant tests
+for (i in 1:nrow(cp.pois)) {
+  btest <- binom.test(cp.pois$p.sig[i], n=cp.pois$nsim[i], p=0.05)
+  cp.pois$p.bin0.05[i] <- btest$p.value
+  cp.pois$conf.low[i] <- btest$conf.int[1]
+  cp.pois$conf.up[i] <- btest$conf.int[2]
+}
 cp.pois$intercept <- fct_relevel(cp.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 cp.pois$sampleSize <- as.factor(as.numeric(cp.pois$sampleSize))
 
@@ -153,7 +193,12 @@ cp.pois$sampleSize <- as.factor(as.numeric(cp.pois$sampleSize))
 ##### figure ####
 bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test, linetype = model))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
                                "Chi-squared Pearson",
@@ -164,7 +209,7 @@ bind_rows(list(uncalibrated=p.pois, calibrated= cp.pois), .id="model") %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")+
   guides(color=guide_legend(nrow=2, byrow=TRUE))
-ggsave(here("figures", "3_glmPois_power.jpeg"), width=10, height = 15)
+ggsave(here("figures", "3_glmPois_power.pdf"), width=10, height = 15)
 
 
 ##### figure statistics #####
@@ -174,13 +219,19 @@ st.pois <- simuls.pois %>% dplyr::select(Pear.stat.dispersion,DHA.stat.dispersio
                                          overdispersion, intercept, sampleSize) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Disp.stats")  %>%
   group_by(sampleSize,intercept,overdispersion, test) %>%
-  summarise(mean.stat = mean(Disp.stats, na.rm=T))
+  summarise(mean.stat = mean(Disp.stats, na.rm=T),
+            mcse = mcse_mean(Disp.stats))
 st.pois$intercept <- fct_relevel(st.pois$intercept, "-3", "-1.5", "0", "1.5", "3")
 st.pois$sampleSize <- as.factor(as.numeric(st.pois$sampleSize))
 
 
 ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_y_log10()+
   scale_color_manual( values= col.tests[c(4,1,2)],
                       labels=c("Sim-based residual variance", 
@@ -191,7 +242,7 @@ ggplot(st.pois, aes(x=overdispersion, y=mean.stat, col=test))+
   ggtitle("Poisson: dispersion statistics", subtitle = "1000 simulations") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")
-ggsave(here("figures", "3_glmPois_dispersionStats.jpeg"), width=10, height = 15)
+ggsave(here("figures", "3_glmPois_dispersionStats.pdf"), width=10, height = 15)
 
 
 
@@ -211,7 +262,12 @@ pow <- bind_rows(list(Poisson_uncalibrated = p.pois,
 sub.pow <- pow %>% filter(intercept == 0, sampleSize %in% c(10,100,1000))
 
 ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibration)) +
-  geom_point(alpha=0.7) + geom_line(alpha=0.7) +
+  geom_point(alpha=0.7, shape=1) + geom_line(alpha=0.7) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                alpha=0.7,
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   ylab("Power") + xlab("Overdispersion") +
   scale_color_manual(values = col.tests[c(4,1,2)], 
                      labels = c("Sim-based residual variance", 
@@ -235,13 +291,14 @@ ggplot(sub.pow, aes(x=overdispersion, y=prop.sig, col=test, linetype = calibrati
         legend.box.background = element_rect(fill = "gray94", color="gray94"),
         legend.position = c(0.01,0.87))
 
-ggsave(here("figures", "3_glm_both_power.jpeg"), width=10, height = 6)
+ggsave(here("figures", "3_glm_both_power.pdf"), width=10, height = 6)
 
 
 
 ## FIGURE DISPERSION STATISTICS together ####
 
 dispersion <- bind_rows(list(Poisson = st.pois, Binomial = st.bin), .id= "model") %>%
+  dplyr::select(-mcse) %>%
   pivot_wider(names_from = test, values_from = mean.stat) %>%
   mutate(reldif_DHA_Pear = (DHA.stat.dispersion - Pear.stat.dispersion)/DHA.stat.dispersion,
          reldif_DHA_Ref = (DHA.stat.dispersion - Ref.stat.dispersion)/DHA.stat.dispersion)
@@ -254,7 +311,7 @@ small.text <- data.frame(label = c("Sim-based higher than Pearson",
                          x = rep(0.7,4), y=c(0.03,-0.025, 0,0 ))
 #all results
 ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
-  geom_point(size=2) + geom_line()+
+  geom_point(size=2, shape=1) + geom_line()+
   facet_grid(intercept~model, scales="free")+
   ylab("Relative diff. Dispersion stats \n (Sim-based x param. Pearson)")+
   geom_hline(yintercept = 0, linetype="dotted") +
@@ -263,7 +320,7 @@ ggplot(dispersion, aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
 ###### figure to present intercept == 0 ####
 dispersion %>% filter(intercept == 0) %>%
 ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
-  geom_point(size=2) + geom_line()+
+  geom_point(size=2, shape=1) + geom_line()+
   facet_grid(~model)+
   ylab("Relative diff. Dispersion stats \n (Sim-based x param. Pearson)")+
   geom_hline(yintercept = 0, linetype="dotted")  +
@@ -274,14 +331,14 @@ ggplot(aes(x=overdispersion, y=reldif_DHA_Pear, col=sampleSize)) +
   theme(panel.background = element_rect(color="black"),
         text = element_text(size=12),
         axis.text = element_text(size=10))
-ggsave(here("figures", "3_glm_DISP_diff_DHA-Pear.jpeg"), height=4, width=9)
+ggsave(here("figures", "3_glm_DISP_diff_DHA-Pear.pdf"), height=4, width=9)
 
 
 
 ##### DHARMa stats X Pearson Bootstrapping ####
 dispersion %>% filter(intercept == 0) %>%
 ggplot(aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
-  geom_point(size=2) + geom_line()+
+  geom_point(size=2, shape=1) + geom_line()+
   facet_grid(~model)+
   ylab("Relative diff. Dispersion stats \n (Sim-based x nonparam. Pearson)")+
   ylim(-0.4,0.2)+
@@ -291,4 +348,4 @@ ggplot(aes(x=overdispersion, y=reldif_DHA_Ref, col=sampleSize)) +
   theme(panel.background = element_rect(color="black"),
         text = element_text(size=12),
         axis.text = element_text(size=10))
-ggsave(here("figures", "3_glm_DISP_diff_DHA-Ref.jpeg"), height=4, width=9)
+ggsave(here("figures", "3_glm_DISP_diff_DHA-Ref.pdf"), height=4, width=9)

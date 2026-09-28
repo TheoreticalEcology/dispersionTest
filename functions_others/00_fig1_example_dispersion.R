@@ -1,6 +1,8 @@
-# Dispersion testes paper ##
-## Code for generating a figure as example of over and underdispersion for figure 1
+## Dispersion testes paper
+# Melina Leite
+# Sep 26
 
+## Code for generating a figure as example of over and underdispersion for figure 1
 
 library(glmmTMB)
 library(DHARMa)

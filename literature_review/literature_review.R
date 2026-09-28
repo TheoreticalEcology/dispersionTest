@@ -1,5 +1,6 @@
-###### Script to perform literature reveiw in PUBMED ###### 
-# 11 Dec 2025
+###### Script to perform literature review in PUBMED ###### 
+# Melina Leite
+# Sep 2026
 
 library(europepmc)
 library(tidyverse)
@@ -67,7 +68,7 @@ results <- resultEco %>% rename(eco_hits = query_hits) %>%
 
 ## Figure trends ----
 
-# only ecological studies using GlM for count data
+# only ecological studies using GLM for count data
 figA <- ggplot(results, aes(x=year, y=glm_within_eco)) + 
   geom_point(col="coral")+
   geom_line(col="coral") +
@@ -76,7 +77,7 @@ figA <- ggplot(results, aes(x=year, y=glm_within_eco)) +
   labs(tag="A)", title = "GLMs/GLMMs within Ecology")
 
 
-# only dispersion within GlM studies
+# only dispersion within GLM studies
 figB <- ggplot(results, aes(x=year, y=disp_within_glm)) + 
   geom_point(col="aquamarine3")+
   geom_line(col="aquamarine3") +
@@ -86,7 +87,7 @@ figB <- ggplot(results, aes(x=year, y=disp_within_glm)) +
   labs(tag="B)", title="Dispersion within GLMs/GLMMs")
 
 figA + figB 
-ggsave("figures/box2_trend_S1.1.jpeg", height = 4, width=8)
+ggsave("figures/box2_trend_S1.1.pdf", height = 4, width=8)
 
 
 # count + prop dispersion with GLM studies
@@ -141,7 +142,7 @@ pizza <- ggplot(data, aes(x = "", y = valor, fill = categoria)) +
   labs(tag = "B)", title="Dispersion issues checks in ecological literature",subtitle = "out of 100 randomly selected papers in 2025")
 
 box2 + pizza + plot_layout(widths = c(1,1))
-ggsave("figures/box2.jpeg", height = 6, width = 12)
+ggsave("figures/box2.pdf", height = 6, width = 12)
 
 
 

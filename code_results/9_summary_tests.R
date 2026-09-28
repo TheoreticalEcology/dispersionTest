@@ -1,7 +1,7 @@
 # Dispersion test paper
 # summarising figure
-# 
-# mar 26
+# Melina Leite
+# Sep 26
 
 library(tidyverse)
 library(cowplot)
@@ -61,4 +61,4 @@ ggplot(df2, aes(x=variable.n, y=test.n, fill=value, col=value))+
 
 
 
-ggsave(filename = "figures/9_testsEvaluation_sign.jpeg", height = 4.5, width = 9)
+ggsave(filename = "figures/9_testsEvaluation_sign.pdf", height = 4.5, width = 9)

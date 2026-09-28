@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
-## 
-# Mar 26
+## Melina Leite
+# Sep 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -10,6 +10,7 @@ library(patchwork)
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 
 
 ##############-###
@@ -51,7 +52,9 @@ p.bin$test <- factor(p.bin$test, levels = c("Pear.p.val", "Ref.p.val","DHA.p.val
 #power
 power <- p.bin %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
-  geom_point() + geom_line()+
+  geom_point(shape=1) + geom_line()+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width = 0, 
+                linetype = "solid", show.legend = FALSE) +
   scale_color_manual(values = col.tests[c(1,2,4)],
                      labels = c("Chi-squared Pearson",
                                 "Param. bootstrap Pearson",
@@ -70,12 +73,15 @@ power
 #type 1
 type1 <- p.bin %>% filter(overdispersion == 0) %>%
   ggplot(aes(x=ntrial, y=prop.sig, col=test))+
-  geom_point(position = position_dodge(width = 0.2)) + 
+  geom_point(position = position_dodge(width = 0.2), shape=1) + 
   geom_line(aes(x=as.numeric(ntrial)),
             position = position_dodge(width = 0.2)) +
   geom_hline(yintercept = 0.05, linetype="dashed") +
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.05,
-                position = position_dodge(width = 0.2)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width = 0.2),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
  scale_color_manual(values = col.tests[c(1,2,4)],
                    labels = c("Chi-squared Pearson",
                               "Param. bootstrap Pearson",
@@ -93,7 +99,8 @@ stats.bin <- bins %>% dplyr::select(Pear.stat.dispersion,
                                    overdispersion, ntrial) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(ntrial, overdispersion,test) %>% 
-  summarise(mean.stat = mean(Dispersion, na.rm=T))
+  summarise(mean.stat = mean(Dispersion, na.rm=T),
+            mcse = mcse_mean(Dispersion))
 stats.bin$test <- factor(stats.bin$test, levels = c("Pear.stat.dispersion", 
                                                     "Ref.stat.dispersion",
                                                     "DHA.stat.dispersion"))
@@ -101,7 +108,11 @@ stats.bin$test <- factor(stats.bin$test, levels = c("Pear.stat.dispersion",
 
 disp <- stats.bin %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test)) +
-  geom_point() + geom_line()+
+  geom_point(shape=1) + geom_line()+
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values = col.tests[c(1,2,4)],
                      labels = c("Chi-squared Pearson",
                                 "Param. bootstrap Pearson",
@@ -120,6 +131,6 @@ disp
 (power /disp) + 
   (type1 + plot_spacer()) +
   plot_layout(ncol = 1)
-ggsave(here("figures", "3b_glmBin_ntrials.jpeg"),width=10,height = 10)
+ggsave(here("figures", "3b_glmBin_ntrials.pdf"),width=10,height = 10)
 
 

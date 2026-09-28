@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
 ## Melina Leite
-# mar 26
+# Sep 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -10,6 +10,7 @@ library(patchwork)
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 
 
 ##############-###
@@ -145,9 +146,13 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize),
                as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
                             `Pear.p.val` = "1) Chi-squared Pearson" ,
                            `Ref.p.val` = "2) Param. bootstrap Pearson"))) +
-  geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8), col = "black",
-                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
+  geom_point(position = position_dodge(width=0.8), shape=1) +
+  geom_errorbar(position = position_dodge(width=0.8),
+                col = "black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
@@ -160,7 +165,7 @@ f.bin <- ggplot(p.bin, aes(y = prop.sig, x=as.factor(sampleSize),
         axis.text.x = element_text(angle=45, hjust=1))+
   labs(tag="B)")
 f.bin
-#ggsave(here("figures", "2_glmBin_type1.jpeg"), width=10, height = 5)
+#ggsave(here("figures", "2_glmBin_type1.pdf"), width=10, height = 5)
 
 f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize), 
                              col=intercept)) +
@@ -168,9 +173,13 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
                as_labeller(c(`DHA.p.val` = "3) Sim-based residual variance" ,
                              `Pear.p.val` = "1) Chi-squared Pearson" ,
                              `Ref.p.val` = "2) Param. bootstrap Pearson"))) +
-  geom_point(position = position_dodge(width=0.8)) +
-  geom_errorbar(position = position_dodge(width=0.8), col="black",
-                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
+  geom_point(position = position_dodge(width=0.8), shape=1) +
+  geom_errorbar(position = position_dodge(width=0.8),
+                col="black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
@@ -184,7 +193,7 @@ f.pois <- ggplot(p.pois, aes(y = prop.sig, x=as.factor(sampleSize),
         axis.text.x = element_text(angle=45, hjust=1)) +
   labs(tag="A)")
 f.pois
-#ggsave(here("figures", "2_glmPois_type1.jpeg"), width=10, height = 5)
+#ggsave(here("figures", "2_glmPois_type1.pdf"), width=10, height = 5)
 
 
 ## both distributions
@@ -202,13 +211,17 @@ dats %>%
                                          `Binomial` = "Binomial",
                                       `Poisson` = "Poisson"))) +
   scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
-  geom_point(position = position_dodge(width=0.8), col="white") +
+  geom_point(position = position_dodge(width=0.8), col="white", shape=1) +
   geom_hline(yintercept = 0.05, linetype="dotted")+
   geom_hline(yintercept = 0, col="gray")+
   geom_line(aes(x=as.numeric(as.factor(sampleSize))),
             position = position_dodge(width=0.8))+
-  geom_errorbar(position = position_dodge(width=0.8), #col="black",
-                aes(ymin=conf.low, ymax=conf.up, group=intercept), width = 0.1)+
+  geom_errorbar(position = position_dodge(width=0.8),
+                #col="black",
+                aes(ymin=conf.low, ymax=conf.up, group=intercept),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   scale_color_manual(values = col.intercept)+
   xlab("Sample size") +
   ylab("Type I error") +
@@ -217,7 +230,7 @@ dats %>%
         legend.background  = element_rect(fill="#F0F0F0"),
         axis.text.x = element_text(angle=45, hjust=1))
 
-ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 7,bg="white")
+ggsave(here("figures", "2_glm_type1.pdf"), width=10, height = 7,bg="white")
 
 
 
@@ -228,10 +241,15 @@ ggsave(here("figures", "2_glm_type1.jpeg"), width=10, height = 7,bg="white")
 d.bin <- stats.bin %>% group_by(test, sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
-            sd = sd(Dispersion, na.rm=T)) %>%
+            sd = sd(Dispersion, na.rm=T),
+            mcse = mcse_median(Dispersion)) %>%
  # pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
   ggplot(aes(x=sampleSize, y=median, col=test))+
-  geom_point()+ geom_line()+
+  geom_point(shape=1)+ geom_line()+
+  geom_errorbar(aes(ymin=median-1.96*mcse, ymax=median+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   scale_x_log10()+
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
@@ -249,11 +267,15 @@ d.bin
 d.pois <- stats.pois %>% group_by(test,sampleSize, intercept) %>%
   summarise(mean = mean(Dispersion,na.rm=T),
             median = median(Dispersion, na.rm=T),
-            sd = sd(Dispersion, na.rm=T)) %>%
+            sd = sd(Dispersion, na.rm=T),
+            mcse = mcse_median(Dispersion)) %>%
   #pivot_longer(c(mean,median), names_to = "stat", values_to = "Dispersion") %>%
   ggplot(aes(x=sampleSize, y=median, col=test))+
-  geom_point()+ geom_line()+
-  #geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd))+
+  geom_point(shape=1)+ geom_line()+
+  geom_errorbar(aes(ymin=median-1.96*mcse, ymax=median+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   scale_x_log10()+
   facet_grid(~intercept) +
   scale_color_manual(values=col.tests[c(4,1,2)],
@@ -272,7 +294,7 @@ d.pois
 d.pois + d.bin +
   plot_layout(ncol=1)
 
-ggsave(here("figures", "2_glm_dispersionStats.jpeg"), width=10, height = 8)
+ggsave(here("figures", "2_glm_dispersionStats.pdf"), width=10, height = 8)
 
 
 ##### distribution p values ####
@@ -289,7 +311,7 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
   ggtitle("Binomial: distribution P-values")
-ggsave(here("figures", "2_glmBin_distribPvals.jpeg"), width=10, height = 15)
+ggsave(here("figures", "2_glmBin_distribPvals.pdf"), width=10, height = 15)
 
 
 ggplot(pvals.pois, aes(x=p.val, col=test))+
@@ -304,7 +326,7 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom") +
   ggtitle("Poisson: distribution P-values")
-ggsave(here("figures", "2_glmPois_distribPvals.jpeg"), width=10, height = 15)
+ggsave(here("figures", "2_glmPois_distribPvals.pdf"), width=10, height = 15)
 
 
 ##### ecdf p values ####
@@ -318,7 +340,7 @@ ggplot(pvals.bin, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
   ggtitle("Binomial: ecdf p-values")
-#ggsave(here("figures", "2_glmBin_ecdfPvals.jpeg"), width=10, height = 15)
+#ggsave(here("figures", "2_glmBin_ecdfPvals.pdf"), width=10, height = 15)
 
 ggplot(pvals.pois, aes(x=p.val, col=test))+
   stat_ecdf()+
@@ -329,5 +351,5 @@ ggplot(pvals.pois, aes(x=p.val, col=test))+
         axis.text.x = element_text(angle=45,  hjust=1),
         legend.position = "bottom")+
   ggtitle("Poisson: ecdf p-values")
-#ggsave(here("figures", "2_glmPois_ecdfPvals.jpeg"), width=10, height = 15)
+#ggsave(here("figures", "2_glmPois_ecdfPvals.pdf"), width=10, height = 15)
 

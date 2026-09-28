@@ -1,6 +1,6 @@
 ---
 title: "GLM Alternative Simulation-based dispersion test: Approximation of Pearson residuals"
-author: ""
+author: "Melina Leite"
 date: "`r Sys.Date()`"
 output: 
   rmdformats::readthedown:
@@ -14,7 +14,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache=F)
+knitr::opts_chunk$set(echo = TRUE, cache=F, warning = FALSE)
 
 library(DHARMa)
 library(here)
@@ -25,6 +25,7 @@ theme_set(theme_cowplot() +
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 ```
 
 # Simulated data
@@ -57,7 +58,7 @@ simpois %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Poisson: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_Pois_propzero.jpeg'), height=10, width=10)
+ggsave(here('figures', '6_Pois_propzero.pdf'), height=10, width=10)
 ```
 
 
@@ -68,7 +69,7 @@ simbin %>%
   facet_grid(nSim~intercept, scales="free") +
   labs(title="Binomial: Prop obs with zero SD simulated data") +
   theme(panel.background = element_rect(color="black"))
-ggsave(here('figures', '6_Bin_propzero.jpeg'), height=10, width=10)
+ggsave(here('figures', '6_Bin_propzero.pdf'), height=10, width=10)
 ```
 
 # Results without zeros 
@@ -113,15 +114,18 @@ for (i in 1:nrow(p.bin)) {
 p.pois %>%
   ggplot(aes(x=nSim, y=prop.sig, col=intercept))+
   facet_grid(sampleSize~test)+
-  geom_point(position = position_dodge(width = 0.2)) + 
+  geom_point(position = position_dodge(width = 0.2), shape=1) + 
   geom_line(position = position_dodge(width = 0.2), aes(x=as.numeric(nSim))) +
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
-                position = position_dodge(width = 0.2)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width = 0.2),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_y_sqrt(breaks=c(0,0.01, 0.05,0.25,0.5, 0.75)) +
   geom_hline(yintercept = 0.05, linetype = "dotted")+
   labs(title= "Poisson: Type I error") +
   theme(panel.background = element_rect(color="black"))
-#ggsave(here('figures', '6_type1.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_type1.pdf'), height=6, width=10)
 ```
 
 
@@ -129,14 +133,17 @@ p.pois %>%
 p.bin %>%
   ggplot(aes(x=nSim, y=prop.sig, col=intercept))+
   facet_grid(sampleSize~test)+
-  geom_point(position = position_dodge(width = 0.2)) + 
+  geom_point(position = position_dodge(width = 0.2), shape=1) + 
   geom_line(position = position_dodge(width = 0.2), aes(x=as.numeric(nSim))) +
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
-                position = position_dodge(width = 0.2)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(width = 0.2),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_y_sqrt(breaks=c(0,0.01, 0.05,0.25,0.5, 0.75)) +
   geom_hline(yintercept = 0.05, linetype = "dotted")+
   labs(title= "Binomial: Type I error") 
-#ggsave(here('figures', '6_type1_bin.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_type1_bin.pdf'), height=6, width=10)
 ```
 
 ### Figure for supplementary material
@@ -152,11 +159,15 @@ ggplot(aes(x=sampleSize, y=prop.sig, col=intercept, linetype=nSim,shape=nSim))+
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_point(position = position_dodge(0.7)) + 
+  scale_shape_manual(values = c(1, 2)) +
   ylab("Type I error rate") + xlab("Sample size (n)")+
-  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width=0.02,
-                position = position_dodge(0.7)) +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                position = position_dodge(0.7),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0.05, linetype = "dotted") 
-ggsave(here('figures', '6_approxPearson_type1GLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_type1GLM.pdf'), height=6, width=10)
 ```
 
 
@@ -188,7 +199,7 @@ dispois %>%
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Poisson: Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
-#ggsave(here('figures', '6_dispersion.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_dispersion.pdf'), height=6, width=10)
 ```
 
 
@@ -201,7 +212,7 @@ disbin %>%
   facet_grid(sampleSize~test, scales="free")+
   labs(title= "Binomial: Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
-#ggsave(here('figures', '6_dispersionBin.jpeg'), height=6, width=10)
+#ggsave(here('figures', '6_dispersionBin.pdf'), height=6, width=10)
 ```
 
 ### differences between dispersions stats and Pearson 
@@ -244,7 +255,7 @@ dispois2 %>% filter(nSim %in% c(250,1000)) %>%
        subtitle = "Difference with Pearson Disp stat") +
   theme(panel.background = element_rect(color="black")) #+
 #  plot_layout(ncol=1)
-#ggsave(here('figures', '6_dispersion_dif.jpeg'), height=12, width=10)
+#ggsave(here('figures', '6_dispersion_dif.pdf'), height=12, width=10)
 ```
 
 
@@ -270,7 +281,7 @@ disbin2 %>% filter(nSim %in% c(250,1000)) %>%
   labs(title= "Binomial: Dispersion statistics",
         subtitle = "Difference with Pearson Disp stat") +
   theme(panel.background = element_rect(color="black")) 
-#ggsave(here('figures', '6_dispersion_difBin.jpeg'), height=12, width=10)
+#ggsave(here('figures', '6_dispersion_difBin.pdf'), height=12, width=10)
 ```
 
 ### Dispersion with overdispersion
@@ -289,24 +300,34 @@ disperbin <- simbin %>%  filter(prop.zero ==0) %>%
 
 ```{r}
 disperpois %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-  summarise(mean.disp = mean(disp.statistics)) %>%
+  summarise(mean.disp = mean(disp.statistics),
+            mcse = mcse_mean(disp.statistics)) %>%
   ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=mean.disp-1.96*mcse, ymax=mean.disp+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 1, linetype="dashed")  +
   scale_y_log10() +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Poisson: Dispersion statistics") +
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom")
-#ggsave(here('figures', '6_dispersion_overdisp.jpeg'), height=6, width=12)
+#ggsave(here('figures', '6_dispersion_overdisp.pdf'), height=6, width=12)
 ```
 
 ```{r}
 disperpois %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-  summarise(mean.disp = mean(disp.statistics)) %>%
+  summarise(mean.disp = mean(disp.statistics),
+            mcse = mcse_mean(disp.statistics)) %>%
   filter(nSim %in% c(250, 1000)) %>%
   ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=mean.disp-1.96*mcse, ymax=mean.disp+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 1, linetype="dashed")  +
   scale_y_log10() +
   facet_grid(sampleSize~nSim, scales="free")+
@@ -316,9 +337,14 @@ disperpois %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
 
 ```{r}
 disperbin %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-  summarise(mean.disp = mean(disp.statistics)) %>%
+  summarise(mean.disp = mean(disp.statistics),
+            mcse = mcse_mean(disp.statistics)) %>%
   ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=mean.disp-1.96*mcse, ymax=mean.disp+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 1, linetype="dashed")  +
   scale_y_log10() +
   facet_grid(sampleSize~nSim, scales="free")+
@@ -329,16 +355,21 @@ disperbin %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
 
 ```{r}
 disperbin %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-  summarise(mean.disp = mean(disp.statistics)) %>%
+  summarise(mean.disp = mean(disp.statistics),
+            mcse = mcse_mean(disp.statistics)) %>%
   filter(nSim %in% c(250, 1000)) %>%
   ggplot(aes(x = overdispersion, y = mean.disp, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=mean.disp-1.96*mcse, ymax=mean.disp+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 1, linetype="dashed")  +
   scale_y_log10() +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Binomial: Dispersion statistics") +
   theme(panel.background = element_rect(color="black"))
-#ggsave(here('figures', '6_dispersion_overdispBin.jpeg'), height=6, width=8)
+#ggsave(here('figures', '6_dispersion_overdispBin.pdf'), height=6, width=8)
 ```
 
 ### Figure for supplementary material
@@ -346,10 +377,12 @@ disperbin %>% group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
 ```{r}
 disp <- bind_rows(list(disperbin %>%
                          group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-                         summarise(mean.disp = mean(disp.statistics)) , 
+                         summarise(mean.disp = mean(disp.statistics),
+                                   mcse = mcse_mean(disp.statistics)) , 
                        disperpois %>%
                          group_by(overdispersion,sampleSize, nSim, test, intercept) %>%
-                         summarise(mean.disp = mean(disp.statistics))), .id="model") %>%
+                         summarise(mean.disp = mean(disp.statistics),
+                                   mcse = mcse_mean(disp.statistics))), .id="model") %>%
   filter(nSim %in% c("250", "1000"),
          intercept == "0")
 ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=nSim))+
@@ -359,11 +392,15 @@ ggplot(disp, aes(x=overdispersion, y=mean.disp, col=test, linetype=nSim, shape=n
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_line() + 
+  geom_errorbar(aes(ymin=mean.disp-1.96*mcse, ymax=mean.disp+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_discrete(labels = c("Approximate Pearson residuals",
                                   "Sim-based residual variance",
                                   "Chi-squared Pearson"))+
   ylab("Mean dispersion") + xlab("Overdispersion")
-ggsave(here('figures', '6_approxPearson_dispersionGLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_dispersionGLM.pdf'), height=6, width=10)
 ```
 
 
@@ -407,6 +444,10 @@ for (i in 1:nrow(powerbin)) {
 powerpois %>% 
   ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0)  +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Poisson:Power") +
@@ -418,6 +459,10 @@ powerpois %>%
 powerpois %>% filter(nSim %in% c("250", "1000")) %>%
   ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0)  +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Poisson: Power") +
@@ -429,6 +474,10 @@ powerpois %>% filter(nSim %in% c("250", "1000")) %>%
 powerbin %>% 
   ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0)  +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Binomial: Power") +
@@ -440,6 +489,10 @@ powerbin %>%
 powerbin %>% filter(nSim %in% c("250", "1000")) %>%
   ggplot(aes(x = overdispersion, y = prop.sig, col = test, linetype=intercept))+
   geom_line() +
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   geom_hline(yintercept = 0)  +
   facet_grid(sampleSize~nSim, scales="free")+
   labs(title= "Binomial: Power") +
@@ -460,11 +513,15 @@ ggplot(pows, aes(x=overdispersion, y=prop.sig, col=test, linetype=nSim))+
                                      "2"= "Poisson",
                                      "1" = "Binomial"))) +
   geom_line() + 
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_discrete(labels = c("Approximate Pearson residuals",
                                   "Sim-based residual variance",
                                   "Chi-squared Pearson"))+
   ylab("Power") + xlab("Overdispersion")
-ggsave(here('figures', '6_approxPearson_powerGLM.jpeg'), height=6, width=10)
+ggsave(here('figures', '6_approxPearson_powerGLM.pdf'), height=6, width=10)
 ```
 
 
@@ -515,9 +572,14 @@ slopepois %>% filter(nSim %in% c("250","1000")) %>%
 slopepois %>% filter(nSim %in% c("250","1000")) %>%
   group_by(nSim, sampleSize, intercept, overdispersion) %>%
   summarise(mean.slope = mean(resPA.slope),
-            median.slope = median(resPA.slope)) %>%
+            median.slope = median(resPA.slope),
+            mcse = mcse_mean(resPA.slope)) %>%
   ggplot(aes(x=overdispersion, y=mean.slope, col=intercept)) +
-  geom_line()+ geom_point()+
+  geom_line()+ geom_point(shape=1)+
+  geom_errorbar(aes(ymin=mean.slope-1.96*mcse, ymax=mean.slope+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   facet_grid(sampleSize ~ nSim)   +
   geom_hline(yintercept = 0, linetype="dotted") +
   labs(title = "Poisson: mean slope") +
@@ -558,9 +620,14 @@ interpois %>% filter(nSim %in% c("250","1000")) %>%
 interpois %>% filter(nSim %in% c("250","1000")) %>%
   group_by(nSim, sampleSize, intercept, overdispersion) %>%
   summarise(mean.inter = mean(resPA.inter),
-            median.inter = median(resPA.inter)) %>%
+            median.inter = median(resPA.inter),
+            mcse = mcse_mean(resPA.inter)) %>%
   ggplot(aes(x=overdispersion, y=mean.inter, col=intercept)) +
-  geom_line()+ geom_point()+
+  geom_line()+ geom_point(shape=1)+
+  geom_errorbar(aes(ymin=mean.inter-1.96*mcse, ymax=mean.inter+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   facet_grid(sampleSize ~ nSim)   +
     labs(title="Poisson: mean intercept")+
   geom_hline(yintercept = 0, linetype="dotted")+
@@ -576,12 +643,14 @@ slopes <- slopepois %>%
                            filter(nSim %in% c("250","1000")) %>%
                            group_by(nSim, sampleSize, intercept, overdispersion) %>%
                            summarise(mean.slope = mean(resPA.slope),
-                                     median.slope = median(resPA.slope))
+                                     median.slope = median(resPA.slope),
+                                     mcse = mcse_mean(resPA.slope))
 intercepts <-  interpois %>% 
                            filter(nSim %in% c("250","1000")) %>%
                            group_by(nSim, sampleSize, intercept, overdispersion) %>%
                            summarise(mean.inter = mean(resPA.inter),
-                                     median.inter = median(resPA.inter))
+                                     median.inter = median(resPA.inter),
+                                     mcse = mcse_mean(resPA.inter))
 ```
 
 
@@ -589,7 +658,11 @@ intercepts <-  interpois %>%
 ```{r, fig.height=8}
 figa <- ggplot(slopes, aes(x=overdispersion, y=mean.slope, col=intercept, linetype=nSim))+
   geom_line()+
-  geom_point()+
+  geom_point(shape=1)+
+  geom_errorbar(aes(ymin=mean.slope-1.96*mcse, ymax=mean.slope+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   geom_hline(yintercept = 0)+
   ylab("Mean slope") + labs(tag="A)")+
   facet_grid(~sampleSize, scales="free",
@@ -597,7 +670,11 @@ figa <- ggplot(slopes, aes(x=overdispersion, y=mean.slope, col=intercept, linety
                                      "1000" = "n = 1000")))
 figb <- ggplot(intercepts, aes(x=overdispersion, y=mean.inter, col=intercept, linetype=nSim))+
   geom_line()+
-  geom_point()+
+  geom_point(shape=1)+
+  geom_errorbar(aes(ymin=mean.inter-1.96*mcse, ymax=mean.inter+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE)+
   geom_hline(yintercept = 0)+
   ylab("Mean intercept") +labs(tag="B)")+
   facet_grid(~sampleSize, scales="free",
@@ -648,7 +725,7 @@ Looking at their p-values
   select(sampleSize,intercept, nSim, overdispersion, ends_with(".p")) %>%
   pivot_longer(5:7, names_to = "test", values_to = "p.val") %>%
   ggplot(aes(x=as.factor(overdispersion), y=p.val, col=test, )) +
-  geom_point()+
+  geom_point(shape=1)+
   geom_hline(yintercept = 0.05, linetype="dashed")+
   facet_grid(~test)
 ```
@@ -660,7 +737,7 @@ Looking at dispersion stat
   select(sampleSize,intercept, nSim, overdispersion, ends_with(".dispersion")) %>%
   pivot_longer(5:7, names_to = "test", values_to = "disp") %>%
   ggplot(aes(x=as.factor(overdispersion), y=disp, col=test, )) +
-  geom_point()+
+  geom_point(shape=1)+
   geom_hline(yintercept = 1, linetype="dashed")+
   facet_grid(~test)
 ```

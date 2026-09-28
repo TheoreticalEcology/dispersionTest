@@ -1,6 +1,6 @@
 ### Dispersion Tests Project
-##
-# mar 26
+## Melina Leite
+# Sep 26
 
 library(DHARMa)
 library(tidyverse); library(cowplot);
@@ -10,6 +10,7 @@ library(patchwork)
 
 # plot Colors
 source(here("functions_others", "plotColors.R"))
+source(here("functions_others", "mcse.R"))
 
 
 ##############-###
@@ -49,7 +50,8 @@ stats.bin <- bin %>% dplyr::select(Pear.stat.dispersion,
                                           overdispersion, slope) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(slope, overdispersion,test) %>% 
-  summarise(mean.stat = mean(Dispersion, na.rm=T))
+  summarise(mean.stat = mean(Dispersion, na.rm=T),
+            mcse = mcse_mean(Dispersion))
 stats.bin$test <- factor(stats.bin$test, levels = c("Pear.stat.dispersion", 
                                                     "Ref.stat.dispersion",
                                                     "DHA.stat.dispersion"))
@@ -78,7 +80,7 @@ p.pois <- pois %>% dplyr::select(Pear.p.val,DHA.p.val,Ref.p.val, replicate,
 p.pois$prop.sig <- p.pois$p.sig/p.pois$nsim
 for (i in 1:nrow(p.pois)) {
   btest <- binom.test(p.pois$p.sig[i], n=p.pois$nsim[i], p=0.05)
-  p.pois$p.pois0.05[i] <- btest$p.value
+  p.pois$p.bin0.05[i] <- btest$p.value
   p.pois$conf.low[i] <- btest$conf.int[1]
   p.pois$conf.up[i] <- btest$conf.int[2]
 }
@@ -93,7 +95,8 @@ stats.pois <- pois %>% dplyr::select(Pear.stat.dispersion,
                                    overdispersion, slope) %>%
   pivot_longer(1:3, names_to = "test", values_to = "Dispersion") %>%
   group_by(slope, overdispersion,test) %>% 
-  summarise(mean.stat = mean(Dispersion, na.rm=T))
+  summarise(mean.stat = mean(Dispersion, na.rm=T),
+            mcse = mcse_mean(Dispersion))
 stats.pois$test <- factor(stats.pois$test, levels = c("DHA.stat.dispersion",
                                                       "Pear.stat.dispersion", 
                                                       "Ref.stat.dispersion"))
@@ -114,7 +117,9 @@ pval <- bind_rows(list(Poisson = p.pois, Binomial = p.bin),
  
 pfig <- pval %>%
   ggplot(aes(x=overdispersion, y=prop.sig, col=test)) +
-  geom_point() + geom_line()+
+  geom_point(shape=1) + geom_line()+
+  geom_errorbar(aes(ymin=conf.low, ymax=conf.up), width = 0,
+                linetype = "solid", show.legend = FALSE) +
   scale_color_manual(values = col.tests[c(4,1,2)],
                     labels = c("Sim-based residual variance", 
                                "Chi-squared Pearson",
@@ -133,7 +138,11 @@ statval <- bind_rows(list(Poisson = stats.pois, Binomial = stats.bin), .id="mode
 
 statfig <- statval %>%
   ggplot(aes(x=overdispersion, y=mean.stat, col=test))+
-  geom_point() + geom_line() +
+  geom_point(shape=1) + geom_line() +
+  geom_errorbar(aes(ymin=mean.stat-1.96*mcse, ymax=mean.stat+1.96*mcse),
+                width = 0,
+                linetype = "solid",
+                show.legend = FALSE) +
   scale_color_manual(values = col.tests[c(4,1,2)],
                      labels = c("Sim-based residual variance", 
                                 "Chi-squared Pearson",
@@ -147,11 +156,11 @@ statfig
 # dif in percentage of the DHA stats
 statval %>% filter(test != "Ref.stat.dispersion",
                    overdispersion == 1) %>% ungroup() %>%
-  select(-overdispersion) %>%
+  select(-overdispersion, -mcse) %>%
   pivot_wider(names_from = test, values_from = mean.stat) %>%
   mutate(dif_prop = (DHA.stat.dispersion-Pear.stat.dispersion)/DHA.stat.dispersion)
 # poisson
 
 
 pfig + statfig + plot_layout(ncol=1)
-ggsave(here("figures", "3a_glm_dispPower_slopes.jpeg"), width=13,height = 10)
+ggsave(here("figures", "3a_glm_dispPower_slopes.pdf"), width=13,height = 10)
