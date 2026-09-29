@@ -10,8 +10,10 @@ theme_set(theme_cowplot())
 library(patchwork)
 
 load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
+# created in script 2_glm_type1_results.R. Valid here because u = 0 is exactly
+# the Poisson / binomial null (CMP and CMB with nu = 1).
 
-# functions
+# plot Colors
 source(here("functions_others", "plotColors.R"))
 source(here("functions_others", "mcse.R"))
 
@@ -295,3 +297,57 @@ bind_rows(pow.over, pow.under) %>%
   theme(panel.background = element_rect(color="black"),
         legend.position = "bottom", legend.title = element_blank())
 ggsave(here("figures", "3_glm_both_power_over_under.pdf"), width=10, height = 6)
+
+
+
+## FIGURE TYPE I ERROR (underdispersion simulations, u = 0) ####
+# Same layout as figures/2_glm_type1.pdf (script 2_glm_type1_results.R).
+# u = 0 means nu = 1, i.e. data are exactly Poisson / binomial (Ntrials = 10).
+# model = two-sided (as in Fig. 2) or one-sided alternative = "less"
+
+t1 <- bind_rows(list(Poisson_two.sided  = p.pois,  Binomial_two.sided  = p.bin,
+                     Poisson_less       = lp.pois, Binomial_less       = lp.bin),
+                .id = "model") %>%
+  filter(underdispersion == 0) %>%
+  separate(model, c("model", "alternative"), sep = "_") %>%
+  mutate(model = fct_relevel(model, "Poisson", "Binomial"),
+         sampleSize = fct_inseq(sampleSize))
+
+type1Fig <- function(dat){
+  dat %>%
+    ggplot(aes(y = prop.sig, x=sampleSize, col=intercept,
+               group=intercept)) +
+    facet_grid(model~test, scales="free",
+               labeller = as_labeller(c(`DHA.p.val` = "C) Sim-based residual variance" ,
+                                        `Pear.p.val` = "A) Chi-squared Pearson",
+                                        `Ref.p.val` = "B) Param. bootstrap Pearson",
+                                        `Binomial` = "Binomial",
+                                        `Poisson` = "Poisson"))) +
+    scale_y_sqrt(breaks = c(0,0.01,0.05,0.2,0.4,0.6))+
+    geom_point(position = position_dodge(width=0.8), col="white", shape=1) +
+    geom_hline(yintercept = 0.05, linetype="dotted")+
+    geom_hline(yintercept = 0, col="gray")+
+    geom_line(aes(x=as.numeric(sampleSize)),
+              position = position_dodge(width=0.8))+
+    geom_errorbar(position = position_dodge(width=0.8),
+                  aes(ymin=conf.low, ymax=conf.up, group=intercept),
+                  width = 0,
+                  linetype = "solid",
+                  show.legend = FALSE)+
+    scale_color_manual(values = col.intercept)+
+    xlab("Sample size") +
+    ylab("Type I error") +
+    theme(panel.background  = element_rect(color = "black"),
+          legend.position = c(0.9,0.86),
+          legend.background  = element_rect(fill="#F0F0F0"),
+          axis.text.x = element_text(angle=45, hjust=1))
+}
+
+# two-sided (directly comparable with Fig. 2)
+t1 %>% filter(alternative == "two.sided") %>% type1Fig()
+ggsave(here("figures", "3_glm_type1_underdisp.pdf"), width=10, height = 7, bg="white")
+
+# one-sided (alternative = "less")
+t1 %>% filter(alternative == "less") %>% type1Fig() +
+  ggtitle("Type I error, one-sided test for underdispersion (alternative = 'less')")
+ggsave(here("figures", "3_glm_type1_underdisp_less.pdf"), width=10, height = 7, bg="white")
