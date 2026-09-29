@@ -1,6 +1,5 @@
 ### Dispersion Tests Project
 ## Power of dispersion tests under UNDERDISPERSION (GLMs)
-## Response to Reviewer 2, Comment 1
 # Sep 26
 
 library(DHARMa)
@@ -35,8 +34,8 @@ source(here("functions_others", "createData_underdispersion.R"))
 
 # varying parameters
 underdispersion <- seq(0, 0.9, 0.10)   # nu = 1/(1-u): 1 (= binomial) ... 10
-sampleSize = c(10,20,50,100,200,500,1000,10000)
-intercept <- c(-3,-1.5,0,1.5,3)
+sampleSize = c(10,50,100,200,500,1000)
+intercept <- c(-1.5,0,1.5) # no extreme -3 or 3
 
 
 out.bin <- list()
@@ -114,8 +113,8 @@ save(out.bin, sampleSize, intercept, underdispersion,
 
 # varying parameters
 underdispersion <- seq(0, 0.9, 0.10)   # nu = 1/(1-u): 1 (= Poisson) ... 10
-sampleSize = c(10,20,50,100,200,500,1000,10000)
-intercept <- c(-3,-1.5,0,1.5,3)
+sampleSize = c(10,50,100,200,500,1000)
+intercept <- c(-1.5,0,1.5,3) # no extreme -3
 
 
 out.pois <- list()
