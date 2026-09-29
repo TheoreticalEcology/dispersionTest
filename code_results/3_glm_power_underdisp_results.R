@@ -1,8 +1,4 @@
 ### Dispersion Tests Project
-## Results: power of dispersion tests under UNDERDISPERSION (GLMs)
-## Simulations in code_simulations/3_glm_power_underdisp.R
-##   Poisson : Conway-Maxwell-Poisson (mean parametrisation), nu = 1/(1-u)
-##   Binomial: Conway-Maxwell-binomial (mean-matched), nu = 1/(1-u), Ntrials = 10
 ## Melina Leite
 # Sep 26
 
@@ -14,10 +10,8 @@ theme_set(theme_cowplot())
 library(patchwork)
 
 load(here("data", "2_callibrated_alphaLevels.Rdata")) # callibrated alpha level
-# created in script 2_glm_type1_results.R. Valid here because u = 0 is exactly
-# the Poisson / binomial null (CMP and CMB with nu = 1).
 
-# plot Colors
+# functions
 source(here("functions_others", "plotColors.R"))
 source(here("functions_others", "mcse.R"))
 
