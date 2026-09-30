@@ -1,7 +1,12 @@
 ## createData_ud(): DHARMa::createData() (DHARMa master, GitHub) extended with
-## underdispersion for Poisson and binomial responses.
-## New arguments: underdispersion (u in [0,1)), underdispersionModel.
-## Everything else is identical to DHARMa::createData().
+## (a) underdispersion for Poisson and binomial responses
+##     new arguments: underdispersion (u in [0,1)), underdispersionModel
+## (b) mean-preserving overdispersion with a constant dispersion factor phi
+##     (negative binomial for Poisson, beta-binomial for binomial; Rev. 2, Comment 2)
+##     new arguments: phi (>= 1), overdispersionModel
+## Everything else is identical to DHARMa::createData(). In particular, the
+## argument 'overdispersion' is still the DHARMa default mechanism (Gaussian
+## noise on the linear predictor), which also shifts the marginal mean.
 
 ## Samplers for underdispersed counts / proportions with a FIXED MEAN
 ## (mean = family$linkinv(eta), so the mean structure is untouched)
@@ -64,6 +69,37 @@ rhyperbin <- function(n, prob, size, phi) {
 }
 
 
+## Samplers for OVERdispersed counts / proportions with a FIXED MEAN and a
+## CONSTANT dispersion factor phi: Var(y|eta) = phi * V(mu) exactly, with
+## mu = family$linkinv(eta). phi is therefore the same for every observation,
+## intercept and slope (the manuscript's Var(Y) = phi * V(mu)).
+
+## 4) Negative binomial with constant dispersion factor ("NB1", quasi-Poisson
+##    variance function). Gamma-Poisson mixture:
+##    lambda ~ Gamma(shape = k, rate = k/mu), y ~ Poisson(lambda), k = mu/(phi - 1)
+##    -> E(y) = mu, Var(y) = mu + mu^2/k = phi * mu
+rnb_phi <- function(n, mu, phi) {
+  mu <- rep_len(mu, n)
+  if (phi == 1) return(rpois(n, mu))
+  rnbinom(n, size = mu / (phi - 1), mu = mu)
+}
+
+## 5) Beta-binomial: p_i ~ Beta(a, b) with mean prob and intra-class correlation
+##    rho = 1/(a + b + 1) = (phi - 1)/(N - 1), y ~ Binomial(N, p_i)
+##    -> E(y) = N prob, Var(y) = N prob (1 - prob) [1 + (N - 1) rho] = phi * N prob (1 - prob)
+##    Requires N > 1 and 1 <= phi < N (phi = N would be rho = 1, i.e. all-or-nothing).
+rbetabin_phi <- function(n, prob, size, phi) {
+  prob <- rep_len(prob, n)
+  if (phi == 1) return(rbinom(n, size, prob))
+  if (size < 2) stop("beta-binomial overdispersion needs binomialTrials > 1")
+  if (phi >= size) stop("phi must be smaller than binomialTrials for the beta-binomial")
+  rho <- (phi - 1) / (size - 1)
+  s <- 1 / rho - 1                                    # a + b
+  p <- rbeta(n, shape1 = prob * s, shape2 = (1 - prob) * s)
+  rbinom(n, size, p)
+}
+
+
 #' Simulate test data
 #' @description This function creates synthetic dataset with various problems such as overdispersion, zero-inflation, etc.
 #' @param sampleSize sample size of the dataset.
@@ -72,7 +108,7 @@ rhyperbin <- function(n, prob, size, phi) {
 #' @param quadraticFixedEffects vector of quadratic fixed effects (linear scale).
 #' @param numGroups number of groups for the random effect.
 #' @param randomEffectVariance variance of the random effect (intercept).
-#' @param overdispersion if this is a numeric value, it will be used as the sd of a random normal variate that is added to the linear predictor. Alternatively, a random function can be provided that takes as input the linear predictor.
+#' @param overdispersion if this is a numeric value, it will be used as the sd of a random normal variate that is added to the linear predictor. Alternatively, a random function can be provided that takes as input the linear predictor. (DHARMa default mechanism; note that it also changes the marginal mean, e.g. E(y) = exp(eta + sd^2/2) for the Poisson.)
 #' @param family a family function for the error distribution and link function to be used in the model to simulate data from. (See [stats::family()] for details of family functions for GLMs.)
 #' @param scale scale if the distribution has a scale (e.g. sd for the Gaussian).
 #' @param cor correlation between predictors.
@@ -84,6 +120,8 @@ rhyperbin <- function(n, prob, size, phi) {
 #' @param factorResponse should the response be transformed to a factor (intended to be used for 0/1 data).
 #' @param underdispersion strength of underdispersion, u in [0, 1). 0 = no underdispersion. The data are generated so that the conditional mean is unchanged (= family$linkinv(eta)) and Var(y|eta) is approx. (1 - u) times the Poisson / binomial variance (the approximation is exact for "hypergeometric", and good for CMP/CMB except at very small means or probabilities close to 0/1, where strong underdispersion is mathematically impossible).
 #' @param underdispersionModel data-generating mechanism for underdispersion: "CMP" (Conway-Maxwell-Poisson, mean parametrisation, nu = 1/(1-u); Poisson only), "CMB" (Conway-Maxwell-binomial, nu = 1/(1-u); binomial only) or "hypergeometric" (binomial only; trials drawn without replacement from a finite unit, phi = 1-u). Defaults to "CMP" for Poisson and "CMB" for binomial.
+#' @param phi dispersion factor for mean-preserving overdispersion, phi >= 1. 1 = no overdispersion. The data are generated so that the conditional mean is unchanged (= family$linkinv(eta)) and Var(y|eta) = phi times the Poisson / binomial variance, exactly and for every observation. Cannot be combined with underdispersion > 0.
+#' @param overdispersionModel data-generating mechanism used when phi > 1: "NB" (negative binomial with constant dispersion factor, size = mu/(phi-1); Poisson only) or "betabinomial" (beta-binomial with intra-class correlation rho = (phi-1)/(binomialTrials-1); binomial only, requires binomialTrials > 1 and phi < binomialTrials). Defaults to "NB" for Poisson and "betabinomial" for binomial.
 #' @param replicates number of datasets to create.
 #' @param hasNA should an NA be added to the environmental predictor (for test purposes).
 #' @export
@@ -96,11 +134,17 @@ createData_ud <- function(sampleSize = 100, intercept = 0, fixedEffects = 1,
                        binomialTrials = 1, temporalAutocorrelation = 0,
                        spatialAutocorrelation = 0, factorResponse = FALSE,
                        replicates = 1, hasNA = FALSE,
-                       underdispersion = 0, underdispersionModel = NULL){
+                       underdispersion = 0, underdispersionModel = NULL,
+                       phi = 1, overdispersionModel = NULL){
 
   if (underdispersion < 0 || underdispersion >= 1) stop("underdispersion must be in [0, 1)")
   if (underdispersion > 0 && !(family$family %in% c("poisson", "binomial"))) stop("underdispersion only implemented for poisson and binomial")
   if (is.null(underdispersionModel)) underdispersionModel = if (family$family == "poisson") "CMP" else "CMB"
+
+  if (phi < 1) stop("phi must be >= 1 (use 'underdispersion' for dispersion factors < 1)")
+  if (phi > 1 && underdispersion > 0) stop("use either underdispersion > 0 or phi > 1, not both")
+  if (phi > 1 && !(family$family %in% c("poisson", "binomial"))) stop("phi > 1 only implemented for poisson and binomial")
+  if (is.null(overdispersionModel)) overdispersionModel = if (family$family == "poisson") "NB" else "betabinomial"
 
 
   nPredictors = length(fixedEffects)
@@ -185,14 +229,22 @@ createData_ud <- function(sampleSize = 100, intercept = 0, fixedEffects = 1,
     if (family$family == "gaussian") observedResponse = rnorm(n = sampleSize, mean = linkResponse, sd = scale)
     # need checking else if (family$family == "gamma") observedResponse = rgamma(n = sampleSize, shape = linkResponse / scale, scale = scale)
     else if (family$family == "binomial"){
-      if (underdispersion == 0) observedResponse = rbinom(n = sampleSize, binomialTrials, prob = linkResponse)
+      if (phi > 1) {
+        if (overdispersionModel != "betabinomial") stop("overdispersionModel for binomial must be 'betabinomial'")
+        observedResponse = rbetabin_phi(sampleSize, linkResponse, binomialTrials, phi = phi)
+      }
+      else if (underdispersion == 0) observedResponse = rbinom(n = sampleSize, binomialTrials, prob = linkResponse)
       else if (underdispersionModel == "CMB") observedResponse = rcmb_mu(sampleSize, linkResponse, binomialTrials, nu = 1/(1 - underdispersion))
       else if (underdispersionModel == "hypergeometric") observedResponse = rhyperbin(sampleSize, linkResponse, binomialTrials, phi = 1 - underdispersion)
       else stop("underdispersionModel for binomial must be 'CMB' or 'hypergeometric'")
       if (binomialTrials > 1) observedResponse = cbind(observedResponse1 = observedResponse, observedResponse0 = binomialTrials - observedResponse)
     }
     else if (family$family == "poisson") {
-      if (underdispersion > 0) {
+      if (phi > 1) {
+        if (overdispersionModel != "NB") stop("overdispersionModel for poisson must be 'NB'")
+        observedResponse = rnb_phi(sampleSize, linkResponse, phi = phi)
+      }
+      else if (underdispersion > 0) {
         if (underdispersionModel != "CMP") stop("underdispersionModel for poisson must be 'CMP'")
         observedResponse = rcmp_mu(sampleSize, linkResponse, nu = 1/(1 - underdispersion))
       }
