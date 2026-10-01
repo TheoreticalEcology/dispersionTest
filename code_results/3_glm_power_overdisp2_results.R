@@ -253,8 +253,8 @@ ggplot(sub.pow, aes(x=phi, y=prop.sig, col=test, linetype = calibration)) +
   scale_x_phi() +
   scale_color_manual(values = col.tests[c(4,1,2)], labels = test.labels) +
   facet_grid(model~sampleSize,
-             labeller = as_labeller(c("Binomial"= "Binomial (beta-binomial)",
-                                      "Poisson" = "Poisson (neg. binomial)",
+             labeller = as_labeller(c("Binomial"= "Binomial",
+                                      "Poisson" = "Poisson",
                                       "10" = "n = 10",
                                       "100" = "n = 100",
                                       "1000" = "n = 1000"))) +

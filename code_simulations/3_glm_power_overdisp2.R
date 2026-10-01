@@ -30,6 +30,9 @@ source(here("functions_others", "createData_underdispersion.R"))
 phi <- c(1, 1.1, 1.2, 1.35, 1.5, 1.75, 2, 2.5, 3, 4, 5)
 
 
+#parallel simulation N cores
+ncores <- 30
+
 ####################
 ##### Binomial #####
 ####################
@@ -96,7 +99,7 @@ for (k in sampleSize){
     }
 
     out <- runBenchmarks(calculateStatistics, controlValues = phi,
-                         nRep = 1000, parallel = T, exportGlobal = T)
+                         nRep = 1000, parallel = ncores, exportGlobal = T)
     out.bin[[length(out.bin) + 1]] <- out
   }
 }
@@ -173,7 +176,7 @@ for (k in sampleSize){
     }
 
     out <- runBenchmarks(calculateStatistics, controlValues = phi,
-                         nRep = 1000, parallel = T, exportGlobal = T)
+                         nRep = 1000, parallel = ncores, exportGlobal = T)
     out.pois[[length(out.pois) + 1]] <- out
   }
 }

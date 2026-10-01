@@ -1,0 +1,258 @@
+model,intercept,level,disp,dgp
+Poisson,-1.5,0,0.9983862586191702,Gaussian noise
+Poisson,-1.5,0.1,1.0041343140628445,Gaussian noise
+Poisson,-1.5,0.2,1.0134505491267851,Gaussian noise
+Poisson,-1.5,0.30000000000000004,1.0282884876322742,Gaussian noise
+Poisson,-1.5,0.4,1.0479580196212226,Gaussian noise
+Poisson,-1.5,0.5,1.0818221948374047,Gaussian noise
+Poisson,-1.5,0.6000000000000001,1.1381294236125565,Gaussian noise
+Poisson,-1.5,0.7000000000000001,1.207418759965105,Gaussian noise
+Poisson,-1.5,0.8,1.3220265539155958,Gaussian noise
+Poisson,-1.5,0.9,1.4846930923782562,Gaussian noise
+Poisson,-1.5,1,1.726723800457789,Gaussian noise
+Poisson,-3,0,0.9987483101303498,Gaussian noise
+Poisson,-3,0.1,0.9979150874451775,Gaussian noise
+Poisson,-3,0.2,1.000646530671524,Gaussian noise
+Poisson,-3,0.30000000000000004,1.0040435561177583,Gaussian noise
+Poisson,-3,0.4,1.0061991585338979,Gaussian noise
+Poisson,-3,0.5,1.0159391366571726,Gaussian noise
+Poisson,-3,0.6000000000000001,1.0301631770246136,Gaussian noise
+Poisson,-3,0.7000000000000001,1.0456861286284822,Gaussian noise
+Poisson,-3,0.8,1.071293187796667,Gaussian noise
+Poisson,-3,0.9,1.1065932372401794,Gaussian noise
+Poisson,-3,1,1.1481026478458094,Gaussian noise
+Poisson,0,0,0.9985776370904165,Gaussian noise
+Poisson,0,0.1,1.0109040712189028,Gaussian noise
+Poisson,0,0.2,1.0482484177631304,Gaussian noise
+Poisson,0,0.30000000000000004,1.1163971148398457,Gaussian noise
+Poisson,0,0.4,1.2206791573501776,Gaussian noise
+Poisson,0,0.5,1.378920987006507,Gaussian noise
+Poisson,0,0.6000000000000001,1.6070596899011123,Gaussian noise
+Poisson,0,0.7000000000000001,1.9351785202027327,Gaussian noise
+Poisson,0,0.8,2.4347938433074883,Gaussian noise
+Poisson,0,0.9,3.1742326959790947,Gaussian noise
+Poisson,0,1,4.275940151752131,Gaussian noise
+Poisson,1.5,0,0.998235844767909,Gaussian noise
+Poisson,1.5,0.1,1.0512916897606124,Gaussian noise
+Poisson,1.5,0.2,1.219287715437472,Gaussian noise
+Poisson,1.5,0.30000000000000004,1.5210588391946203,Gaussian noise
+Poisson,1.5,0.4,1.9899101638904717,Gaussian noise
+Poisson,1.5,0.5,2.6899909325908378,Gaussian noise
+Poisson,1.5,0.6000000000000001,3.7142010629844986,Gaussian noise
+Poisson,1.5,0.7000000000000001,5.2122653611660414,Gaussian noise
+Poisson,1.5,0.8,7.470692222173804,Gaussian noise
+Poisson,1.5,0.9,10.824146522556756,Gaussian noise
+Poisson,1.5,1,15.74045821079032,Gaussian noise
+Poisson,3,0,0.9982088703882152,Gaussian noise
+Poisson,3,0.1,1.2345605705558202,Gaussian noise
+Poisson,3,0.2,1.9848405251110242,Gaussian noise
+Poisson,3,0.30000000000000004,3.335291033646044,Gaussian noise
+Poisson,3,0.4,5.429460521859087,Gaussian noise
+Poisson,3,0.5,8.588461420132992,Gaussian noise
+Poisson,3,0.6000000000000001,13.150075009527672,Gaussian noise
+Poisson,3,0.7000000000000001,19.96177489019066,Gaussian noise
+Poisson,3,0.8,29.703500099165122,Gaussian noise
+Poisson,3,0.9,44.95498188727019,Gaussian noise
+Poisson,3,1,67.50363665566087,Gaussian noise
+Binomial,-1.5,0,0.9985485239892731,Gaussian noise
+Binomial,-1.5,0.1,1.0127257152430673,Gaussian noise
+Binomial,-1.5,0.2,1.0539295937122521,Gaussian noise
+Binomial,-1.5,0.30000000000000004,1.1221430809398225,Gaussian noise
+Binomial,-1.5,0.4,1.2146910793521604,Gaussian noise
+Binomial,-1.5,0.5,1.3373062826132947,Gaussian noise
+Binomial,-1.5,0.6000000000000001,1.4757886303101488,Gaussian noise
+Binomial,-1.5,0.7000000000000001,1.645002906737766,Gaussian noise
+Binomial,-1.5,0.8,1.8302139045308317,Gaussian noise
+Binomial,-1.5,0.9,2.0267917863528373,Gaussian noise
+Binomial,-1.5,1,2.2329599293917877,Gaussian noise
+Binomial,-3,0,1.0002875603972619,Gaussian noise
+Binomial,-3,0.1,1.0056795753620162,Gaussian noise
+Binomial,-3,0.2,1.0185886966313438,Gaussian noise
+Binomial,-3,0.30000000000000004,1.0433277610297844,Gaussian noise
+Binomial,-3,0.4,1.0805656291239785,Gaussian noise
+Binomial,-3,0.5,1.1265173043960757,Gaussian noise
+Binomial,-3,0.6000000000000001,1.198328555364841,Gaussian noise
+Binomial,-3,0.7000000000000001,1.283755420482294,Gaussian noise
+Binomial,-3,0.8,1.3881677752084327,Gaussian noise
+Binomial,-3,0.9,1.5159938154882535,Gaussian noise
+Binomial,-3,1,1.6677800441588966,Gaussian noise
+Binomial,0,0,1.0010310747853066,Gaussian noise
+Binomial,0,0.1,1.020393269394951,Gaussian noise
+Binomial,0,0.2,1.0828419559518956,Gaussian noise
+Binomial,0,0.30000000000000004,1.1814792189844314,Gaussian noise
+Binomial,0,0.4,1.3175454527948345,Gaussian noise
+Binomial,0,0.5,1.4770699334182265,Gaussian noise
+Binomial,0,0.6000000000000001,1.6588868521141045,Gaussian noise
+Binomial,0,0.7000000000000001,1.855589601899705,Gaussian noise
+Binomial,0,0.8,2.0720422513252204,Gaussian noise
+Binomial,0,0.9,2.2913492193375222,Gaussian noise
+Binomial,0,1,2.51139302763478,Gaussian noise
+Binomial,1.5,0,1.0024767553548397,Gaussian noise
+Binomial,1.5,0.1,1.0126855381808917,Gaussian noise
+Binomial,1.5,0.2,1.0539254773644284,Gaussian noise
+Binomial,1.5,0.30000000000000004,1.120382497231611,Gaussian noise
+Binomial,1.5,0.4,1.2164739480682896,Gaussian noise
+Binomial,1.5,0.5,1.3386637617797104,Gaussian noise
+Binomial,1.5,0.6000000000000001,1.4788327560248138,Gaussian noise
+Binomial,1.5,0.7000000000000001,1.643704309527498,Gaussian noise
+Binomial,1.5,0.8,1.8241043535510748,Gaussian noise
+Binomial,1.5,0.9,2.0248654448388175,Gaussian noise
+Binomial,1.5,1,2.241220238472369,Gaussian noise
+Binomial,3,0,0.9997419413480647,Gaussian noise
+Binomial,3,0.1,1.004484730158178,Gaussian noise
+Binomial,3,0.2,1.0205996314363166,Gaussian noise
+Binomial,3,0.30000000000000004,1.0438844564921277,Gaussian noise
+Binomial,3,0.4,1.0787942226000165,Gaussian noise
+Binomial,3,0.5,1.1306491295063434,Gaussian noise
+Binomial,3,0.6000000000000001,1.1995641690439005,Gaussian noise
+Binomial,3,0.7000000000000001,1.286929488342579,Gaussian noise
+Binomial,3,0.8,1.386933956492679,Gaussian noise
+Binomial,3,0.9,1.5140883234993678,Gaussian noise
+Binomial,3,1,1.6662441183990273,Gaussian noise
+Poisson,-1.5,1,0.9989457480556289,NB / beta-binomial
+Poisson,-1.5,1.1,1.0965525258841697,NB / beta-binomial
+Poisson,-1.5,1.2,1.194950155869277,NB / beta-binomial
+Poisson,-1.5,1.35,1.3461514166670203,NB / beta-binomial
+Poisson,-1.5,1.5,1.4972438795267395,NB / beta-binomial
+Poisson,-1.5,1.75,1.7373756557039304,NB / beta-binomial
+Poisson,-1.5,2,1.9793154087855143,NB / beta-binomial
+Poisson,-1.5,2.5,2.452734213483252,NB / beta-binomial
+Poisson,-1.5,3,2.931795560311204,NB / beta-binomial
+Poisson,-1.5,4,3.9075109015493696,NB / beta-binomial
+Poisson,-1.5,5,4.797290937940369,NB / beta-binomial
+Poisson,0,1,1.0005870092904692,NB / beta-binomial
+Poisson,0,1.1,1.1004190511403347,NB / beta-binomial
+Poisson,0,1.2,1.1960925678246348,NB / beta-binomial
+Poisson,0,1.35,1.3468664793509972,NB / beta-binomial
+Poisson,0,1.5,1.5000199116768005,NB / beta-binomial
+Poisson,0,1.75,1.750923151849769,NB / beta-binomial
+Poisson,0,2,1.9953168775971182,NB / beta-binomial
+Poisson,0,2.5,2.490822403578677,NB / beta-binomial
+Poisson,0,3,2.9946125727270028,NB / beta-binomial
+Poisson,0,4,3.965320397397957,NB / beta-binomial
+Poisson,0,5,4.948702910675962,NB / beta-binomial
+Poisson,1.5,1,1.0011342919501771,NB / beta-binomial
+Poisson,1.5,1.1,1.1013321758141346,NB / beta-binomial
+Poisson,1.5,1.2,1.1986270484239652,NB / beta-binomial
+Poisson,1.5,1.35,1.3481630941665372,NB / beta-binomial
+Poisson,1.5,1.5,1.4981523123553477,NB / beta-binomial
+Poisson,1.5,1.75,1.7433395022056084,NB / beta-binomial
+Poisson,1.5,2,2.003692260891283,NB / beta-binomial
+Poisson,1.5,2.5,2.4910010466659767,NB / beta-binomial
+Poisson,1.5,3,2.9906505362535096,NB / beta-binomial
+Poisson,1.5,4,3.9990553809536213,NB / beta-binomial
+Poisson,1.5,5,4.968884068579645,NB / beta-binomial
+Poisson,3,1,0.9987192699384834,NB / beta-binomial
+Poisson,3,1.1,1.1024473827652357,NB / beta-binomial
+Poisson,3,1.2,1.1991599547762717,NB / beta-binomial
+Poisson,3,1.35,1.351132024324224,NB / beta-binomial
+Poisson,3,1.5,1.499004802580288,NB / beta-binomial
+Poisson,3,1.75,1.7526019135157314,NB / beta-binomial
+Poisson,3,2,2.0038629767516514,NB / beta-binomial
+Poisson,3,2.5,2.4993382641725423,NB / beta-binomial
+Poisson,3,3,3.001063161650257,NB / beta-binomial
+Poisson,3,4,3.9889379380285805,NB / beta-binomial
+Poisson,3,5,4.991862097114442,NB / beta-binomial
+Binomial,-1.5,1,1.000785512197541,NB / beta-binomial
+Binomial,-1.5,1.1,1.098511821807701,NB / beta-binomial
+Binomial,-1.5,1.2,1.1995665231135049,NB / beta-binomial
+Binomial,-1.5,1.35,1.3478538064569168,NB / beta-binomial
+Binomial,-1.5,1.5,1.497300814963402,NB / beta-binomial
+Binomial,-1.5,1.75,1.7482369792634385,NB / beta-binomial
+Binomial,-1.5,2,1.998411750124048,NB / beta-binomial
+Binomial,-1.5,2.5,2.50729563084036,NB / beta-binomial
+Binomial,-1.5,3,2.999680989041137,NB / beta-binomial
+Binomial,-1.5,4,4.003258345870712,NB / beta-binomial
+Binomial,-1.5,5,5.004198227667087,NB / beta-binomial
+Binomial,0,1,1.0000458955271592,NB / beta-binomial
+Binomial,0,1.1,1.10036059796615,NB / beta-binomial
+Binomial,0,1.2,1.2005756375259953,NB / beta-binomial
+Binomial,0,1.35,1.3480690281108962,NB / beta-binomial
+Binomial,0,1.5,1.4989634217485992,NB / beta-binomial
+Binomial,0,1.75,1.7516656319025543,NB / beta-binomial
+Binomial,0,2,2.0013609069998046,NB / beta-binomial
+Binomial,0,2.5,2.4994691922207237,NB / beta-binomial
+Binomial,0,3,3.0029250181624287,NB / beta-binomial
+Binomial,0,4,4.002818976285298,NB / beta-binomial
+Binomial,0,5,4.999971381648171,NB / beta-binomial
+Binomial,1.5,1,0.9992952597417948,NB / beta-binomial
+Binomial,1.5,1.1,1.0994586647293276,NB / beta-binomial
+Binomial,1.5,1.2,1.2000270570513416,NB / beta-binomial
+Binomial,1.5,1.35,1.352883708028853,NB / beta-binomial
+Binomial,1.5,1.5,1.497606633504855,NB / beta-binomial
+Binomial,1.5,1.75,1.7462643957552544,NB / beta-binomial
+Binomial,1.5,2,1.9994461009626279,NB / beta-binomial
+Binomial,1.5,2.5,2.5072078635768573,NB / beta-binomial
+Binomial,1.5,3,2.9956002569395586,NB / beta-binomial
+Binomial,1.5,4,3.996638939089492,NB / beta-binomial
+Binomial,1.5,5,4.992585879830486,NB / beta-binomial
+Poisson,-1.5,0,0.9993205681473623,CMP / CMB (underdispersion)
+Poisson,-1.5,0.1,0.9834478775100995,CMP / CMB (underdispersion)
+Poisson,-1.5,0.2,0.9659453864036478,CMP / CMB (underdispersion)
+Poisson,-1.5,0.30000000000000004,0.9394791487053182,CMP / CMB (underdispersion)
+Poisson,-1.5,0.4,0.9162814516286808,CMP / CMB (underdispersion)
+Poisson,-1.5,0.5,0.8857109421743038,CMP / CMB (underdispersion)
+Poisson,-1.5,0.6000000000000001,0.8494388479242033,CMP / CMB (underdispersion)
+Poisson,-1.5,0.7000000000000001,0.8058449679881188,CMP / CMB (underdispersion)
+Poisson,-1.5,0.8,0.7637163113528936,CMP / CMB (underdispersion)
+Poisson,-1.5,0.9,0.7390711855513175,CMP / CMB (underdispersion)
+Poisson,0,0,0.9971849857513847,CMP / CMB (underdispersion)
+Poisson,0,0.1,0.9496128316962806,CMP / CMB (underdispersion)
+Poisson,0,0.2,0.8931003628485366,CMP / CMB (underdispersion)
+Poisson,0,0.30000000000000004,0.8319388501656275,CMP / CMB (underdispersion)
+Poisson,0,0.4,0.7601174432679413,CMP / CMB (underdispersion)
+Poisson,0,0.5,0.67985236614734,CMP / CMB (underdispersion)
+Poisson,0,0.6000000000000001,0.5880116078658438,CMP / CMB (underdispersion)
+Poisson,0,0.7000000000000001,0.4808139938927661,CMP / CMB (underdispersion)
+Poisson,0,0.8,0.35968761578624886,CMP / CMB (underdispersion)
+Poisson,0,0.9,0.25382415485708004,CMP / CMB (underdispersion)
+Poisson,1.5,0,1.002663257909889,CMP / CMB (underdispersion)
+Poisson,1.5,0.1,0.9124411605185735,CMP / CMB (underdispersion)
+Poisson,1.5,0.2,0.8267087659794097,CMP / CMB (underdispersion)
+Poisson,1.5,0.30000000000000004,0.7304782482424339,CMP / CMB (underdispersion)
+Poisson,1.5,0.4,0.6364631451596171,CMP / CMB (underdispersion)
+Poisson,1.5,0.5,0.5353578405021945,CMP / CMB (underdispersion)
+Poisson,1.5,0.6000000000000001,0.435694044136798,CMP / CMB (underdispersion)
+Poisson,1.5,0.7000000000000001,0.33023604960180775,CMP / CMB (underdispersion)
+Poisson,1.5,0.8,0.22263650126083195,CMP / CMB (underdispersion)
+Poisson,1.5,0.9,0.11224397357210125,CMP / CMB (underdispersion)
+Poisson,3,0,1.0015131839677416,CMP / CMB (underdispersion)
+Poisson,3,0.1,0.9010638656995276,CMP / CMB (underdispersion)
+Poisson,3,0.2,0.8062520262723883,CMP / CMB (underdispersion)
+Poisson,3,0.30000000000000004,0.705081993338241,CMP / CMB (underdispersion)
+Poisson,3,0.4,0.6070237621881605,CMP / CMB (underdispersion)
+Poisson,3,0.5,0.5074912480783353,CMP / CMB (underdispersion)
+Poisson,3,0.6000000000000001,0.40685652093286556,CMP / CMB (underdispersion)
+Poisson,3,0.7000000000000001,0.30664407000428673,CMP / CMB (underdispersion)
+Poisson,3,0.8,0.20437061973482387,CMP / CMB (underdispersion)
+Poisson,3,0.9,0.1027037248875742,CMP / CMB (underdispersion)
+Binomial,-1.5,0,1.0001546466508002,CMP / CMB (underdispersion)
+Binomial,-1.5,0.1,0.9286072349045243,CMP / CMB (underdispersion)
+Binomial,-1.5,0.2,0.8552100505346093,CMP / CMB (underdispersion)
+Binomial,-1.5,0.30000000000000004,0.7720375120226316,CMP / CMB (underdispersion)
+Binomial,-1.5,0.4,0.6835675460193528,CMP / CMB (underdispersion)
+Binomial,-1.5,0.5,0.5850729163273417,CMP / CMB (underdispersion)
+Binomial,-1.5,0.6000000000000001,0.4819559319719623,CMP / CMB (underdispersion)
+Binomial,-1.5,0.7000000000000001,0.36760638105753235,CMP / CMB (underdispersion)
+Binomial,-1.5,0.8,0.24411983708532106,CMP / CMB (underdispersion)
+Binomial,-1.5,0.9,0.1331911739431977,CMP / CMB (underdispersion)
+Binomial,0,0,1.0016415285704463,CMP / CMB (underdispersion)
+Binomial,0,0.1,0.9125747959161501,CMP / CMB (underdispersion)
+Binomial,0,0.2,0.8191445263909937,CMP / CMB (underdispersion)
+Binomial,0,0.30000000000000004,0.7281891620979136,CMP / CMB (underdispersion)
+Binomial,0,0.4,0.6315084539609468,CMP / CMB (underdispersion)
+Binomial,0,0.5,0.5317413667532183,CMP / CMB (underdispersion)
+Binomial,0,0.6000000000000001,0.43041771341713997,CMP / CMB (underdispersion)
+Binomial,0,0.7000000000000001,0.32645821641261896,CMP / CMB (underdispersion)
+Binomial,0,0.8,0.21956933242533744,CMP / CMB (underdispersion)
+Binomial,0,0.9,0.11062111496620061,CMP / CMB (underdispersion)
+Binomial,1.5,0,1.0004153070004635,CMP / CMB (underdispersion)
+Binomial,1.5,0.1,0.930316683053676,CMP / CMB (underdispersion)
+Binomial,1.5,0.2,0.8537146833179724,CMP / CMB (underdispersion)
+Binomial,1.5,0.30000000000000004,0.7716727742469459,CMP / CMB (underdispersion)
+Binomial,1.5,0.4,0.6837869650951365,CMP / CMB (underdispersion)
+Binomial,1.5,0.5,0.5860717949276832,CMP / CMB (underdispersion)
+Binomial,1.5,0.6000000000000001,0.4816883367930704,CMP / CMB (underdispersion)
+Binomial,1.5,0.7000000000000001,0.3679780507628901,CMP / CMB (underdispersion)
+Binomial,1.5,0.8,0.24424851787020627,CMP / CMB (underdispersion)
+Binomial,1.5,0.9,0.13292980579032906,CMP / CMB (underdispersion)
